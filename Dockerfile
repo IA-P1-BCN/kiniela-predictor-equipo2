@@ -30,8 +30,11 @@ COPY app ./app
 # Promoted model, if any; .dockerignore lets in only the model file and its model card
 COPY models ./models
 
-# Run as an unprivileged user instead of root
-RUN useradd --create-home --uid 1000 appuser
+# Run as an unprivileged user instead of root. data/ is writable for the local SQLite
+# fallback; in production DATABASE_URL points to PostgreSQL and nothing is written here.
+RUN useradd --create-home --uid 1000 appuser \
+    && mkdir -p /app/data \
+    && chown appuser:appuser /app/data
 USER appuser
 
 EXPOSE 8501

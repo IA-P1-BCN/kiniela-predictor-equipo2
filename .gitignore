@@ -35,3 +35,7 @@ CLAUDE.md
 CLAUDE.local.md
 GEMINI.md
 .claude/settings.local.json
+
+# Local SQLite databases (predictions and feedback)
+*.db
+*.sqlite3
