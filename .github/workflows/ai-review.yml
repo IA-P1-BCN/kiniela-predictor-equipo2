@@ -1,0 +1,41 @@
+# Gemini reviews each pull request and leaves a single comment.
+# It never approves or blocks: any failure only logs a warning and the check stays green.
+name: AI review
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ai-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: AI review
+    # Fork PRs get a read-only token, and drafts are reviewed once they are ready
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Review the diff with Gemini
+        run: python .github/scripts/ai_review.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.AI_REVIEW_API_KEY }}
+          GEMINI_MODEL: ${{ vars.AI_REVIEW_MODEL }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
