@@ -10,7 +10,7 @@ Reusable code lives in `src/kiniela/`. Notebooks explore and call that code; the
 
 ## Stack
 
-Versions are declared in `requirements.txt`.
+Versions are declared in `requirements.txt` (runtime: app and model) and `requirements-dev.txt` (runtime plus tests and notebooks).
 
 - Python 3.12, pandas, NumPy
 - scikit-learn, XGBoost, LightGBM
@@ -40,7 +40,7 @@ docs/                  # Spanish docs: backlog, dailies, ai-log/
 
 From the repo root, with the virtualenv active:
 
-- Install: `python -m venv .venv`, then `source .venv/Scripts/activate` (Git Bash) or `.venv\Scripts\Activate.ps1` (PowerShell), then `pip install -r requirements.txt`.
+- Install: `python -m venv .venv`, then `source .venv/Scripts/activate` (Git Bash) or `.venv\Scripts\Activate.ps1` (PowerShell), then `pip install -r requirements-dev.txt`.
 - Tests: `pytest`.
 - App: `streamlit run app/streamlit_app.py` → http://localhost:8501.
 - Docker: `docker build -t kiniela-predictor .` and `docker run --rm -p 8501:8501 kiniela-predictor`.
@@ -105,7 +105,14 @@ PRs are merged with **Squash and merge**. The PR title becomes the commit on `de
 - Documentation (`docs/`, README) and the board in **Spanish**.
 - Commits: [Conventional Commits](https://www.conventionalcommits.org/) with a scope, for example `feat(app): ...`, `fix(data): ...`, `test(models): ...`, `docs: ...`, `refactor: ...`, `chore: ...`.
 - The first commits of the repo are in Spanish and stay as they are: the history is not rewritten. The convention applies from this file onwards.
-- Dependencies: add them to `requirements.txt` with a minimum version, and only when the issue needs them.
+- Dependencies: add them with a minimum version, and only when the issue needs them. `requirements.txt` only if the app needs them to predict, otherwise `requirements-dev.txt`.
+
+## AI assistant setup
+
+Cursor, GitHub Copilot and Codex read this file automatically. Other tools need a personal file at the repo root that points here; these files are in `.gitignore`, so each person keeps their own:
+
+- Claude Code: `CLAUDE.md` with the line `@AGENTS.md`, plus any personal instructions.
+- Gemini CLI: `GEMINI.md` with the line `@AGENTS.md`.
 
 ## AI log (one file per person)
 

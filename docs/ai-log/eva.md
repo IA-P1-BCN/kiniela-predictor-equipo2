@@ -60,3 +60,33 @@
   - Con `gemini-flash-latest`, Gemini respondió 503 en cada intento, también tras el reintento. Se resolvió fijando `gemini-2.5-flash`.
   - El agente no sabía que Mariana había subido `tests.yml` directamente a `dev` mientras se preparaba el PR #22. Lo vio al actualizar `dev` en local y comprobar que había dos checks `Tests`.
 - **Revisión humana:** Eva, en este PR. Punto a mirar: que después de fusionarlo solo quede un check `Tests` por PR.
+
+### #10 Dockerización y separación de requirements
+
+- **Fecha:** 2026-11-10
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «que nos toca a nosotros, instalaciones docker etc? siguiente tarea», y después «dime que me recomiendas» sobre cómo meter el modelo en la imagen y si separar los requirements.
+- **Qué generó el agente:**
+  - El `.venv` con Python 3.12.13, la rama `10-dockerize-app` desde la issue y la #10 en «En curso».
+  - Un `Dockerfile` nuevo:
+    - instala `libgomp1`, que LightGBM necesita;
+    - ejecuta la app con un usuario sin privilegios;
+    - tiene un `HEALTHCHECK` contra `/_stcore/health` sin curl;
+    - usa el puerto de `$PORT` (por defecto 8501) con `exec`, para que `docker stop` llegue a Streamlit;
+    - copia de `models/` solo el modelo promocionado y su ficha.
+  - Un `.dockerignore` ampliado: secretos, cachés, archivos personales de las IAs y, de `models/`, solo `kiniela_model.joblib` y `model_card.json`.
+  - `requirements.txt` (lo que necesita la app para predecir) separado de `requirements-dev.txt` (lo anterior más pytest, matplotlib, seaborn e ipykernel). La CI instala el segundo.
+  - El README (instalación y Docker), `AGENTS.md` (comandos, dónde va cada dependencia y cómo conecta cada IA con `AGENTS.md`) y `.gitignore` (`CLAUDE.md`, `GEMINI.md` y los ajustes locales son personales).
+- **Aceptado:**
+  - Separar los requirements: la imagen solo lleva lo necesario para predecir, como pide el briefing («un requirements.txt limpio»).
+  - Para el despliegue (#12), versionar en git solo el modelo final y su `model_card.json`, sin volúmenes ni descargas. Queda por acordar con Cala, que genera el artefacto.
+  - Quitar de la imagen las librerías NVIDIA NCCL que instala XGBoost para entrenar con varias GPU: la app predice con CPU. La imagen baja de 1,89 GB a 1,23 GB, y XGBoost y LightGBM siguen funcionando.
+  - Cada persona tiene su `CLAUDE.md` o `GEMINI.md` fuera de git, con `@AGENTS.md` para cargar las reglas comunes.
+- **Rechazado o cambiado, y por qué:**
+  - Instalar `jupyter` completo: basta `ipykernel`, que es lo que usa VS Code para los notebooks.
+  - Cambiar a `xgboost-cpu` en `requirements.txt`: afectaría al entorno de todo el equipo y no tiene versión para macOS. El recorte se hace solo dentro de la imagen.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - El primer `CMD` en forma shell provocaba el aviso `JSONArgsRecommended`: Streamlit no recibía la señal de parada. Se cambió a `["sh", "-c", "exec …"]`, que mantiene `$PORT`.
+  - El primer intento de quitar NCCL desinstalaba `nvidia-nccl-cu12`, pero el paquete instalado era `cu13`. `pip uninstall` no da error si el paquete no existe, así que la imagen seguía igual. Se detectó porque el tamaño no bajó al revisar las capas con `docker history`, y se cambió por un filtro que encuentra cualquier `nvidia-nccl-*`.
+- **Pruebas:** `docker build` sin avisos. `docker run` responde 200 y sale `healthy`, también con `PORT=8080`. El usuario es `appuser`, en la imagen no hay `.env`, datos, tests ni pytest, y `docker stop` tarda menos de 1 s. `pytest` pasa en local.
+- **Revisión humana:** pendiente en el PR.

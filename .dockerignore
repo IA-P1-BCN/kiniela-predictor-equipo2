@@ -1,16 +1,41 @@
+# Version control and CI
 .git
 .github
+.gitignore
+
+# Local environments and caches
 .venv
 venv
+env
 __pycache__
+*.py[cod]
 .pytest_cache
+.mypy_cache
+.ruff_cache
 .ipynb_checkpoints
 .DS_Store
+
+# Secrets: never baked into the image, passed at runtime with -e or --env-file
 .env
 .env.*
+
+# AI assistants' local settings
+.claude
+CLAUDE.md
+CLAUDE.local.md
+GEMINI.md
+
+# Not needed to run the app
 data/raw
 data/processed
-models
 tests
 notebooks
 docs
+Dockerfile
+.dockerignore
+
+# Only the promoted model and its metadata go into the image
+models/*
+!models/.gitkeep
+!models/kiniela_model.joblib
+!models/model_card.json

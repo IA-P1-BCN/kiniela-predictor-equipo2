@@ -29,3 +29,9 @@ models/*
 dist/
 build/
 *.egg-info/
+
+# Personal AI assistant settings: each person keeps their own, never versioned
+CLAUDE.md
+CLAUDE.local.md
+GEMINI.md
+.claude/settings.local.json
