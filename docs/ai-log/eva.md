@@ -90,3 +90,30 @@
   - El primer intento de quitar NCCL desinstalaba `nvidia-nccl-cu12`, pero el paquete instalado era `cu13`. `pip uninstall` no da error si el paquete no existe, así que la imagen seguía igual. Se detectó porque el tamaño no bajó al revisar las capas con `docker history`, y se cambió por un filtro que encuentra cualquier `nvidia-nccl-*`.
 - **Pruebas:** `docker build` sin avisos. `docker run` responde 200 y sale `healthy`, también con `PORT=8080`. El usuario es `appuser`, en la imagen no hay `.env`, datos, tests ni pytest, y `docker stop` tarda menos de 1 s. `pytest` pasa en local.
 - **Revisión humana:** pendiente en el PR.
+
+### #11 Base de datos de predicciones y feedback
+
+- **Fecha:** 2026-11-10
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «ok» a empezar la #11. El agente propuso el diseño y preguntó dos decisiones: la librería y la base de datos de producción.
+- **Qué generó el agente:**
+  - `src/kiniela/storage/`:
+    - conexión con `DATABASE_URL` (SQLite por defecto, PostgreSQL en Neon en producción);
+    - las tablas `predictions` y `feedback`;
+    - las funciones `save_prediction`, `save_feedback`, `list_history` y `feedback_stats`, esta última con el acierto por versión de modelo para las métricas en tiempo real.
+  - 24 tests nuevos con SQLite temporal (30 en total).
+  - `docs/database.md` con el esquema, el porqué de cada columna y consultas útiles; `.env.example`; README y `AGENTS.md`.
+  - En la imagen Docker, una carpeta `data/` escribible por `appuser`.
+- **Aceptado:**
+  - SQLAlchemy 2 y PostgreSQL en Neon (decisiones de Eva): el mismo código sirve en local y en producción, y la base de datos gratuita de Neon no caduca, a diferencia de la de Render (30 días).
+  - Las probabilidades en 6 columnas (se agregan en SQL) y las entradas en JSON (las features de la #3 pueden cambiar sin tocar la tabla).
+  - `model_version` en cada predicción, para el A/B testing y la #16.
+  - `predicted_class` se calcula a partir de las probabilidades con la misma función que usa la app (`predicted_class`), sin duplicar la validación.
+  - Un feedback por predicción, y `actual_class` tiene que cuadrar con `is_correct`.
+  - Las funciones del repositorio no confirman la transacción: lo hace `session_scope`, que deshace todo si algo falla.
+- **Rechazado o cambiado, y por qué:**
+  - `sqlite3` de la librería estándar: solo vale para SQLite, y en Render gratis el archivo se borra en cada despliegue.
+  - La base de datos de Render (caduca) y MongoDB (cambiaría el diseño).
+  - Migraciones con Alembic: de momento `init_db` crea las tablas. Se añadirán si el esquema cambia.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno en esta tarea. Como los tests usan SQLite, el agente probó también contra un PostgreSQL 17 real en Docker: el driver psycopg, el JSON, las fechas en UTC y el rechazo de clases fuera de rango y de feedback sin predicción.
+- **Revisión humana:** pendiente en el PR.

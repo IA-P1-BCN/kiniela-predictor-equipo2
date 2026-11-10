@@ -7,3 +7,6 @@ xgboost>=2.1
 lightgbm>=4.5
 streamlit>=1.40
 joblib>=1.4
+# Predictions and feedback storage: SQLite locally, PostgreSQL (Neon) in production
+sqlalchemy>=2.0
+psycopg[binary]>=3.2

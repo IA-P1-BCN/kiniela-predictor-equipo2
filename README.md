@@ -52,6 +52,7 @@ src/kiniela/                  Código reutilizable
   features/                   Feature engineering
   models/                     Entrenamiento y predicción
   monitoring/                 Data drift
+  storage/                    Predicciones y feedback (base de datos)
 notebooks/                    EDA, features y modelado
 data/raw/                     Datos de origen (no se versionan)
 data/processed/               Dataset de modelado (no se versiona)
@@ -104,6 +105,15 @@ Detalles de la imagen:
 - No incluye `.env`, datos, notebooks, tests ni entornos virtuales (ver `.dockerignore`). Los secretos se pasan al arrancar, con `-e` o `--env-file .env`.
 - De `models/` solo entran el modelo promocionado (`kiniela_model.joblib`) y su ficha (`model_card.json`), si existen.
 
+## Base de datos
+
+La app guarda cada predicción y el feedback de la persona usuaria.
+
+- **En local** no hay que configurar nada: se usa SQLite en `data/kiniela.db`.
+- **En producción** se usa PostgreSQL en Neon, con la variable `DATABASE_URL`. Las variables necesarias están en `.env.example`, sin valores reales.
+
+El esquema y las métricas en tiempo real están en [docs/database.md](docs/database.md).
+
 ## Tests
 
 ```bash
@@ -117,4 +127,5 @@ Hoy cubren el catálogo de clases, la validación de goles y la elección de la 
 - [Issues](docs/ISSUES.md)
 - [Asignación de tareas](docs/ASIGNACION_TAREAS.md)
 - [Plantilla de daily](docs/DAILY_TEMPLATE.md)
+- [Base de datos](docs/database.md)
 - Plantilla de GitHub: `.github/ISSUE_TEMPLATE/tarea.md`
