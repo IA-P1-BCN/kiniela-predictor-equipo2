@@ -12,12 +12,12 @@ jobs:
   cerrar:
     if: >
       github.event.review.state == 'approved' &&
-      github.event.review.user.login == 'marianamarinflor622' &&
+      github.event.review.user.login == 'miskybox' &&
       github.event.pull_request.base.ref == 'main' &&
       github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-      - name: Fusionar cuando aprueba la Product Owner
+      - name: Fusionar cuando aprueba Eva
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.number }}
