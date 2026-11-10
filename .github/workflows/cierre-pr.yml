@@ -1,0 +1,24 @@
+name: Cierre automático de pull requests
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  cerrar:
+    if: >
+      github.event.review.state == 'approved' &&
+      github.event.review.user.login == 'marianamarinflor622' &&
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fusionar cuando aprueba la Product Owner
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr merge "$PR" --repo "${{ github.repository }}" --squash --auto --delete-branch
