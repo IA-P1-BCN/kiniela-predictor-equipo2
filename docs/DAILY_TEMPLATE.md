@@ -1,8 +1,8 @@
 # Daily — Kiniela Predictor, Equipo 2
 
 **Fecha**:  
-**Facilita**: Anna  
-**Asisten**: Anna, Cala, Eva, Mariana
+**Facilita**: carla
+**Asisten**: Anna, Carla, Eva, Mariana
 
 ## Ayer
 
