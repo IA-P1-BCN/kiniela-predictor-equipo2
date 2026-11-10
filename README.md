@@ -64,11 +64,20 @@ docs/                         Backlog, tareas y dailies
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+source .venv/bin/activate          # Windows (Git Bash): source .venv/Scripts/activate
+pip install -r requirements-dev.txt
 pytest
 streamlit run app/streamlit_app.py
 ```
+
+Las dependencias están en dos archivos:
+
+| Archivo | Contenido | Quién lo usa |
+| --- | --- | --- |
+| `requirements.txt` | Lo que necesitan la app y el modelo para predecir | La imagen Docker y el despliegue |
+| `requirements-dev.txt` | Lo anterior, más pytest, matplotlib, seaborn e ipykernel | Desarrollo local, notebooks y CI |
+
+Una librería nueva va en `requirements.txt` solo si la app la necesita para predecir. Si no, va en `requirements-dev.txt`.
 
 La pantalla abre las seis clases. El botón de predicción permanece desactivado hasta que haya un modelo en `models/`.
 
@@ -76,10 +85,24 @@ La pantalla abre las seis clases. El botón de predicción permanece desactivado
 
 ```bash
 docker build -t kiniela-predictor .
-docker run --rm -p 8501:8501 kiniela-predictor
+docker run --rm -p 8501:8501 --name kiniela kiniela-predictor
 ```
 
 La app queda en http://localhost:8501.
+
+| Comando | Para qué |
+| --- | --- |
+| `docker ps` | Ver si el contenedor está en marcha y si el healthcheck lo marca como `healthy` |
+| `docker logs -f kiniela` | Ver los logs de la app |
+| `docker stop kiniela` | Pararlo |
+| `docker run --rm -p 8080:8080 -e PORT=8080 kiniela-predictor` | Cambiar el puerto, como hacen los servicios en la nube |
+
+Detalles de la imagen:
+
+- Parte de `python:3.12-slim` e instala solo `requirements.txt`.
+- La app se ejecuta con un usuario sin privilegios, no como root.
+- No incluye `.env`, datos, notebooks, tests ni entornos virtuales (ver `.dockerignore`). Los secretos se pasan al arrancar, con `-e` o `--env-file .env`.
+- De `models/` solo entran el modelo promocionado (`kiniela_model.joblib`) y su ficha (`model_card.json`), si existen.
 
 ## Tests
 
