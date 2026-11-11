@@ -1,92 +1,108 @@
-# 📘 Bitácora de IA - Anna
+# 📘 Bitácora Final - Anna (Tarea #1 y #2)
 
 **Rama:** `bionic/tarea-1-y-2-datos-reales-y-target`  
-**Fecha:** 2026-11-11
+**Fecha:** 2026-11-11  
+**Estado:** ✅ Ambas tareas completadas
 
 ---
 
-## ✅ Tarea #1 Completada: Datos Reales
+## 🎯 Resumen de Trabajos Completados
 
-### Cambios Implementados:
+### ✅ PR #1 - Datos Reales (commit `f705f45`)
+**Título:** `feat(data): download and clean real Premier League matches`  
+**Closes:** #1  
 
-#### 📊 Dataset Real de Premier League
-- **Fuente:** `https://www.football-data.co.uk/mmz4281/2324/E0.csv`
-- **Temporada:** 2324 (2023-24)
-- **Partidos descargados:** 380 partidos reales
-- **Guardado en:** `data/processed/premier_league_2023_24.csv`
+#### Cambios:
+- **`src/kiniela/data/dataset.py`** (+58 líneas netas)
+  - ✅ Nueva función `download_premier_league_data()` con API real de football-data.co.uk
+  - ✅ Temporada 2324 (2023-24) con 380 partidos reales
+  - ✅ Limpieza: elimina NaN, duplicados y normaliza nombres de equipos
+  - ✅ Distribución: H=46.1%, A=32.4%, D=21.6%
 
-#### 🔄 Archivo Actualizado:
-- **`src/kiniela/data/dataset.py`** (+58 líneas)
-  - ✅ Nueva función `download_premier_league_data()` que descarga desde API real
-  - ✅ Limpieza de datos: elimina NaN, duplicados
-  - ✅ Normalización de nombres de equipos (minúsculas, sin apóstrofes)
-  - ✅ Mantiene función `load_matches()` para compatibilidad
-
----
-
-## 🎯 Tarea #2 Completada: Target con Umbral Ajustado
-
-### Cambios Implementados:
-
-#### 🎯 Lógica de Clasificación 6 Clases
-- **Umbral:** Diferencia ≥ 2 para victoria clara (ajustado según feedback del equipo)
-- **Precedencia absoluta:** Clase 5 (4+ goles totales) anula resultado local/visitante
-- **Clases:**
-  - 0: Local gana con diferencia ≥ 2
-  - 1: Local gana con diferencia = 1
-  - 2: Empate
-  - 3: Visitante gana con diferencia = 1
-  - 4: Visitante gana con diferencia ≥ 2
-  - 5: 4+ goles totales (precedencia absoluta)
-
-#### 🔄 Archivos Actualizados:
-1. **`src/kiniela/data/target.py`** (+74 líneas)
-   - ✅ Implementación completa de `build_target()` con umbral >= 2
-   - ✅ Documentación detallada de la regla y distribución esperada
-   
-2. **`tests/test_target.py`** (+86 líneas, sin duplicados)
-   - ✅ 19 tests que cubren todos los casos (sin duplicados)
-   - ✅ Casos límite: 1-0, 2-0, 2-2, 4-0
-   - ✅ Validación de precedencia clase 5
-
-#### ✅ Tests Pasan: 19/19
+- **`data/processed/premier_league_2023_24.csv`** (nuevo archivo)
+  - ✅ Columnas principales: HomeTeam, AwayTeam, FTHG, FTAG, FTR
+  - ✅ Y muchas columnas adicionales para features futuras
 
 ---
 
-## 📝 Próximos Pasos
+### ✅ PR #2 - Target con Umbral Ajustado (commit `f99d733`)
+**Título:** `feat(data): add 6-class target labelling with difference threshold >= 2`  
+**Closes:** #2  
 
-### Crear dos PRs separados a `dev`:
+#### Cambios:
+- **`src/kiniela/data/target.py`** (+58 líneas netas)
+  - ✅ Implementación de `build_target()` con umbral diferencia ≥ 2
+  - ✅ Precedencia absoluta de clase 5 (4+ goles totales)
+  - ✅ Distribución esperada: Clase 5 ~44%, Clase 0 ~11%, Clase 4 ~7%
 
-#### PR #1 - Datos Reales ✅ COMPLETADO
-- **Rama actual:** `bionic/tarea-1-y-2-datos-reales-y-target`  
-- **Cambios:** dataset.py, premier_league_2023_24.csv
-- **Título:** `feat(data): download and clean real Premier League matches`
-- **Closes:** #1
+- **`tests/test_target.py`** (+65 líneas netas, sin duplicados)
+  - ✅ 18 tests que cubren todos los casos (sin duplicados)
+  - ✅ Casos límite: 1-0, 2-0, 2-2, 4-0
+  - ✅ Validación de precedencia clase 5
 
-#### PR #2 - Target con Umbral >= 2 ⏳ PENDIENTE
-- **Cambios:** target.py, test_target.py  
-- **Título:** `feat(data): add 6-class target labelling with difference threshold >= 2`
-- **Closes:** #2
+- **`docs/ai-log/anna.md`** (bitácora de progreso)
 
----
-
-## 📊 Estadísticas del Dataset Real
-
-| Métrica | Valor |
-|---------|-------|
-| Partidos totales | 380 |
-| Ventanas locales (H) | 175 (46.1%) |
-| Visitante gana (A) | 123 (32.4%) |
-| Empate (D) | 82 (21.6%) |
-
-**Columnas disponibles:** HomeTeam, AwayTeam, FTHG, FTAG, FTR  
-*(y muchas columnas adicionales para features futuras)*
+#### Tests Pasan: 18/18 ✅
 
 ---
 
-## 🔬 Observaciones Clave
+## 📊 Estadísticas Finales
 
-✅ **Datos reales vs simulados:** Los datos muestran ventaja local real y distribución natural de goles.  
-✅ **Tamaño suficiente:** 380 partidos es un buen conjunto inicial para entrenar el modelo.  
-✅ **Columnas extra:** Dispondremos de tiros, córners y cuotas para features adicionales.  
-✅ **Umbral optimizado:** Con umbral >= 2, las clases raras son más frecuentes que con >= 3, facilitando el aprendizaje del modelo.
+| Tarea | Estado | Commit | Archivos |
+|-------|--------|--------|----------|
+| **#1 Datos reales** | ✅ Completado | f705f45 | dataset.py, premier_league_2023_24.csv |
+| **#2 Target ajustado** | ✅ Completado | f99d733 | target.py, test_target.py |
+
+---
+
+## 📈 Regla Final de Clasificación 6 Clases
+
+```python
+build_target(home_goals, away_goals) -> int:
+    # Prioridad 1: Clase 5 (4+ goles totales) - precedencia absoluta
+    if home_goals + away_goals >= 4:
+        return 5
+    
+    # Prioridad 2: Diferencia ≥ 2
+    diff = home_goals - away_goals
+    if diff >= 2:
+        return 0  # Victoria local clara
+    elif diff <= -2:
+        return 4  # Victoria visitante clara
+    
+    # Prioridad 3: Resultados ajustados (diferencia < 2)
+    if home_goals > away_goals:
+        return 1  # Local gana ajustado
+    elif away_goals > home_goals:
+        return 3  # Visitante gana ajustado
+    else:
+        return 2  # Empate
+```
+
+---
+
+## 🎯 Observaciones Clave
+
+✅ **Datos reales:** Los datos de Premier League muestran ventaja local real (46.1% vs 32.4%).  
+✅ **Umbral optimizado:** Con umbral >= 2, las clases raras son más frecuentes que con >= 3.  
+✅ **Tests robustos:** 18 tests cubren todos los casos incluyendo límites críticos.  
+✅ **Precedencia clara:** Clase 5 (4+ goles) anula siempre el resultado local/visitante/empate.
+
+---
+
+## 🚀 Próximos Pasos Sugeridos
+
+### Opción A: Crear dos PRs separados a `dev`
+1. Crear PR #1 desde `bionic/tarea-1-y-2-datos-reales-y-target` → `dev`
+   - Archivos: dataset.py, premier_league_2023_24.csv
+2. Crear PR #2 desde `bionic/tarea-1-y-2-datos-reales-y-target` → `dev`  
+   - Archivos: target.py, test_target.py
+
+### Opción B: Unificar en un solo commit
+- Mantener ambos cambios en la rama actual hasta que sea necesario separarlos.
+
+---
+
+**Hecho por:** Anna  
+**Fecha:** 2026-11-11  
+**Rama actual:** `bionic/tarea-1-y-2-datos-reales-y-target`
