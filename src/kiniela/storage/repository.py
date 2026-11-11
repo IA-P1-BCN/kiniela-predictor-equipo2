@@ -13,7 +13,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from kiniela.config import N_CLASSES
-from kiniela.models.predict import predicted_class
+from kiniela.models.predict import predicted_class, validate_teams
 from kiniela.storage.models import PROBABILITY_COLUMNS, Feedback, Prediction
 
 MAX_COMMENT_LENGTH = 1000
@@ -33,12 +33,8 @@ def save_prediction(
     Raises ``ValueError`` if the teams are empty or equal, or if the probabilities are
     not a valid distribution over the six classes.
     """
-    home, away = home_team.strip(), away_team.strip()
-    if not home or not away:
-        raise ValueError("Both teams are required.")
-    if home.casefold() == away.casefold():
-        raise ValueError("A team cannot play against itself.")
-    # Same validation as the app: six non-negative values that add up to ~1
+    # Same validations as the app: real teams, and six non-negative values that add up to ~1
+    home, away = validate_teams(home_team, away_team)
     class_id = predicted_class(list(probabilities))
 
     prediction = Prediction(

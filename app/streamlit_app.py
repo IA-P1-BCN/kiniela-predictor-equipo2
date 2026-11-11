@@ -1,32 +1,25 @@
+"""Kiniela Predictor: Streamlit entry point.
+
+Run with: streamlit run app/streamlit_app.py
+"""
+
 import sys
 from pathlib import Path
 
 import streamlit as st
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src"))
-
-from kiniela.config import CLASS_NAMES  # noqa: E402
+APP_DIR = Path(__file__).resolve().parent
+# Reusable code lives in src/; app modules (resources, views) live next to this file
+for path in (APP_DIR.parent / "src", APP_DIR):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
 
 st.set_page_config(page_title="Kiniela Predictor", page_icon="⚽", layout="centered")
 
-st.title("Kiniela Predictor")
-st.caption("Equipo 2 · clasificación del tipo de resultado")
-
-st.info(
-    "La aplicación todavía no predice: no hay modelo entrenado ni dataset en el repositorio. "
-    "Cuando exista un artefacto en models/, esta pantalla mostrará la clase y las seis probabilidades."
+navigation = st.navigation(
+    [
+        st.Page(APP_DIR / "views" / "predict.py", title="Predecir", icon="⚽", default=True),
+        st.Page(APP_DIR / "views" / "history.py", title="Historial", icon="📊"),
+    ]
 )
-
-st.subheader("Clases")
-for class_id, name in CLASS_NAMES.items():
-    st.write(f"**{class_id}.** {name}")
-
-st.subheader("Partido")
-col_home, col_away = st.columns(2)
-with col_home:
-    st.text_input("Equipo local", placeholder="Nombre del local")
-with col_away:
-    st.text_input("Equipo visitante", placeholder="Nombre del visitante")
-
-st.button("Predecir", disabled=True, help="Se activa cuando haya un modelo en models/.")
+navigation.run()
