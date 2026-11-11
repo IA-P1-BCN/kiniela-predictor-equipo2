@@ -89,7 +89,7 @@
   - El primer `CMD` en forma shell provocaba el aviso `JSONArgsRecommended`: Streamlit no recibía la señal de parada. Se cambió a `["sh", "-c", "exec …"]`, que mantiene `$PORT`.
   - El primer intento de quitar NCCL desinstalaba `nvidia-nccl-cu12`, pero el paquete instalado era `cu13`. `pip uninstall` no da error si el paquete no existe, así que la imagen seguía igual. Se detectó porque el tamaño no bajó al revisar las capas con `docker history`, y se cambió por un filtro que encuentra cualquier `nvidia-nccl-*`.
 - **Pruebas:** `docker build` sin avisos. `docker run` responde 200 y sale `healthy`, también con `PORT=8080`. El usuario es `appuser`, en la imagen no hay `.env`, datos, tests ni pytest, y `docker stop` tarda menos de 1 s. `pytest` pasa en local.
-- **Revisión humana:** pendiente en el PR.
+- **Revisión humana:** Eva fusionó el PR #24 con `Tests` y la revisión de IA en verde. Gemini señaló como problema que `COPY app` iba antes que `COPY src`, y era al revés: una alucinación que no se aplicó. Ejemplo de por qué su revisión solo orienta.
 
 ### #11 Base de datos de predicciones y feedback
 
@@ -115,5 +115,42 @@
   - `sqlite3` de la librería estándar: solo vale para SQLite, y en Render gratis el archivo se borra en cada despliegue.
   - La base de datos de Render (caduca) y MongoDB (cambiaría el diseño).
   - Migraciones con Alembic: de momento `init_db` crea las tablas. Se añadirán si el esquema cambia.
-- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno en esta tarea. Como los tests usan SQLite, el agente probó también contra un PostgreSQL 17 real en Docker: el driver psycopg, el JSON, las fechas en UTC y el rechazo de clases fuera de rango y de feedback sin predicción.
-- **Revisión humana:** pendiente en el PR.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - En el código, ninguno. Como los tests usan SQLite, el agente probó también contra un PostgreSQL 17 real en Docker: el driver psycopg, el JSON, las fechas en UTC y el rechazo de clases fuera de rango y de feedback sin predicción.
+  - En el proceso: el PR #25 decía `Refs #11` para dejar la issue abierta hasta tener la interfaz, pero la #11 se cerró sola al fusionar. La rama se había creado con `gh issue develop`, que la enlaza a la issue, y GitHub cierra la issue enlazada al fusionar en la rama por defecto aunque no haya `Closes`. Se reabrió con un comentario. Para trabajo parcial hay que usar una rama sin enlazar.
+- **Revisión humana:** Eva fusionó el PR #25 con `Tests` y la revisión de IA en verde. Las sugerencias de Gemini no se aplicaron: el `chown` de `data/` en la imagen no puede fallar porque `appuser` se crea en esa misma capa, y pasar las probabilidades a `Numeric` no aporta nada.
+
+### #9 Aplicación Streamlit (cierra también la #11)
+
+- **Fecha:** 2026-11-11
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «ok» a empezar la #9. El agente propuso el diseño y preguntó dos decisiones: qué modelo de prueba usar sin modelo entrenado y de dónde sacar los equipos.
+- **Qué generó el agente:**
+  - La app con dos páginas (`st.navigation`):
+    - **Predecir:** equipos o partido de ejemplo, la clase predicha con su nombre, una tabla con las 6 probabilidades, el guardado en la base de datos y el formulario de feedback (acertó o falló, la clase real y un comentario).
+    - **Historial:** las últimas 50 predicciones con su feedback, y el acierto en tiempo real del modelo actual y de todos.
+  - En `src/`:
+    - el contrato `Predictor` (`version` + `predict(home, away)` → 6 probabilidades);
+    - `ReferencePredictor`, el modelo de prueba con las frecuencias de clase;
+    - `load_predictor()`, que usa `models/kiniela_model.joblib` si existe;
+    - `validate_teams()`, compartida por la app y la base de datos;
+    - `kiniela/data/catalog.py`, con los equipos y los targets del dataset, y valores de respaldo si no hay datos.
+  - 46 tests nuevos (76 en total). Los de la app usan `AppTest` de Streamlit, sin navegador: predicción, entradas inválidas, feedback e historial.
+  - `docs/model-contract.md` para quien entregue el modelo, más README y `AGENTS.md`.
+- **Aceptado:**
+  - Modelo de prueba con frecuencias de clase (decisión de Eva): es honesto, la app lo avisa en pantalla y no invade el trabajo de modelado.
+  - Equipos sacados del dataset procesado, con la lista de la Premier 2023-24 como respaldo (decisión de Eva). Dentro de Docker no hay `data/`, y la app tiene que funcionar igual.
+  - La app solo conoce el contrato `Predictor`. Cuando Cala entregue el modelo, la app no se toca.
+  - La validación de equipos sale de `src/` y se usa en la app y en la base de datos, sin duplicarla. La app traduce los mensajes al español.
+  - Si la base de datos falla, la predicción se muestra igualmente, con un aviso.
+- **Rechazado o cambiado, y por qué:**
+  - Un modelo de Poisson como modelo de prueba: queda mejor en una demo, pero es trabajo de modelado (#5–#8).
+  - Equipos en texto libre: los errores de escritura no los reconocería el modelo real.
+  - Hacer una página nueva para el feedback de partidos antiguos: de momento el feedback se da justo después de predecir.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - Los tests de la app fallaban porque `AppTest.from_file` busca las rutas relativas desde el archivo del test, no desde la raíz. Se pasó una ruta absoluta.
+  - Tres tests fallaban porque, con una entrada inválida, la app no llega a abrir la base de datos y las tablas no existían cuando el test las leía. El fallo estaba en el test, no en la app, y se corrigió creando las tablas en el helper del test.
+  - El agente usó `use_container_width`, que en local no avisaba. Dentro de Docker, Streamlit avisó de que se retira después del 31/12/2025, una fecha ya pasada. Se cambió a `width="stretch"` y se subió el mínimo a `streamlit>=1.50`.
+  - Un heredoc de bash con comillas en el contenido falló al escribir los tests. Se escribieron con el editor, sin pasar por el shell.
+- **Pruebas:** `pytest` (76 tests). La app arrancada en local responde 200. Dentro de la imagen Docker, sin `data/`, salen los 20 equipos de respaldo y se ejecuta el flujo completo con `AppTest`: predicción e historial, sin errores ni avisos.
+- **Revisión humana:** pendiente en el PR. Puntos a mirar: el aspecto de la app en el navegador y que los textos sean claros para alguien que no sabe de ML.

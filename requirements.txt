@@ -5,7 +5,7 @@ numpy>=1.26
 scikit-learn>=1.5
 xgboost>=2.1
 lightgbm>=4.5
-streamlit>=1.40
+streamlit>=1.50
 joblib>=1.4
 # Predictions and feedback storage: SQLite locally, PostgreSQL (Neon) in production
 sqlalchemy>=2.0

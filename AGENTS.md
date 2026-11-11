@@ -21,7 +21,10 @@ Versions are declared in `requirements.txt` (runtime: app and model) and `requir
 ## Structure
 
 ```
-app/streamlit_app.py   # Streamlit app
+app/
+├── streamlit_app.py   # entry point and navigation
+├── resources.py       # cached model, database engine and teams; UI formatting
+└── views/             # pages: predict, history (UI only, logic lives in src/)
 src/kiniela/
 ├── config.py          # classes, N_CLASSES, RANDOM_STATE
 ├── data/              # loading and target labelling

@@ -45,7 +45,10 @@ La red neuronal se añade en la issue correspondiente, cuando el baseline ya sea
 ## Estructura
 
 ```text
-app/streamlit_app.py          Aplicación
+app/                          Aplicación Streamlit
+  streamlit_app.py            Entrada y navegación
+  resources.py                Modelo, base de datos y equipos (en caché)
+  views/                      Páginas: predecir e historial
 src/kiniela/                  Código reutilizable
   config.py                   Clases y semilla
   data/                       Carga y variable objetivo
@@ -80,7 +83,23 @@ Las dependencias están en dos archivos:
 
 Una librería nueva va en `requirements.txt` solo si la app la necesita para predecir. Si no, va en `requirements-dev.txt`.
 
-La pantalla abre las seis clases. El botón de predicción permanece desactivado hasta que haya un modelo en `models/`.
+## Aplicación
+
+```bash
+streamlit run app/streamlit_app.py
+```
+
+Se abre en http://localhost:8501 y tiene dos páginas:
+
+| Página | Qué hace |
+| --- | --- |
+| **Predecir** | Eliges el equipo local y el visitante (o un partido de ejemplo), y la app muestra la clase predicha con su nombre y las probabilidades de las 6 clases. La predicción se guarda, y después puedes decir si acertó y cuál fue la clase real |
+| **Historial** | Las últimas 50 predicciones con su feedback, y el acierto según el feedback, para el modelo actual y para todos |
+
+- Si eliges un equipo que falta, o el mismo equipo dos veces, la app muestra un mensaje y no predice.
+- Si la base de datos falla, la predicción se muestra igualmente, con un aviso de que no se ha guardado.
+- **Modelo de prueba.** Mientras no haya un modelo en `models/kiniela_model.joblib`, la app usa el reparto de clases observado en el dataset, igual para cualquier partido, y lo avisa en pantalla. El modelo real tiene que cumplir el [contrato del modelo](docs/model-contract.md).
+- Los equipos salen del dataset de `data/processed/`. Si no está, como dentro de Docker, se usan los 20 equipos de la Premier 2023-24.
 
 ## Docker
 
@@ -120,7 +139,7 @@ El esquema y las métricas en tiempo real están en [docs/database.md](docs/data
 pytest
 ```
 
-Hoy cubren el catálogo de clases, la validación de goles y la elección de la clase más probable. El etiquetado completo sigue pendiente de la regla de negocio.
+Cubren el catálogo de clases, el etiquetado, la predicción, la base de datos y la app de punta a punta. La app se prueba con `AppTest` de Streamlit, sin navegador: predicción, entradas inválidas, feedback e historial.
 
 ## Documentación de trabajo
 
