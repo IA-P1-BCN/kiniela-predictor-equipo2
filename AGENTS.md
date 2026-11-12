@@ -31,7 +31,7 @@ src/kiniela/
 ├── features/          # feature engineering
 ├── models/            # training and prediction
 ├── monitoring/        # data drift
-└── storage/           # predictions and feedback (SQLAlchemy; DATABASE_URL, see docs/database.md)
+└── storage/           # predictions and feedback (SQLAlchemy; DATABASE_URL, see docs/database.md); export.py = labelled data for retraining
 notebooks/             # EDA, features, modelling
 data/raw/              # source data, not versioned
 data/processed/        # modelling dataset, not versioned

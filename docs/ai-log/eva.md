@@ -198,4 +198,33 @@
 - **Pruebas:**
   - En https://kiniela-predictor.onrender.com: predicción Arsenal – Chelsea (clase 5, 6 probabilidades), sin aviso de base de datos, y feedback guardado.
   - Para confirmar que se guarda en Neon y no en un SQLite temporal del contenedor, Eva consultó `predictions` con su `feedback` en el SQL Editor de Neon. Salió la fila: `arsenal`, `chelsea`, clase 5, `is_correct = t`, `actual_class = 5`.
-- **Revisión humana:** Eva, en el navegador y en Neon.
+- **Revisión humana:** Eva, en el navegador y en Neon. Fusionó el PR #33 con `Tests` en verde; Gemini no encontró problemas.
+
+### #36 Pipeline de datos para reentrenamiento
+
+- **Fecha:** 2026-11-12
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:**
+  - «y nos queda alguna tarea? y al resto que le falta». El agente detectó cuatro tareas necesarias sin issue y comprobó cuáles salen literalmente del briefing.
+  - «las 4 issues nuevas están en los requisitos del briefing? […] creamos las tareas y las dejamos sin dueño […] asígnanos la del pipeline». Se crearon las #34, #35 y #37 sin dueña y la #36 para Eva.
+- **Qué generó el agente:**
+  - `src/kiniela/storage/export.py`: exporta a CSV las predicciones con feedback y clase real, con un comando `python -m kiniela.storage.export` y los filtros `--since` y `--model-version`.
+  - 8 tests nuevos (99 en total).
+  - `docs/retraining.md`: cómo ejecutarlo, qué columnas exporta, cómo se usa para reentrenar y qué precauciones tener. Enlaces en el README y una línea en `AGENTS.md`.
+- **Aceptado:**
+  - **Export incremental** comparando con el `prediction_id` que ya hay en el CSV, en vez de añadir una columna `exported_at` a la base de datos. Sin migraciones, `init_db` no añade columnas a tablas que ya existen, así que habría roto la base de datos de Neon.
+  - Solo se exporta el feedback **con clase real**: un «falló» sin clase no es una etiqueta.
+  - Las columnas siguen el dataset histórico (`HomeTeam`, `AwayTeam`, `Date`), y la etiqueta se llama `target`, importada de `kiniela.models.train`, para no repetir el nombre. Así las features se recalculan con el mismo pipeline, sin fuga de datos.
+  - La salida va a `data/raw/feedback/`, que no se versiona.
+  - Para producción, `DATABASE_URL` se carga desde `.env` en la terminal. Nunca como argumento, porque quedaría en el historial.
+- **Rechazado o cambiado, y por qué:**
+  - Exportar las `inputs` en JSON: ahora solo llevan los equipos, y las features se recalculan desde el historial.
+  - Que el export lance el reentrenamiento: es trabajo de las #35 y #37.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - El filtro `--since` comparaba una fecha sin zona horaria con fechas guardadas en UTC. En SQLite funcionaba, pero en PostgreSQL podía desplazar el corte. Se cambió a medianoche UTC y se probó contra PostgreSQL.
+  - Un test incluía una comprobación que no probaba nada (el nombre de la tabla). Se quitó.
+  - Para probar en el contenedor del Compose, `docker compose exec -w /app` falló porque Git Bash convierte `/app` en una ruta de Windows. Se resolvió con `MSYS_NO_PATHCONV=1`.
+- **Pruebas:**
+  - `pytest`: 99 tests.
+  - Contra el PostgreSQL del Compose: la primera ejecución exporta 1 partido, la segunda 0 (sin duplicados), y `--since` filtra bien.
+- **Revisión humana:** pendiente en el PR.

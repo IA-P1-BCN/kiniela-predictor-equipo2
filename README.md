@@ -155,7 +155,7 @@ La app guarda cada predicción y el feedback de la persona usuaria.
 - **En local** no hay que configurar nada: se usa SQLite en `data/kiniela.db`.
 - **En producción** se usa PostgreSQL en Neon, con la variable `DATABASE_URL`. Las variables necesarias están en `.env.example`, sin valores reales.
 
-El esquema y las métricas en tiempo real están en [docs/database.md](docs/database.md).
+El esquema y las métricas en tiempo real están en [docs/database.md](docs/database.md). Para sacar los partidos con su clase real y reentrenar: `python -m kiniela.storage.export` ([docs/retraining.md](docs/retraining.md)).
 
 ## Tests
 
@@ -173,4 +173,5 @@ Cubren el catálogo de clases, el etiquetado, la predicción, la base de datos y
 - [Base de datos](docs/database.md)
 - [Despliegue](docs/deploy.md)
 - [Contrato del modelo](docs/model-contract.md)
+- [Datos para reentrenar](docs/retraining.md)
 - Plantilla de GitHub: `.github/ISSUE_TEMPLATE/tarea.md`
