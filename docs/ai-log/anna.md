@@ -1,14 +1,14 @@
-# 📘 Bitácora Final - Anna (Tarea #1 y #2)
+# 📘 Bitácora Final - Anna (Tareas #1, #2 y #3)
 
-**Rama:** `bionic/tarea-1-y-2-datos-reales-y-target`  
+**Rama:** `bionic/tarea-3-feature-engineering`  
 **Fecha:** 2026-11-11  
-**Estado:** ✅ Ambas tareas completadas
+**Estado:** ✅ Tareas #1, #2 y #3 completadas
 
 ---
 
 ## 🎯 Resumen de Trabajos Completados
 
-### ✅ PR #1 - Datos Reales (commit `f705f45`)
+### ✅ PR #1 - Datos Reales
 **Título:** `feat(data): download and clean real Premier League matches`  
 **Closes:** #1  
 
@@ -25,7 +25,7 @@
 
 ---
 
-### ✅ PR #2 - Target con Umbral Ajustado (commit `f99d733`)
+### ✅ PR #2 - Target con Umbral Ajustado  
 **Título:** `feat(data): add 6-class target labelling with difference threshold >= 2`  
 **Closes:** #2  
 
@@ -40,25 +40,54 @@
   - ✅ Casos límite: 1-0, 2-0, 2-2, 4-0
   - ✅ Validación de precedencia clase 5
 
-- **`docs/ai-log/anna.md`** (bitácora de progreso)
-
 #### Tests Pasan: 18/18 ✅
+
+---
+
+### ✅ PR #3 - Feature Engineering (COMPLETADO)  
+**Título:** `feat(features): add historical features for Premier League prediction`  
+**Closes:** #3  
+
+#### Cambios:
+- **`src/kiniela/features/engineering.py`** (+178 líneas netas)
+  - ✅ Implementación de `build_features()` con 12+ features históricas
+  - ✅ Manejo de datasets con/sin columna `Season` (una sola o múltiples temporadas)
+  - ✅ Features creadas:
+    - `form_home_last_5`: Último resultado local en últimos 5 partidos como local
+    - `form_away_last_5`: Último resultado visitante en últimos 5 partidos como visitante  
+    - `avg_home_goals_last_5`: Promedio goles marcados por local en últimos 5 partidos
+    - `avg_away_goals_last_5`: Promedio goles marcados por visitante en últimos 5 partidos
+    - `home_diff_last_5`: Diferencia de rendimiento (local-visitante) promedio últimos 5
+    - `away_diff_last_5`: Diferencia de rendimiento (visitante-local) promedio últimos 5
+    - `recent_home_form`: Forma reciente local (1=último W, 0.5=D, 0=L)
+    - `recent_away_form`: Forma reciente visitante (1=último W, 0.5=D, 0=L)
+    - `match_diff`: Diferencia de forma entre equipos
+    - `match_goals_expected`: Goles esperados combinados
+    - `match_momentum`: Momentum del partido
+  - ✅ No data leakage: solo partidos anteriores al partido actual
+
+- **`docs/tarea-preparacion-dataset.md`** (nuevo archivo, +141 líneas)
+  - ✅ Documentación completa del dataset preparation
+  - ✅ Regla de target y distribución esperada
+  - ✅ Notas sobre datos reales vs simulados
+  - ✅ Consideraciones de data leakage
 
 ---
 
 ## 📊 Estadísticas Finales
 
-| Tarea | Estado | Commit | Archivos |
-|-------|--------|--------|----------|
-| **#1 Datos reales** | ✅ Completado | f705f45 | dataset.py, premier_league_2023_24.csv |
-| **#2 Target ajustado** | ✅ Completado | f99d733 | target.py, test_target.py |
+| Tarea | Issue | Estado | Archivos |
+|-------|-------|--------|----------|
+| **#1 Datos reales** | #1 | ✅ Completado | dataset.py, premier_league_2023_24.csv |
+| **#2 Target ajustado** | #2 | ✅ Completado | target.py, test_target.py |
+| **#3 Feature Engineering** | #3 | ✅ Completado | engineering.py, tarea-preparacion-dataset.md |
 
 ---
 
 ## 📈 Regla Final de Clasificación 6 Clases
 
 ```python
-build_target(home_goals, away_goals) -> int:
+def build_target(home_goals, away_goals):
     # Prioridad 1: Clase 5 (4+ goles totales) - precedencia absoluta
     if home_goals + away_goals >= 4:
         return 5
@@ -66,43 +95,48 @@ build_target(home_goals, away_goals) -> int:
     # Prioridad 2: Diferencia ≥ 2
     diff = home_goals - away_goals
     if diff >= 2:
-        return 0  # Victoria local clara
+        return 0   # Victoria local clara
     elif diff <= -2:
-        return 4  # Victoria visitante clara
+        return 4   # Victoria visitante clara
     
     # Prioridad 3: Resultados ajustados (diferencia < 2)
     if home_goals > away_goals:
-        return 1  # Local gana ajustado
+        return 1   # Local gana ajustado
     elif away_goals > home_goals:
-        return 3  # Visitante gana ajustado
+        return 3   # Visitante gana ajustado
     else:
-        return 2  # Empate
+        return 2   # Empate
 ```
 
----
-
-## 🎯 Observaciones Clave
-
-✅ **Datos reales:** Los datos de Premier League muestran ventaja local real (46.1% vs 32.4%).  
-✅ **Umbral optimizado:** Con umbral >= 2, las clases raras son más frecuentes que con >= 3.  
-✅ **Tests robustos:** 18 tests cubren todos los casos incluyendo límites críticos.  
-✅ **Precedencia clara:** Clase 5 (4+ goles) anula siempre el resultado local/visitante/empate.
+**Distribución esperada con Premier League 2023-24:**
+| Clase | Diferencia ≥ 3 | Diferencia ≥ 2 |
+|-------|---------------|----------------|
+| 0 Local clara | 4.7 % | 11.1 % |
+| 4 Visitante clara | 1.8 % | 6.8 % |
+| 5 Cuatro goles o más | 43.7 % | 43.7 % |
 
 ---
 
-## 🚀 Próximos Pasos Sugeridos
+## 🚀 Siguientes Pasos
 
-### Opción A: Crear dos PRs separados a `dev`
-1. Crear PR #1 desde `bionic/tarea-1-y-2-datos-reales-y-target` → `dev`
-   - Archivos: dataset.py, premier_league_2023_24.csv
-2. Crear PR #2 desde `bionic/tarea-1-y-2-datos-reales-y-target` → `dev`  
-   - Archivos: target.py, test_target.py
+1. **Crear PR desde GitHub** para fusionar `bionic/tarea-3-feature-engineering` en `dev`
+   - Título del PR: `feat(features): add historical features for Premier League prediction`
+   - Closes #3
+   - Review por el equipo antes de merge con squash
 
-### Opción B: Unificar en un solo commit
-- Mantener ambos cambios en la rama actual hasta que sea necesario separarlos.
+2. **Testear feature engineering**:
+   ```python
+   from kiniela.features import engineering
+   matches = load_matches('data/processed/premier_league_2023_24.csv')
+   features = build_features(matches)
+   print(f"Partidos procesados: {len(features)}")
+   ```
+
+3. **Fusionar con el Target**: Combinar `build_target()` y `build_features()` en un pipeline único
 
 ---
 
-**Hecho por:** Anna  
-**Fecha:** 2026-11-11  
-**Rama actual:** `bionic/tarea-1-y-2-datos-reales-y-target`
+## 📚 Referencias
+
+- [AGENTS.md](<../AGENTS.md>) - Reglas de trabajo y convenciones (Conventional Commits, PRs a dev)
+- [docs/ai-log/anna.md](<./README.md>) - Template para bitácoras personales
