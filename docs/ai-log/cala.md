@@ -16,6 +16,7 @@
   - `CV_N_SPLITS = 5` junto a `RANDOM_STATE` en `config.py`, para que #6 y #13 reutilicen el mismo esquema sin divergir.
   - `tests/test_train.py`: 13 tests con dataset sintético (esquema fijo, reproducibilidad, exclusión de columnas con fuga, artefacto guardado, CLI, errores) → 90 tests en verde.
   - CLI re-ejecutable: `PYTHONPATH=src python -m kiniela.models.train --dataset ... --model ...`.
+  - Tras la revisión automática del PR: `train_baseline()` ya no imprime nada; el informe lo renderiza `format_report()` como texto puro y solo `main()` lo escribe en consola, con un test nuevo que lo comprueba. Docstring de `_cross_validate` con `X` (features) e `y` (etiquetas).
   - Ante el bloqueo de la #3 (Anna), implementación completa esperando su dataset, validada al llegar: rama rebasada sobre `dev` y prueba real con `premier_league_with_features_and_target.csv`.
 - **Aceptado:**
   - **Random Forest** en lugar de Logistic Regression: el `target` se define con reglas no lineales (umbral ≥ 2, precedencia de la clase 5), no hace falta escalar y es comparable después con XGBoost/LightGBM (#6). Lo decidí yo con la comparativa del agente delante.
