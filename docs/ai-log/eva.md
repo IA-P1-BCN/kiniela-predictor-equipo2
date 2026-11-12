@@ -153,4 +153,78 @@
   - El agente usó `use_container_width`, que en local no avisaba. Dentro de Docker, Streamlit avisó de que se retira después del 31/12/2025, una fecha ya pasada. Se cambió a `width="stretch"` y se subió el mínimo a `streamlit>=1.50`.
   - Un heredoc de bash con comillas en el contenido falló al escribir los tests. Se escribieron con el editor, sin pasar por el shell.
 - **Pruebas:** `pytest` (76 tests). La app arrancada en local responde 200. Dentro de la imagen Docker, sin `data/`, salen los 20 equipos de respaldo y se ejecuta el flujo completo con `AppTest`: predicción e historial, sin errores ni avisos.
-- **Revisión humana:** pendiente en el PR. Puntos a mirar: el aspecto de la app en el navegador y que los textos sean claros para alguien que no sabe de ML.
+- **Revisión humana:** Eva probó la app en el navegador y fusionó el PR #27 con `Tests` y la revisión de IA en verde. Las sugerencias de Gemini eran menores y no se aplicaron: la tupla de respaldo es inmutable a propósito, y el modelo en caché se recarga reiniciando la app.
+
+### #12 Despliegue (parte 1: configuración y Compose)
+
+- **Fecha:** 2026-11-12
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «ok» a empezar la #12. El agente preguntó dos decisiones: desde qué rama desplegar y si añadir Docker Compose.
+- **Qué generó el agente:**
+  - `render.yaml` (Blueprint de Render): servicio Docker gratuito en Frankfurt, rama `dev`, healthcheck en `/_stcore/health` y `DATABASE_URL` como secreto que solo se rellena en el panel.
+  - `docker-compose.yml`: la app con PostgreSQL 17, igual que en producción, como proyecto `kiniela` en Docker Desktop.
+  - `docs/deploy.md`: los pasos de Neon y Render, las variables, las limitaciones del plan gratuito y cómo pasar a `main`. Además, el README y `.env.example`.
+  - En `AGENTS.md`, una lista de comprobación obligatoria para los PRs, después de que tres PRs entraran con el título y la descripción sin rellenar y uno vacío.
+- **Aceptado:**
+  - Desplegar desde `dev` ahora y pasar a `main` en la entrega (decisión de Eva): `main` va 12 commits por detrás y no tiene la app.
+  - Añadir Compose (decisión de Eva).
+  - Conectar Render por la URL pública del repo: conectar la organización IA-P1-BCN necesita a una propietaria. El precio es que cada despliegue se lanza a mano.
+  - Conexión directa a Neon, sin pooler: psycopg 3 usa *prepared statements*, que pueden fallar a través del pooler.
+- **Rechazado o cambiado, y por qué:**
+  - El prompt de configuración que propone Neon para agentes: está pensado para Node.js (`npm`, `neon.ts`, `npm run build`). Habría llenado el repo de archivos de Node y escrito credenciales en un `.env.local`. La app ya lee `DATABASE_URL`.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - `docker compose build` falló con `failed to execute bake: exit status 1`. Compose 5 pide permiso para leer archivos, y la terminal del agente no puede contestar. Se confirmó con `BUILDX_BAKE_ENTITLEMENTS_FS=0` y se documentó en `docs/deploy.md`.
+  - El agente lanzó la prueba del Compose con Docker Desktop apagado, y un bucle de espera sin límite se quedó colgado hasta pararlo a mano. Los bucles siguientes llevan un número máximo de intentos.
+- **Pruebas:** con Compose, la app y la base de datos salen *healthy*, y la predicción hecha desde la app queda guardada en PostgreSQL. `pytest` pasa.
+- **Revisión humana:** Eva fusionó el PR #32 con `Tests` en verde. Gemini afirmó que el PR no añadía una entrada nueva a la bitácora, y sí la añadía (esta). No se aplicó.
+
+### #12 Despliegue (parte 2: app en producción)
+
+- **Fecha:** 2026-11-12
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** las capturas de Neon y Render que Eva iba compartiendo, y la URL desplegada. El agente guió los pasos en los paneles, que hizo Eva.
+- **Qué hizo Eva en los paneles:**
+  - Un proyecto en Neon con la conexión directa, sin pooler.
+  - Un Blueprint `kiniela` en Render con la URL pública del repo y la rama `dev`.
+  - `DATABASE_URL` pegada solo en Render.
+- **Qué generó el agente:** la URL pública y el enlace al tablero en el README, en lugar de la frase antigua de que el repo no tenía modelo.
+- **Aceptado:**
+  - Desplegar por la URL pública del repo: no hace falta que una propietaria de la organización apruebe la app de Render. A cambio, cada despliegue se lanza a mano (*Manual Deploy*).
+  - No usar el prompt para agentes de Neon (era para Node.js).
+- **Rechazado o cambiado, y por qué:** nada.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - Se repitió lo de la #11: la rama de la parte 1 estaba enlazada a la #12 y la issue se cerró sola al fusionar el PR #32 con `Refs`. Esta vez estaba previsto y se reabrió en el momento.
+  - El agente no puede manejar el navegador, así que la prueba de punta a punta en la URL pública la hizo Eva. El agente comprobó el healthcheck (`ok`) y la respuesta HTTP 200.
+- **Pruebas:**
+  - En https://kiniela-predictor.onrender.com: predicción Arsenal – Chelsea (clase 5, 6 probabilidades), sin aviso de base de datos, y feedback guardado.
+  - Para confirmar que se guarda en Neon y no en un SQLite temporal del contenedor, Eva consultó `predictions` con su `feedback` en el SQL Editor de Neon. Salió la fila: `arsenal`, `chelsea`, clase 5, `is_correct = t`, `actual_class = 5`.
+- **Revisión humana:** Eva, en el navegador y en Neon. Fusionó el PR #33 con `Tests` en verde; Gemini no encontró problemas.
+
+### #36 Pipeline de datos para reentrenamiento
+
+- **Fecha:** 2026-11-12
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:**
+  - «y nos queda alguna tarea? y al resto que le falta». El agente detectó cuatro tareas necesarias sin issue y comprobó cuáles salen literalmente del briefing.
+  - «las 4 issues nuevas están en los requisitos del briefing? […] creamos las tareas y las dejamos sin dueño […] asígnanos la del pipeline». Se crearon las #34, #35 y #37 sin dueña y la #36 para Eva.
+- **Qué generó el agente:**
+  - `src/kiniela/storage/export.py`: exporta a CSV las predicciones con feedback y clase real, con un comando `python -m kiniela.storage.export` y los filtros `--since` y `--model-version`.
+  - 8 tests nuevos (99 en total).
+  - `docs/retraining.md`: cómo ejecutarlo, qué columnas exporta, cómo se usa para reentrenar y qué precauciones tener. Enlaces en el README y una línea en `AGENTS.md`.
+- **Aceptado:**
+  - **Export incremental** comparando con el `prediction_id` que ya hay en el CSV, en vez de añadir una columna `exported_at` a la base de datos. Sin migraciones, `init_db` no añade columnas a tablas que ya existen, así que habría roto la base de datos de Neon.
+  - Solo se exporta el feedback **con clase real**: un «falló» sin clase no es una etiqueta.
+  - Las columnas siguen el dataset histórico (`HomeTeam`, `AwayTeam`, `Date`), y la etiqueta se llama `target`, importada de `kiniela.models.train`, para no repetir el nombre. Así las features se recalculan con el mismo pipeline, sin fuga de datos.
+  - La salida va a `data/raw/feedback/`, que no se versiona.
+  - Para producción, `DATABASE_URL` se carga desde `.env` en la terminal. Nunca como argumento, porque quedaría en el historial.
+- **Rechazado o cambiado, y por qué:**
+  - Exportar las `inputs` en JSON: ahora solo llevan los equipos, y las features se recalculan desde el historial.
+  - Que el export lance el reentrenamiento: es trabajo de las #35 y #37.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - El filtro `--since` comparaba una fecha sin zona horaria con fechas guardadas en UTC. En SQLite funcionaba, pero en PostgreSQL podía desplazar el corte. Se cambió a medianoche UTC y se probó contra PostgreSQL.
+  - Un test incluía una comprobación que no probaba nada (el nombre de la tabla). Se quitó.
+  - Para probar en el contenedor del Compose, `docker compose exec -w /app` falló porque Git Bash convierte `/app` en una ruta de Windows. Se resolvió con `MSYS_NO_PATHCONV=1`.
+- **Pruebas:**
+  - `pytest`: 99 tests.
+  - Contra el PostgreSQL del Compose: la primera ejecución exporta 1 partido, la segunda 0 (sin duplicados), y `--since` filtra bien.
+- **Revisión humana:** pendiente en el PR.

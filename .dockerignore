@@ -39,3 +39,7 @@ models/*
 !models/.gitkeep
 !models/kiniela_model.joblib
 !models/model_card.json
+
+# Orchestration files, not needed inside the image
+docker-compose.yml
+render.yaml

@@ -1,0 +1,18 @@
+# Render Blueprint: the production web service, built from the Dockerfile.
+# The database lives on Neon; its connection string is set in the Render dashboard
+# as DATABASE_URL (sync: false keeps it out of this file). See docs/deploy.md.
+services:
+  - type: web
+    name: kiniela-predictor
+    runtime: docker
+    plan: free
+    region: frankfurt
+    # dev until the delivery; then switch to main
+    branch: dev
+    dockerfilePath: ./Dockerfile
+    # Streamlit's own health endpoint (the Dockerfile HEALTHCHECK uses the same one)
+    healthCheckPath: /_stcore/health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        sync: false

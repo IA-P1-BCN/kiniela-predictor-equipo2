@@ -2,10 +2,12 @@
 
 Clasificación multiclase del tipo de resultado de un partido de fútbol para una kiniela. El modelo distingue seis situaciones, no solo local, empate o visitante.
 
+**App desplegada**: https://kiniela-predictor.onrender.com  
 **Repositorio**: https://github.com/IA-P1-BCN/kiniela-predictor-equipo2  
-**Organización**: [IA-P1-BCN](https://github.com/IA-P1-BCN)
+**Organización**: [IA-P1-BCN](https://github.com/IA-P1-BCN)  
+**Tablero**: [GitHub Projects](https://github.com/orgs/IA-P1-BCN/projects/56)
 
-Esta versión es la base del proyecto. No incluye dataset ni modelo entrenado.
+Mientras no haya un modelo entrenado en `models/`, la app usa un modelo de prueba y lo avisa en pantalla.
 
 ## Clases
 
@@ -124,6 +126,28 @@ Detalles de la imagen:
 - No incluye `.env`, datos, notebooks, tests ni entornos virtuales (ver `.dockerignore`). Los secretos se pasan al arrancar, con `-e` o `--env-file .env`.
 - De `models/` solo entran el modelo promocionado (`kiniela_model.joblib`) y su ficha (`model_card.json`), si existen.
 
+### Docker Compose (app + PostgreSQL)
+
+Para probar en local igual que en producción, con PostgreSQL en vez de SQLite:
+
+```bash
+docker compose up --build      # http://localhost:8501
+docker compose down            # parar (los datos se quedan)
+```
+
+## Despliegue
+
+**URL pública:** https://kiniela-predictor.onrender.com (rama `dev`; si lleva un rato sin visitas, tarda alrededor de un minuto en despertar)
+
+La app corre en Render (Docker, plan gratuito) y guarda las predicciones en PostgreSQL de Neon. Variables de entorno:
+
+| Variable | Para qué | Dónde se define |
+| --- | --- | --- |
+| `DATABASE_URL` | Conexión a PostgreSQL (Neon) | Panel de Render; es secreta, nunca va en el repo |
+| `PORT` | Puerto de la app | Lo pone Render |
+
+Pasos, limitaciones del plan gratuito y cómo cambiar a `main`: [docs/deploy.md](docs/deploy.md).
+
 ## Base de datos
 
 La app guarda cada predicción y el feedback de la persona usuaria.
@@ -131,7 +155,7 @@ La app guarda cada predicción y el feedback de la persona usuaria.
 - **En local** no hay que configurar nada: se usa SQLite en `data/kiniela.db`.
 - **En producción** se usa PostgreSQL en Neon, con la variable `DATABASE_URL`. Las variables necesarias están en `.env.example`, sin valores reales.
 
-El esquema y las métricas en tiempo real están en [docs/database.md](docs/database.md).
+El esquema y las métricas en tiempo real están en [docs/database.md](docs/database.md). Para sacar los partidos con su clase real y reentrenar: `python -m kiniela.storage.export` ([docs/retraining.md](docs/retraining.md)).
 
 ## Tests
 
@@ -147,4 +171,7 @@ Cubren el catálogo de clases, el etiquetado, la predicción, la base de datos y
 - [Asignación de tareas](docs/ASIGNACION_TAREAS.md)
 - [Plantilla de daily](docs/DAILY_TEMPLATE.md)
 - [Base de datos](docs/database.md)
+- [Despliegue](docs/deploy.md)
+- [Contrato del modelo](docs/model-contract.md)
+- [Datos para reentrenar](docs/retraining.md)
 - Plantilla de GitHub: `.github/ISSUE_TEMPLATE/tarea.md`
