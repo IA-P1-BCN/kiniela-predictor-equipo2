@@ -1,0 +1,36 @@
+# Local stack that mirrors production: the app plus PostgreSQL (Neon in production).
+#   docker compose up --build     -> http://localhost:8501
+#   docker compose down           -> stop (data kept in the "pgdata" volume)
+#   docker compose down -v        -> stop and delete the local database
+name: kiniela
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: kiniela
+      # Local-only default; override with POSTGRES_PASSWORD in .env if you want another one
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kiniela}
+      POSTGRES_DB: kiniela
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kiniela -d kiniela"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    image: kiniela-predictor
+    ports:
+      - "8501:8501"
+    environment:
+      # Same variable as in production: the app does not know which database it talks to
+      DATABASE_URL: postgresql://kiniela:${POSTGRES_PASSWORD:-kiniela}@db:5432/kiniela
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

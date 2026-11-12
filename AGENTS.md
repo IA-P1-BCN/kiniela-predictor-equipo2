@@ -103,6 +103,18 @@ Before opening it:
 
 PRs are merged with **Squash and merge**. The PR title becomes the commit on `dev`, so it must follow the commit convention.
 
+### PR checklist (every PR, no exceptions)
+
+- [ ] The branch was created from the issue, off an up-to-date `dev` (`git checkout dev && git pull` first), with an English slug: `3-match-features`, never `bionic/...` or Spanish names.
+- [ ] The PR has at least one changed file (an empty PR means the branch was out of date).
+- [ ] **Title** in English with Conventional Commits and a scope: `feat(features): add per-match features`. Never the branch name or a sentence in Spanish.
+- [ ] **Description** filled in from the template: what changes, `Closes #N` (or `Refs #N` for partial work), and the checklist ticked. Never leave the template empty.
+- [ ] One PR = one issue. Do not mix tasks.
+- [ ] `pytest` passes locally; new behaviour comes with tests.
+- [ ] Entry added to your own `docs/ai-log/<name>.md`.
+- [ ] No datasets, trained models, or `.env` in the diff.
+- [ ] Merge only when `Tests` is green; read the Gemini comment (advisory, it can be wrong); use **Squash and merge**.
+
 ## Conventions
 
 - Code, names, comments, `print` texts, branches, commits, and PR titles in **English**.
