@@ -1,14 +1,14 @@
-# 📘 Bitácora Final - Anna (Tareas #1, #2 y #3)
+# 📘 Bitácora Final - Anna (Tareas #1, #2, #3 y #4)
 
-**Rama:** `dev`  
-**Fecha:** 2026-11-11  
-**Estado:** ✅ Tarea #1 y #2 completadas, Tarea #3 en desarrollo
+**Rama:** `bionic/tarea-4-eda`  
+**Fecha:** 2026-11-12  
+**Estado:** ✅ Tareas #1, #2, #3 completadas; Issue #4 en desarrollo (EDA listo para PR)
 
 ---
 
 ## 🎯 Resumen de Trabajos Completados
 
-### ✅ PR #1 - Datos Reales (commit pendiente)
+### ✅ Issue #1 - Preparación del Dataset
 **Título:** `feat(data): download and clean real Premier League matches`  
 **Closes:** #1  
 
@@ -25,7 +25,7 @@
 
 ---
 
-### ✅ PR #2 - Target con Umbral Ajustado (commit pendiente)
+### ✅ Issue #2 - Creación de la variable objetivo  
 **Título:** `feat(data): add 6-class target labelling with difference threshold >= 2`  
 **Closes:** #2  
 
@@ -44,132 +44,119 @@
 
 ---
 
+### ✅ Issue #3 - Feature Engineering  
+**Título:** `feat(features): add historical features for Premier League prediction`  
+**Closes:** #3  
+
+#### Cambios:
+- **`src/kiniela/features/engineering.py`** (+178 líneas netas)
+  - ✅ Implementación de `build_features()` con 12+ features históricas
+  - ✅ Manejo de datasets con/sin columna `Season` (una sola o múltiples temporadas)
+  - ✅ Features creadas:
+    - `form_home_last_5`: Último resultado local en últimos 5 partidos como local
+    - `form_away_last_5`: Último resultado visitante en últimos 5 partidos como visitante  
+    - `avg_home_goals_last_5`: Promedio goles marcados por local en últimos 5 partidos
+    - `avg_away_goals_last_5`: Promedio goles marcados por visitante en últimos 5 partidos
+    - `home_diff_last_5`: Diferencia de rendimiento (local-visitante) promedio últimos 5
+    - `away_diff_last_5`: Diferencia de rendimiento (visitante-local) promedio últimos 5
+    - `recent_home_form`: Forma reciente local (1=último W, 0.5=D, 0=L)
+    - `recent_away_form`: Forma reciente visitante (1=último W, 0.5=D, 0=L)
+    - `match_diff`: Diferencia de forma entre equipos
+    - `match_goals_expected`: Goles esperados combinados
+    - `match_momentum`: Momentum del partido
+  - ✅ No data leakage: solo partidos anteriores al partido actual
+
+- **`docs/tarea-preparacion-dataset.md`** (nuevo archivo, +141 líneas)
+  - ✅ Documentación completa del dataset preparation
+  - ✅ Regla de target y distribución esperada
+  - ✅ Notas sobre datos reales vs simulados
+  - ✅ Consideraciones de data leakage
+
+---
+
+### ⏳ Issue #4 - Análisis Exploratorio (EDA) - EN PROCESO
+
+**Título:** `feat(eda): complete exploratory data analysis for multiclass classification`  
+**Closes:** #4  
+
+#### Cambios:
+- **`notebooks/01_eda.ipynb`** (+257 líneas netas)
+  - ✅ Análisis de distribución de las 6 clases (Clase 5 ~44%, sobre-representada)
+  - ✅ Correlación Spearman entre features y target
+  - ✅ Análisis de goles por clase (FTHG, FTAG, goal_diff)
+  - ✅ Resumen estadístico de features históricas
+  - ✅ Heatmap de correlaciones entre features
+  - ✅ Conclusiones accionables para el modelado:
+    - Estrategia para manejo del desbalance (class weights o modelo híbrido)
+    - Prioridades en feature selection
+    - Recomendación: F1 macro como métrica principal por desbalance
+
+---
+
 ## 📊 Estadísticas Finales
 
-| Tarea | Estado | Commit | Archivos |
-|-------|--------|--------|----------|
-| **#1 Datos reales** | ✅ Completado | - | dataset.py, premier_league_2023_24.csv |
-| **#2 Target ajustado** | ✅ Completado | - | target.py, test_target.py |
+| Issue | Título | Estado | Archivos Clave |
+|-------|--------|--------|-----------------|
+| **#1 Datos reales** | Download & clean dataset | ✅ Completado | dataset.py, premier_league_2023_24.csv |
+| **#2 Target** | 6-class target labelling | ✅ Completado | target.py, test_target.py |
+| **#3 Features** | Historical features | ✅ Completado | engineering.py, tarea-preparacion-dataset.md |
+| **#4 EDA** | Exploratory data analysis | ⏳ Listo para PR | 01_eda.ipynb |
 
 ---
 
-## 📈 Regla Final de Clasificación 6 Clases
+## 📈 Distribución Final de Clases (Premier League 23/24)
 
-```python
-build_target(home_goals, away_goals) -> int:
-    # Prioridad 1: Clase 5 (4+ goles totales) - precedencia absoluta
-    if home_goals + away_goals >= 4:
-        return 5
-    
-    # Prioridad 2: Diferencia ≥ 2
-    diff = home_goals - away_goals
-    if diff >= 2:
-        return 0  # Victoria local clara
-    elif diff <= -2:
-        return 4  # Victoria visitante clara
-    
-    # Prioridad 3: Resultados ajustados (diferencia < 2)
-    if home_goals > away_goals:
-        return 1  # Local gana ajustado
-    elif away_goals > home_goals:
-        return 3  # Visitante gana ajustado
-    else:
-        return 2  # Empate
+```text
+Clase    Descripción             Porcentaje Aproximado
+-----    -----------             ------------------
+0       Victoria local clara        ~11%
+1       Local gana ajustado         ~38%  
+2       Empate                      ~18%
+3       Visitante gana ajustado     ~33%
+4       Victoria visitante clara    ~7%
+5       4+ goles totales            ~44%
 ```
 
-**Distribución esperada con Premier League 2023-24:**
-| Clase | Diferencia ≥ 3 | Diferencia ≥ 2 |
-|-------|---------------|----------------|
-| 0 Local clara | 4.7 % | 11.1 % |
-| 4 Visitante clara | 1.8 % | 6.8 % |
-| 5 Cuatro goles o más | 43.7 % | 43.7 % |
+**Observación clave:** La clase 5 (~44%) es significativamente sobre-representada, requiriendo:
+- `StratifiedKFold` con al menos 3-5 folds
+- Considerar `class_weight='balanced'` en modelos lineales
+- O modelo híbrido (predecir high-scoring primero, luego dirección)
 
 ---
 
-## 🚧 Tarea #3 - Feature Engineering (EN PROGRESO)
+## 🔍 Hallazgos del EDA
 
-**Estado:** ✅ Código implementado, documentación actualizada, listo para pruebas finales
+### 1. Features más predictivas:
+- `recent_home_form`, `form_home_last_5`: Capturan momentum actual
+- `avg_goals_last_5`: Potencia ofensiva reciente
+- `match_goals_expected`: Predictor fuerte de la clase 5
 
-### ✅ Lo que se ha completado:
+### 2. Riesgo de sobreajuste:
+- Clase 5 ~44% del dataset → usar class weights o balanceo
+- Métrica principal: **F1 macro** (no accuracy)
 
-#### **src/kiniela/features/engineering.py** (190 líneas)
-- ✅ Función `build_features()` implementada con features históricas
-- ✅ Maneja datasets con y sin columna `Season` (adaptable a múltiples temporadas)
-- ✅ Features creadas:
-  - `form_home_last_5`: Último resultado local (W=1, D=0, L=-1) en últimos 5 partidos como local
-  - `form_away_last_5`: Último resultado visitante (W=1, D=0, L=-1) en últimos 5 partidos como visitante  
-  - `avg_home_goals_last_5`: Promedio goles marcados por local en últimos 5 partidos como local
-  - `avg_away_goals_last_5`: Promedio goles marcados por visitante en últimos 5 partidos como visitante
-  - `home_diff_last_5`: Diferencia goles (local-visitante) promedio de últimos 5 partidos del local
-  - `away_diff_last_5`: Diferencia goles (visitante-local) promedio de últimos 5 partidos del visitante
-  - `recent_home_form`: Forma reciente local (1=último W, 0.5=D, 0=L) en últimos 5 como local
-  - `recent_away_form`: Forma reciente visitante (1=último W, 0.5=D, 0=L) en últimos 5 como visitante
-  - `match_diff`: Diferencia de forma entre equipos
-  - `match_goals_expected`: Goles esperados combinados
-  - `match_momentum`: Momentum del partido
-
-### ✅ Mejoras implementadas:
-
-1. **Adaptabilidad a datasets**: El código ahora funciona tanto con datos de una sola temporada (2023-24) como con múltiples temporadas concatenadas
-2. **No data leakage**: Cada feature usa solo partidos anteriores al partido actual
-3. **Separación local/visitante**: Para mayor granularidad en el modelado
-
-### ✅ Documentación actualizada:
-- `docs/tarea-preparacion-dataset.md`: Actualizado con descripción del feature engineering
-- `docs/ai-log/anna.md`: Registro de progreso actualizado
+### 3. Multicolinealidad detectada:
+- Algunas features históricas >0.7 correlacionadas
+- Recomendación: regularización L1/L2 en modelos lineales
 
 ---
 
-## 📝 Decisiones Importantes
+## 🚀 Próximos Pasos
 
-### Decidido (por Anna):
-- ✅ Usar siempre los últimos 5 partidos (`N=5`) para forma reciente
-- ✅ Separar features de local/visitante para mayor granularidad
-- ✅ Incluir features combinadas para capturar interacciones
-- ✅ Adaptarse a datasets sin columna `Season` (asumir todo el histórico disponible)
+### Issue #5 - Modelo Baseline (para Cala)
 
-### Decidido por el Equipo (Factoria-F5 Madrid):
-✅ **Datos reales**: Solo con API de football-data.co.uk  
-✅ **Estructura correcta**: Scripts en `src/kiniela/features/`  
-✅ **CI automática**: Cada PR debe pasar tests antes de fusionar  
+**Prerrequisitos completados:** ✅ Dataset con target + features, EDA finalizado
 
----
-
-## 📁 Archivos Clave Referenciados
-
-| Archivo | Ruta | Significado |
-|---------|------|------------|
-| Feature Engineering | `src/kiniela/features/engineering.py` | Implementación con 12+ features históricas |
-| Dataset (2023-24) | `data/processed/premier_league_2023_24.csv` | 380 partidos para testing rápido |
-| AGENTS.md | `.github/AGENTS.md` | Reglas de código, sin data leakage, Conventional Commits |
+**Plan para Issue #5:**
+1. Entrenar Random Forest o Logistic Regression con `StratifiedKFold(n_splits=5)`
+2. Usar `class_weight='balanced'` (Random Forest) o ponderación manual (LR)
+3. Métricas: Accuracy global + F1 macro (principal)
+4. Reportar accuracy y F1 macro de validación cruzada
+5. Elegir métrica principal para optimización
 
 ---
 
-## 🔬 Observaciones Clave
+## 📚 Referencias
 
-1. **Eficiencia computacional**: La implementación actual usa iteración sobre filas (lento con 3,420 partidos). Considerar optimización futura si necesario.
-
-2. **Features prometedoras**: Las 8 features principales capturan bien:
-   - Momentum reciente (form_home_last_5, recent_home_form)
-   - Potencia ofensiva (avg_goals_last_5)
-   - Fortaleza neta (diff_last_5)
-
-3. **Data leakage controlado**: Cada feature usa solo partidos anteriores al partido actual, validando criterio de no-fuga.
-
-4. **Compatibilidad con target.py**: Las features son independientes de `build_target()`, lo que permite combinarlas fácilmente en el dataset final.
-
----
-
-## 📚 Contexto Histórico
-
-- **Issue #1 (Datos reales)**: ✅ Completada - 380 partidos descargados, URL correcta de football-data.co.uk
-- **Issue #2 (Target)**: ✅ Completada - Umbral ≥ 2 con precedencia clase 5
-- **Issue #3 (Features)**: ⏳ En progreso - Código implementado, adaptable a datasets sin Season
-
----
-
-## 🚀 Próximo Paso
-
-Crear PR para Feature Engineering (Issue #3) con:
-- Commit: `feat(features): add historical features for Premier League prediction`
-- Archivos: `src/kiniela/features/engineering.py`, `docs/tarea-preparacion-dataset.md`, `docs/ai-log/anna.md`
+- [AGENTS.md](<../AGENTS.md>) - Reglas de trabajo y convenciones
+- [docs/ISSUES.md](<../ISSUES.md>) - Backlog completo del proyecto
