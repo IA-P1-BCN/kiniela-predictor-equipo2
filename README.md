@@ -124,6 +124,28 @@ Detalles de la imagen:
 - No incluye `.env`, datos, notebooks, tests ni entornos virtuales (ver `.dockerignore`). Los secretos se pasan al arrancar, con `-e` o `--env-file .env`.
 - De `models/` solo entran el modelo promocionado (`kiniela_model.joblib`) y su ficha (`model_card.json`), si existen.
 
+### Docker Compose (app + PostgreSQL)
+
+Para probar en local igual que en producción, con PostgreSQL en vez de SQLite:
+
+```bash
+docker compose up --build      # http://localhost:8501
+docker compose down            # parar (los datos se quedan)
+```
+
+## Despliegue
+
+**URL pública:** _pendiente del primer despliegue_
+
+La app corre en Render (Docker, plan gratuito) y guarda las predicciones en PostgreSQL de Neon. Variables de entorno:
+
+| Variable | Para qué | Dónde se define |
+| --- | --- | --- |
+| `DATABASE_URL` | Conexión a PostgreSQL (Neon) | Panel de Render; es secreta, nunca va en el repo |
+| `PORT` | Puerto de la app | Lo pone Render |
+
+Pasos, limitaciones del plan gratuito y cómo cambiar a `main`: [docs/deploy.md](docs/deploy.md).
+
 ## Base de datos
 
 La app guarda cada predicción y el feedback de la persona usuaria.
@@ -147,4 +169,6 @@ Cubren el catálogo de clases, el etiquetado, la predicción, la base de datos y
 - [Asignación de tareas](docs/ASIGNACION_TAREAS.md)
 - [Plantilla de daily](docs/DAILY_TEMPLATE.md)
 - [Base de datos](docs/database.md)
+- [Despliegue](docs/deploy.md)
+- [Contrato del modelo](docs/model-contract.md)
 - Plantilla de GitHub: `.github/ISSUE_TEMPLATE/tarea.md`
