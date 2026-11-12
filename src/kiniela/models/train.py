@@ -135,7 +135,16 @@ def stratified_cv() -> StratifiedKFold:
 
 
 def _cross_validate(X: np.ndarray, y: np.ndarray, estimator) -> FoldScores:
-    """Fit ``estimator`` on each fold and score it on the held-out fold."""
+    """Fit ``estimator`` on each fold and score it on the held-out fold.
+
+    Args:
+        X: Feature matrix, one row per match and one column per numeric feature.
+        y: Target labels, one per match, values between 0 and ``N_CLASSES - 1``.
+        estimator: Unfitted model; it is cloned for every fold.
+
+    Returns:
+        The accuracy and F1 macro of each of the ``CV_N_SPLITS`` folds.
+    """
     accuracy: list[float] = []
     f1_macro: list[float] = []
     for train_index, test_index in stratified_cv().split(X, y):
@@ -174,39 +183,43 @@ def _prepare(dataset: pd.DataFrame, columns: list[str]) -> tuple[np.ndarray, np.
     return usable[columns].to_numpy(), y, n_dropped
 
 
-def _print_report(report: BaselineReport, dataset_path: Path, model_path: Path) -> None:
-    """Human-readable summary of what was fixed and what was measured."""
-    print("Baseline training (Random Forest)")
-    print(
+def format_report(
+    report: BaselineReport, dataset_path: str | Path, model_path: str | Path
+) -> str:
+    """Human-readable summary of what was fixed and what was measured.
+
+    Pure function: it renders the report as text and never prints, so callers decide
+    where the output goes (the CLI prints it, tests assert on it).
+    """
+    lines = [
+        "Baseline training (Random Forest)",
         f"  validation: StratifiedKFold(n_splits={report.n_splits}, shuffle=True, "
-        f"random_state={report.random_state})"
-    )
-    print(
+        f"random_state={report.random_state})",
         f"  dataset: {dataset_path} ({report.n_samples} rows"
         + (f", {report.n_dropped} dropped without history" if report.n_dropped else "")
-        + f", {len(report.feature_columns)} features)"
-    )
-    print()
-    print(f"  {'model':<22}{'accuracy':<22}{'f1_macro'}")
+        + f", {len(report.feature_columns)} features)",
+        "",
+        f"  {'model':<22}{'accuracy':<22}{'f1_macro'}",
+    ]
     for name, scores in (
         ("reference (majority)", report.reference),
         ("random_forest", report.random_forest),
     ):
-        print(
+        lines.append(
             f"  {name:<22}{scores.accuracy_mean:.3f} +/- {scores.accuracy_std:.3f}"
             f"{'':<8}{scores.f1_macro_mean:.3f} +/- {scores.f1_macro_std:.3f}"
         )
-    print()
-    print(f"  saved: {model_path}")
+    lines.extend(["", f"  saved: {model_path}"])
+    return "\n".join(lines)
 
 
 def train_baseline(dataset_path: str | Path, model_path: str | Path) -> BaselineReport:
     """Train the baseline with the project's stratified scheme and save the artefact.
 
     Trains a majority-class reference and a ``RandomForestClassifier`` with
-    ``StratifiedKFold`` (seed and splits in :mod:`kiniela.config`), reports accuracy
+    ``StratifiedKFold`` (seed and splits in :mod:`kiniela.config`), measures accuracy
     and F1 macro per model, fits the forest on the whole dataset and saves it with
-    joblib.
+    joblib. It does not print: render the report with :func:`format_report`.
 
     Args:
         dataset_path: Modelling CSV with numeric features and a ``target`` column.
@@ -267,7 +280,6 @@ def train_baseline(dataset_path: str | Path, model_path: str | Path) -> Baseline
     destination.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(artifact, destination)
 
-    _print_report(report, path, destination)
     return report
 
 
@@ -287,7 +299,8 @@ def main(argv: list[str] | None = None) -> int:
         help="Output path of the artefact, for example models/baseline_rf.joblib.",
     )
     args = parser.parse_args(argv)
-    train_baseline(args.dataset, args.model)
+    report = train_baseline(args.dataset, args.model)
+    print(format_report(report, args.dataset, args.model))
     return 0
 
 

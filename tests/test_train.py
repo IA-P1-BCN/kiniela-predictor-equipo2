@@ -12,6 +12,7 @@ from kiniela.models.train import (
     NON_FEATURE_COLUMNS,
     TrainedBaseline,
     feature_columns,
+    format_report,
     main,
     stratified_cv,
     train_baseline,
@@ -186,3 +187,17 @@ def test_cli_trains_again_from_the_command_line(tmp_path, capsys):
     assert "reference (majority)" in output
     assert "random_forest" in output
     assert (tmp_path / "baseline_rf.joblib").is_file()
+
+
+def test_training_stays_silent_and_the_report_is_rendered_as_text(tmp_path, capsys):
+    report = train_baseline(
+        write_dataset(tmp_path / "modelling.csv"), tmp_path / "baseline_rf.joblib"
+    )
+    assert capsys.readouterr().out == ""  # printing is the caller's job
+    text = format_report(report, "modelling.csv", "baseline_rf.joblib")
+    assert capsys.readouterr().out == ""  # formatting does not print either
+    assert isinstance(text, str)
+    assert "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)" in text
+    assert "reference (majority)" in text
+    assert "random_forest" in text
+    assert "saved: baseline_rf.joblib" in text
