@@ -10,9 +10,13 @@ against the same numbers (issues #5 to #8 use it):
 - Reference: a majority-class ``DummyClassifier`` evaluated on the same folds, so the
   Random Forest is always compared against the trivial baseline.
 
-The functions that build the data and run the folds (:func:`feature_columns`,
-:func:`prepare_xy`, :func:`cross_validate_model`, :func:`stratified_cv`) are shared with
-the ensembles of issue #6, so every model is measured the same way.
+The functions that build the data and run the folds are the **public API of this
+module**: :func:`feature_columns`, :func:`prepare_xy`, :func:`cross_validate_model`,
+:func:`stratified_cv`, :func:`build_forest` and :func:`build_reference`. They were
+private before issue #6 (``_prepare`` and ``_cross_validate``) and were renamed and made
+public so that :mod:`kiniela.models.ensembles` reuses them instead of duplicating the
+validation logic; nothing else in the repository imported the old names. Every model in
+the project is measured the same way because of them.
 
 The dataset must be the modelling CSV of issue #3: numeric features plus a ``target``
 column with the 6 classes of issue #2. Features are the numeric columns minus
