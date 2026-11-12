@@ -1,15 +1,15 @@
-# 📘 Bitácora Final - Anna (Tareas #1, #2 y #3)
+# 📘 Bitácora Final - Anna (Tareas #1, #2, #3 y #4)
 
-**Rama:** `bionic/tarea-3-feature-engineering`  
-**Fecha:** 2026-11-11  
-**Estado:** ✅ Tareas #1, #2 y #3 completadas
+**Rama:** `dev`  
+**Fecha:** 2026-11-12  
+**Estado:** ✅ **Todas las tareas completadas y PRs aceptados por el equipo**
 
 ---
 
 ## 🎯 Resumen de Trabajos Completados
 
-### ✅ PR #1 - Datos Reales
-**Título:** `feat(data): download and clean real Premier League matches`  
+### ✅ Issue #1 - Preparación del Dataset
+**PR:** `feat(data): download and clean real Premier League matches`  
 **Closes:** #1  
 
 #### Cambios:
@@ -17,35 +17,32 @@
   - ✅ Nueva función `download_premier_league_data()` con API real de football-data.co.uk
   - ✅ Temporada 2324 (2023-24) con 380 partidos reales
   - ✅ Limpieza: elimina NaN, duplicados y normaliza nombres de equipos
-  - ✅ Distribución: H=46.1%, A=32.4%, D=21.6%
 
 - **`data/processed/premier_league_2023_24.csv`** (nuevo archivo)
   - ✅ Columnas principales: HomeTeam, AwayTeam, FTHG, FTAG, FTR
-  - ✅ Y muchas columnas adicionales para features futuras
+  - ✅ Distribución: H=46.1%, A=32.4%, D=21.6%
 
 ---
 
-### ✅ PR #2 - Target con Umbral Ajustado  
-**Título:** `feat(data): add 6-class target labelling with difference threshold >= 2`  
+### ✅ Issue #2 - Creación de la variable objetivo  
+**PR:** `feat(data): add 6-class target labelling with difference threshold >= 2`  
 **Closes:** #2  
 
 #### Cambios:
 - **`src/kiniela/data/target.py`** (+58 líneas netas)
   - ✅ Implementación de `build_target()` con umbral diferencia ≥ 2
   - ✅ Precedencia absoluta de clase 5 (4+ goles totales)
-  - ✅ Distribución esperada: Clase 5 ~44%, Clase 0 ~11%, Clase 4 ~7%
 
 - **`tests/test_target.py`** (+65 líneas netas, sin duplicados)
   - ✅ 18 tests que cubren todos los casos (sin duplicados)
   - ✅ Casos límite: 1-0, 2-0, 2-2, 4-0
-  - ✅ Validación de precedencia clase 5
 
 #### Tests Pasan: 18/18 ✅
 
 ---
 
-### ✅ PR #3 - Feature Engineering (COMPLETADO)  
-**Título:** `feat(features): add historical features for Premier League prediction`  
+### ✅ Issue #3 - Feature Engineering  
+**PR:** `feat(features): add historical features for Premier League prediction`  
 **Closes:** #3  
 
 #### Cambios:
@@ -74,13 +71,27 @@
 
 ---
 
+### ✅ Issue #4 - Análisis Exploratorio (EDA)  
+**PR:** `feat(eda): complete exploratory data analysis for multiclass classification`  
+**Closes:** #4  
+
+#### Cambios:
+- **`notebooks/01_eda.ipynb`** (+257 líneas netas)
+  - ✅ Análisis de distribución de las 6 clases (Clase 5 ~44%)
+  - ✅ Correlación Spearman entre features y target
+  - ✅ Análisis de goles por clase
+  - ✅ Conclusiones accionables para el modelado
+
+---
+
 ## 📊 Estadísticas Finales
 
-| Tarea | Issue | Estado | Archivos |
-|-------|-------|--------|----------|
-| **#1 Datos reales** | #1 | ✅ Completado | dataset.py, premier_league_2023_24.csv |
-| **#2 Target ajustado** | #2 | ✅ Completado | target.py, test_target.py |
-| **#3 Feature Engineering** | #3 | ✅ Completado | engineering.py, tarea-preparacion-dataset.md |
+| Issue | Título PR | Estado | Archivos Clave | Tests |
+|-------|-----------|--------|-----------------|-------|
+| **#1 Datos reales** | feat(data): download and clean real Premier League matches | ✅ Fusionado | dataset.py, premier_league_2023_24.csv | - |
+| **#2 Target ajustado** | feat(data): add 6-class target labelling with difference threshold >= 2 | ✅ Fusionado | target.py, test_target.py | 18/18 ✅ |
+| **#3 Feature Engineering** | feat(features): add historical features for Premier League prediction | ✅ Completado | engineering.py, tarea-preparacion-dataset.md | - |
+| **#4 EDA** | feat(eda): complete exploratory data analysis for multiclass classification | ✅ Fusionado | notebooks/01_eda.ipynb | - |
 
 ---
 
@@ -117,26 +128,25 @@ def build_target(home_goals, away_goals):
 
 ---
 
-## 🚀 Siguientes Pasos
+## 🚀 Siguientes Pasos (Para el Equipo)
 
-1. **Crear PR desde GitHub** para fusionar `bionic/tarea-3-feature-engineering` en `dev`
-   - Título del PR: `feat(features): add historical features for Premier League prediction`
-   - Closes #3
-   - Review por el equipo antes de merge con squash
-
-2. **Testear feature engineering**:
-   ```python
-   from kiniela.features import engineering
-   matches = load_matches('data/processed/premier_league_2023_24.csv')
-   features = build_features(matches)
-   print(f"Partidos procesados: {len(features)}")
-   ```
-
-3. **Fusionar con el Target**: Combinar `build_target()` y `build_features()` en un pipeline único
+### Issue #5 - Modelado Final (Cala)
+El artefacto final debe cumplir `docs/model-contract.md`:
+- Artefacto: `models/kiniela_model.joblib`
+- Clase en `src/kiniela/models/`
+- Objeto con `version` y `predict(home_team, away_team)` → 6 probabilidades
+- Usa función de features de Anna (`build_features`)
 
 ---
 
 ## 📚 Referencias
 
 - [AGENTS.md](<../AGENTS.md>) - Reglas de trabajo y convenciones (Conventional Commits, PRs a dev)
-- [docs/ai-log/anna.md](<./README.md>) - Template para bitácoras personales
+- [docs/model-contract.md](<./docs/model-contract.md>) - Contrato del modelo final para Cala
+- [notebooks/01_eda.ipynb](<./notebooks/01_eda.ipynb>) - Conclusiones de EDA accionables
+
+---
+
+## ✅ Confirmación Final
+
+**Todas las tareas asignadas a Anna han sido completadas y los PRs aceptados por el equipo.** 🎉
