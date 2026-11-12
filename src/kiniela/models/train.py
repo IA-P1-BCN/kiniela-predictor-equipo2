@@ -5,10 +5,18 @@ against the same numbers (issues #5 to #8 use it):
 
 - Splitter: ``StratifiedKFold(n_splits=CV_N_SPLITS, shuffle=True, random_state=RANDOM_STATE)``.
 - Seed: ``RANDOM_STATE`` from :mod:`kiniela.config`, used by the splitter and by the model.
-- Metrics per fold: ``accuracy`` and ``f1_macro``; the report shows their mean and
-  standard deviation across folds.
+- Metrics per fold: ``accuracy``, ``f1_macro`` and F1 per class; the report shows their
+  mean and standard deviation across folds.
 - Reference: a majority-class ``DummyClassifier`` evaluated on the same folds, so the
   Random Forest is always compared against the trivial baseline.
+
+The functions that build the data and run the folds are the **public API of this
+module**: :func:`feature_columns`, :func:`prepare_xy`, :func:`cross_validate_model`,
+:func:`stratified_cv`, :func:`build_forest` and :func:`build_reference`. They were
+private before issue #6 (``_prepare`` and ``_cross_validate``) and were renamed and made
+public so that :mod:`kiniela.models.ensembles` reuses them instead of duplicating the
+validation logic; nothing else in the repository imported the old names. Every model in
+the project is measured the same way because of them.
 
 The dataset must be the modelling CSV of issue #3: numeric features plus a ``target``
 column with the 6 classes of issue #2. Features are the numeric columns minus
@@ -42,6 +50,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import StratifiedKFold
+from sklearn.utils.class_weight import compute_sample_weight
 
 from kiniela.config import CV_N_SPLITS, N_CLASSES, RANDOM_STATE
 from kiniela.models.predict import DEFAULT_MODEL_PATH
@@ -66,10 +75,11 @@ VERSION_PREFIX = "baseline-rf"
 
 @dataclass(frozen=True)
 class FoldScores:
-    """Accuracy and F1 macro of each fold of the cross-validation."""
+    """Accuracy and F1 of each fold of the cross-validation."""
 
     accuracy: tuple[float, ...]
     f1_macro: tuple[float, ...]
+    f1_per_class: tuple[tuple[float, ...], ...]  # one row per fold, one value per class
 
     @property
     def accuracy_mean(self) -> float:
@@ -86,6 +96,11 @@ class FoldScores:
     @property
     def f1_macro_std(self) -> float:
         return float(np.std(self.f1_macro))
+
+    @property
+    def f1_per_class_mean(self) -> tuple[float, ...]:
+        """Mean F1 of each class (0 to ``N_CLASSES - 1``) across the folds."""
+        return tuple(float(np.mean(fold)) for fold in zip(*self.f1_per_class))
 
 
 @dataclass(frozen=True)
@@ -134,31 +149,69 @@ def stratified_cv() -> StratifiedKFold:
     )
 
 
-def _cross_validate(X: np.ndarray, y: np.ndarray, estimator) -> FoldScores:
+def build_forest() -> RandomForestClassifier:
+    """The baseline forest of issue #5, built the same way everywhere it is used."""
+    return RandomForestClassifier(
+        n_estimators=100,
+        class_weight="balanced",
+        random_state=RANDOM_STATE,
+        n_jobs=-1,
+    )
+
+
+def build_reference() -> DummyClassifier:
+    """The majority-class reference of issue #5: the trivial bar every model must beat."""
+    return DummyClassifier(strategy="most_frequent", random_state=RANDOM_STATE)
+
+
+def cross_validate_model(
+    X: np.ndarray, y: np.ndarray, estimator, *, balanced: bool = False
+) -> FoldScores:
     """Fit ``estimator`` on each fold and score it on the held-out fold.
 
     Args:
         X: Feature matrix, one row per match and one column per numeric feature.
         y: Target labels, one per match, values between 0 and ``N_CLASSES - 1``.
         estimator: Unfitted model; it is cloned for every fold.
+        balanced: Fit with class-balanced sample weights computed **on the training
+            fold only**. Used by XGBoost, which has no ``class_weight`` parameter;
+            the other models balance through their own parameter.
 
     Returns:
-        The accuracy and F1 macro of each of the ``CV_N_SPLITS`` folds.
+        The accuracy, F1 macro and F1 per class of each of the ``CV_N_SPLITS`` folds.
     """
     accuracy: list[float] = []
     f1_macro: list[float] = []
+    f1_per_class: list[tuple[float, ...]] = []
     for train_index, test_index in stratified_cv().split(X, y):
         fold_model = clone(estimator)
-        fold_model.fit(X[train_index], y[train_index])
+        if balanced:
+            sample_weight = compute_sample_weight("balanced", y[train_index])
+            fold_model.fit(X[train_index], y[train_index], sample_weight=sample_weight)
+        else:
+            fold_model.fit(X[train_index], y[train_index])
         predictions = fold_model.predict(X[test_index])
         accuracy.append(accuracy_score(y[test_index], predictions))
         f1_macro.append(
             f1_score(y[test_index], predictions, average="macro", zero_division=0)
         )
-    return FoldScores(tuple(accuracy), tuple(f1_macro))
+        f1_per_class.append(
+            tuple(
+                f1_score(
+                    y[test_index],
+                    predictions,
+                    labels=range(N_CLASSES),
+                    average=None,
+                    zero_division=0,
+                )
+            )
+        )
+    return FoldScores(tuple(accuracy), tuple(f1_macro), tuple(f1_per_class))
 
 
-def _prepare(dataset: pd.DataFrame, columns: list[str]) -> tuple[np.ndarray, np.ndarray, int]:
+def prepare_xy(
+    dataset: pd.DataFrame, columns: list[str]
+) -> tuple[np.ndarray, np.ndarray, int]:
     """Validate the target, drop the rows without features and return ``X``, ``y``, dropped.
 
     The first matchdays have no history behind them, so ``build_features`` leaves their
@@ -240,18 +293,11 @@ def train_baseline(dataset_path: str | Path, model_path: str | Path) -> Baseline
     dataset = pd.read_csv(path)
 
     columns = feature_columns(dataset)
-    X, y, n_dropped = _prepare(dataset, columns)
+    X, y, n_dropped = prepare_xy(dataset, columns)
 
-    reference = _cross_validate(
-        X, y, DummyClassifier(strategy="most_frequent", random_state=RANDOM_STATE)
-    )
-    forest = RandomForestClassifier(
-        n_estimators=100,
-        class_weight="balanced",
-        random_state=RANDOM_STATE,
-        n_jobs=-1,
-    )
-    scores = _cross_validate(X, y, forest)
+    reference = cross_validate_model(X, y, build_reference())
+    forest = build_forest()
+    scores = cross_validate_model(X, y, forest)
 
     report = BaselineReport(
         n_splits=CV_N_SPLITS,
