@@ -176,4 +176,26 @@
   - `docker compose build` falló con `failed to execute bake: exit status 1`. Compose 5 pide permiso para leer archivos, y la terminal del agente no puede contestar. Se confirmó con `BUILDX_BAKE_ENTITLEMENTS_FS=0` y se documentó en `docs/deploy.md`.
   - El agente lanzó la prueba del Compose con Docker Desktop apagado, y un bucle de espera sin límite se quedó colgado hasta pararlo a mano. Los bucles siguientes llevan un número máximo de intentos.
 - **Pruebas:** con Compose, la app y la base de datos salen *healthy*, y la predicción hecha desde la app queda guardada en PostgreSQL. `pytest` pasa.
-- **Revisión humana:** pendiente en el PR.
+- **Revisión humana:** Eva fusionó el PR #32 con `Tests` en verde. Gemini afirmó que el PR no añadía una entrada nueva a la bitácora, y sí la añadía (esta). No se aplicó.
+
+### #12 Despliegue (parte 2: app en producción)
+
+- **Fecha:** 2026-11-12
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** las capturas de Neon y Render que Eva iba compartiendo, y la URL desplegada. El agente guió los pasos en los paneles, que hizo Eva.
+- **Qué hizo Eva en los paneles:**
+  - Un proyecto en Neon con la conexión directa, sin pooler.
+  - Un Blueprint `kiniela` en Render con la URL pública del repo y la rama `dev`.
+  - `DATABASE_URL` pegada solo en Render.
+- **Qué generó el agente:** la URL pública y el enlace al tablero en el README, en lugar de la frase antigua de que el repo no tenía modelo.
+- **Aceptado:**
+  - Desplegar por la URL pública del repo: no hace falta que una propietaria de la organización apruebe la app de Render. A cambio, cada despliegue se lanza a mano (*Manual Deploy*).
+  - No usar el prompt para agentes de Neon (era para Node.js).
+- **Rechazado o cambiado, y por qué:** nada.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - Se repitió lo de la #11: la rama de la parte 1 estaba enlazada a la #12 y la issue se cerró sola al fusionar el PR #32 con `Refs`. Esta vez estaba previsto y se reabrió en el momento.
+  - El agente no puede manejar el navegador, así que la prueba de punta a punta en la URL pública la hizo Eva. El agente comprobó el healthcheck (`ok`) y la respuesta HTTP 200.
+- **Pruebas:**
+  - En https://kiniela-predictor.onrender.com: predicción Arsenal – Chelsea (clase 5, 6 probabilidades), sin aviso de base de datos, y feedback guardado.
+  - Para confirmar que se guarda en Neon y no en un SQLite temporal del contenedor, Eva consultó `predictions` con su `feedback` en el SQL Editor de Neon. Salió la fila: `arsenal`, `chelsea`, clase 5, `is_correct = t`, `actual_class = 5`.
+- **Revisión humana:** Eva, en el navegador y en Neon.
