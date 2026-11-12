@@ -2,10 +2,12 @@
 
 Clasificación multiclase del tipo de resultado de un partido de fútbol para una kiniela. El modelo distingue seis situaciones, no solo local, empate o visitante.
 
+**App desplegada**: https://kiniela-predictor.onrender.com  
 **Repositorio**: https://github.com/IA-P1-BCN/kiniela-predictor-equipo2  
-**Organización**: [IA-P1-BCN](https://github.com/IA-P1-BCN)
+**Organización**: [IA-P1-BCN](https://github.com/IA-P1-BCN)  
+**Tablero**: [GitHub Projects](https://github.com/orgs/IA-P1-BCN/projects/56)
 
-Esta versión es la base del proyecto. No incluye dataset ni modelo entrenado.
+Mientras no haya un modelo entrenado en `models/`, la app usa un modelo de prueba y lo avisa en pantalla.
 
 ## Clases
 
@@ -135,7 +137,7 @@ docker compose down            # parar (los datos se quedan)
 
 ## Despliegue
 
-**URL pública:** _pendiente del primer despliegue_
+**URL pública:** https://kiniela-predictor.onrender.com (rama `dev`; si lleva un rato sin visitas, tarda alrededor de un minuto en despertar)
 
 La app corre en Render (Docker, plan gratuito) y guarda las predicciones en PostgreSQL de Neon. Variables de entorno:
 
