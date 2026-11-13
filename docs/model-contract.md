@@ -59,5 +59,6 @@ predicted_class(probabilities)          # falla si no son 6 probabilidades váli
 
 ## Junto al modelo
 
-- `models/model_card.json`: versión, fecha, métricas de validación, features y `RANDOM_STATE`. Lo usará la documentación MLOps (#16).
+- `models/model_card.json`: versión, fecha, métricas de validación, features y `RANDOM_STATE`. Lo usará la documentación MLOps (#16). La regla de promoción lee `version`, `metrics.f1_macro` y `metrics.overfitting_gap` ([A/B testing](ab-testing.md)).
+- Un modelo **candidato** para A/B testing usa el mismo contrato, con los nombres `candidate_model.joblib` y `candidate_model_card.json`.
 - Solo estos dos archivos entran en la imagen Docker (ver `.dockerignore`).
