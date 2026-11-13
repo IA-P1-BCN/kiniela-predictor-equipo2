@@ -6,7 +6,6 @@ anteriores, para no filtrar el resultado del partido que se predice.
 
 import pandas as pd
 import numpy as np
-from datetime import datetime
 
 
 def build_features(matches: pd.DataFrame) -> pd.DataFrame:
@@ -19,26 +18,29 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
         DataFrame con features añadidas y ordenadas por fecha.
     
     Features creadas:
-    - **form_home_last_5**: Último resultado del local (1=W, 0=D, -1=L) en últimos 5 partidos como local
-    - **form_away_last_5**: Último resultado del visitante (1=W, 0=D, -1=L) en últimos 5 partidos como visitante  
+    - **form_home_last_5**: Promedio de resultados del local en últimos 5 partidos como local (1=W, 0=D, -1=L)
+    - **form_away_last_5**: Promedio de resultados del visitante en últimos 5 partidos como visitante (1=W, 0=D, -1=L)  
     - **avg_home_goals_last_5**: Promedio goles marcados por local en últimos 5 partidos como local
     - **avg_away_goals_last_5**: Promedio goles marcados por visitante en últimos 5 partidos como visitante
     - **home_diff_last_5**: Diferencia goles (local-visitante) promedio de últimos 5 partidos del local
     - **away_diff_last_5**: Diferencia goles (visitante-local) promedio de últimos 5 partidos del visitante
-    - **recent_home_form**: Forma reciente local (1=último W, 0.5=D, 0=L) en últimos 5 como local
-    - **recent_away_form**: Forma reciente visitante (1=último W, 0.5=D, 0=L) en últimos 5 como visitante
-    - **avg_home_goals_conceded_last_5**: Promedio goles recibidos por local en últimos 5 partidos
-    - **avg_away_goals_conceded_last_5**: Promedio goles recibidos por visitante en últimos 5 partidos
+    - **recent_home_form**: Forma reciente local (1=último partido W, 0.5=D, 0=último L) en últimos 5 como local
+    - **recent_away_form**: Forma reciente visitante (1=último partido W, 0.5=D, 0=último L) en últimos 5 como visitante
+    - **match_diff**: Diferencia entre form_home_last_5 y form_away_last_5
+    - **match_goals_expected**: Suma de avg_home_goals_last_5 y avg_away_goals_last_5
+    - **match_momentum**: Diferencia entre recent_home_form y recent_away_form
     
     Justificación:
-    - La forma reciente captura el momentum actual del equipo
-    - Los promedios de goles indican la potencia ofensiva
+    - La forma reciente (promedio) captura el momentum actual del equipo
+    - Los promedios de goles indican la potencia ofensiva reciente
     - Las diferencias de rendimiento muestran la fortaleza defensiva/ofensiva neta
     - La localía reciente refleja si el equipo está rindiendo bien en su estadio
     
     Cada feature solo usa información de PARTIDOS ANTERIORES para evitar data leakage.
     
-    Nota: Para predicción individual (app) ver build_match_features().
+    Notes:
+    - `form_*_last_5` devuelve el PROMEDIO de los últimos 5 resultados (no solo el último)
+    - `recent_*_form` devuelve el resultado del último partido en escala ponderada (1/0.5/0)
     """
     if matches.empty:
         raise ValueError("El histórico de partidos está vacío.")
@@ -59,7 +61,6 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
     matches["ResultHome"] = matches["FTR"].apply(lambda x: result_to_num(x))
     matches["ResultAway"] = matches["FTR"].apply(lambda x: -result_to_num(x))
     
-    # Para cada equipo, calcular las estadísticas de sus últimos N partidos como local/visitante
     N = 5  # Últimos 5 partidos para forma reciente
     
     print(f"Calculando historial por equipo ({N} partidos recientes)...")
@@ -72,14 +73,11 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
         
         # Detectar si el dataset tiene columna Season o no
         if "Season" not in matches.columns:
-            # No hay columna Season - usar todo el histórico disponible
-            print(f"   ⚠️  Dataset sin columna 'Season', usando todo el histórico...")
             season_matches = matches.copy()
         else:
-            # Filtrar solo los partidos de la misma temporada
             season_matches = matches[matches["Season"] == row["Season"]]
         
-        # Encontrar todos los partidos del local hasta ahora (ordenados por fecha)
+        # Encontrar todos los partidos del local y visitante hasta ahora (ordenados por fecha)
         home_history = season_matches[season_matches["HomeTeam"] == home_team].sort_values("Date")
         away_history = season_matches[season_matches["AwayTeam"] == away_team].sort_values("Date")
         
@@ -89,13 +87,15 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
             home_past = home_history[home_history["Date"] < current_date]
             
             if len(home_past) > 0:
-                # Últimos N partidos como local del local
+                # Últimos N partidos como local
                 last_n_home = home_past.tail(N).copy()
                 
-                form_home_last_5 = result_to_num(last_n_home.iloc[-1]["FTR"])
+                form_home_last_5 = last_n_home["ResultHome"].mean()
                 avg_home_goals_last_5 = last_n_home["FTHG"].tail(N).mean()
                 away_goals_conceded_last_5 = last_n_home["FTAG"].tail(N).mean()
                 home_diff_last_5 = (last_n_home["FTHG"] - last_n_home["FTAG"]).tail(N).mean()
+                
+                # Forma reciente: resultado del último partido en escala ponderada
                 recent_home_form = result_to_num(last_n_home.iloc[-1]["FTR"])
             else:
                 form_home_last_5 = np.nan
@@ -116,13 +116,15 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
             away_past = away_history[away_history["Date"] < current_date]
             
             if len(away_past) > 0:
-                # Últimos N partidos como visitante del visitante
+                # Últimos N partidos como visitante
                 last_n_away = away_past.tail(N).copy()
                 
-                form_away_last_5 = result_to_num(last_n_away.iloc[-1]["FTR"])
+                form_away_last_5 = last_n_away["ResultAway"].mean()
                 avg_away_goals_last_5 = last_n_away["FTAG"].tail(N).mean()
                 home_goals_conceded_last_5 = last_n_away["FTHG"].tail(N).mean()
                 away_diff_last_5 = (last_n_away["FTAG"] - last_n_away["FTHG"]).tail(N).mean()
+                
+                # Forma reciente: resultado del último partido en escala ponderada
                 recent_away_form = result_to_num(last_n_away.iloc[-1]["FTR"])
             else:
                 form_away_last_5 = np.nan
@@ -138,14 +140,25 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
             recent_away_form = np.nan
         
         # Features combinadas
-        match_diff = form_home_last_5 - form_away_last_5 if not (pd.isna(form_home_last_5) and pd.isna(form_away_last_5)) else np.nan
-        match_goals_expected = avg_home_goals_last_5 + avg_away_goals_last_5 if not (pd.isna(avg_home_goals_last_5) and pd.isna(avg_away_goals_last_5)) else np.nan
-        match_momentum = recent_home_form - recent_away_form if not (pd.isna(recent_home_form) and pd.isna(recent_away_form)) else np.nan
+        if pd.notna(form_home_last_5) and pd.notna(form_away_last_5):
+            match_diff = form_home_last_5 - form_away_last_5
+        else:
+            match_diff = np.nan
+        
+        if pd.notna(avg_home_goals_last_5) and pd.notna(avg_away_goals_last_5):
+            match_goals_expected = avg_home_goals_last_5 + avg_away_goals_last_5
+        else:
+            match_goals_expected = np.nan
+        
+        if pd.notna(recent_home_form) and pd.notna(recent_away_form):
+            match_momentum = recent_home_form - recent_away_form
+        else:
+            match_momentum = np.nan
         
         features_list.append({
             "HomeTeam": home_team,
             "AwayTeam": away_team,
-            # Formas recientes
+            # Formas recientes (promedio y último)
             "form_home_last_5": form_home_last_5,
             "form_away_last_5": form_away_last_5,
             # Promedios de goles
@@ -157,6 +170,10 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
             # Forma reciente numérica (1/0.5/0 para peso en regresión logística)
             "recent_home_form": recent_home_form,
             "recent_away_form": recent_away_form,
+            # Features combinadas
+            "match_diff": match_diff,
+            "match_goals_expected": match_goals_expected,
+            "match_momentum": match_momentum,
             # Goles originales (para feature engineering adicional si es necesario)
             "FTHG": row["FTHG"],
             "FTAG": row["FTAG"],
@@ -189,11 +206,12 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_match_features(history: pd.DataFrame, home_team: str, away_team: str) -> dict:
-    """Calcula las features para un partido nuevo basado en el historial.
+    """Calcula las features para un partido específico a partir del historial.
     
-    Esta función es necesaria para que la app pueda predecir partidos individuales
-    sin necesidad de todo el histórico. Calcula las features del local y visitante
-    basándose solo en sus partidos anteriores (evitando data leakage).
+    Esta función es necesaria para predecir partidos individuales desde la app,
+    donde no tenemos todo el histórico de partidos disponible. Calcula las 
+    features del local y visitante basándose solo en sus partidos anteriores 
+    (evitando data leakage).
     
     Args:
         history: DataFrame con historial de partidos (columnas: HomeTeam, AwayTeam, 
@@ -203,23 +221,23 @@ def build_match_features(history: pd.DataFrame, home_team: str, away_team: str) 
         
     Returns:
         dict con las siguientes features:
-        - form_home_last_5: Último resultado local (1=W, 0=D, -1=L) de últimos 5 como local
-        - form_away_last_5: Último resultado visitante (1=W, 0=D, -1=L) de últimos 5 como visitante
+        - form_home_last_5: Promedio de últimos 5 resultados como local (1=W, 0=D, -1=L)
+        - form_away_last_5: Promedio de últimos 5 resultados como visitante (1=W, 0=D, -1=L)
         - avg_home_goals_last_5: Promedio goles marcados por local en últimos 5 como local
         - avg_away_goals_last_5: Promedio goles marcados por visitante en últimos 5 como visitante
         - home_diff_last_5: Diferencia goles promedio de últimos 5 del local (FTHG-FTAG)
         - away_diff_last_5: Diferencia goles promedio de últimos 5 del visitante (FTAG-FTHG)
-        - recent_home_form: Forma reciente local (1=W, 0=D, -1=L) del último partido como local
-        - recent_away_form: Forma reciente visitante (1=W, 0=D, -1=L) del último partido como visitante
+        - recent_home_form: Último resultado local en escala ponderada (1=W, 0.5=D, 0=L)
+        - recent_away_form: Último resultado visitante en escala ponderada (1=W, 0.5=D, 0=L)
         - match_diff: Diferencia de forma entre equipos (form_home_last_5 - form_away_last_5)
         - match_goals_expected: Goles esperados en el partido (avg_home + avg_away)
         - match_momentum: Momentum reciente (recent_home_form - recent_away_form)
         
     Notes:
-        - Las features con menos de 5 partidos históricos se marcan con NaN
-        - Se usa solo la información de PARTIDOS ANTERIORES para evitar data leakage
-        - Los nombres de equipo deben coincidir exactamente (case-sensitive)
-        
+    - Usa solo partidos ANTERIORES al momento de predicción (evita data leakage)
+    - Si no hay historial suficiente, devuelve NaN para las features
+    - Los nombres de equipo deben coincidir exactamente (case-sensitive)
+    
     Example:
         >>> history = pd.DataFrame({...})
         >>> features = build_match_features(history, "Arsenal", "Chelsea")
@@ -227,16 +245,32 @@ def build_match_features(history: pd.DataFrame, home_team: str, away_team: str) 
     """
     
     if history.empty:
-        raise ValueError("El histórico de partidos está vacío.")
+        return {k: np.nan for k in ["form_home_last_5", "form_away_last_5", 
+                                      "avg_home_goals_last_5", "avg_away_goals_last_5",
+                                      "home_diff_last_5", "away_diff_last_5",
+                                      "recent_home_form", "recent_away_form",
+                                      "match_diff", "match_goals_expected", "match_momentum"]}
     
-    # Ordenar por fecha para asegurar que las features usan solo datos pasados
+    # Ordenar historial por fecha
     history = history.sort_values("Date")
     
-    print(f"\n{'='*60}")
-    print("Build Match Features - Calculando features para partido nuevo...")
-    print(f"  Local: {home_team}")
-    print(f"  Visitante: {away_team}")
-    print(f"{'='*60}\n")
+    N = 5  # Últimos 5 partidos para forma reciente
+    
+    # Detectar si el historial tiene columna Season
+    if "Season" not in history.columns:
+        matches_to_use = history.copy()
+    else:
+        # Para predicción, necesitamos la temporada actual. 
+        # Si no se especifica, usamos la última temporada disponible.
+        if "Date" in history.columns:
+            last_season = str(history["Season"].iloc[-1])
+            matches_to_use = history[history["Season"] == last_season]
+        else:
+            matches_to_use = history
+    
+    # Filtrar historial del local y visitante hasta ahora (ordenados por fecha)
+    home_history = matches_to_use[matches_to_use["HomeTeam"] == home_team].sort_values("Date")
+    away_history = matches_to_use[matches_to_use["AwayTeam"] == away_team].sort_values("Date")
     
     # Función para convertir resultado a número (W=1, D=0, L=-1)
     def result_to_num(result):
@@ -244,102 +278,49 @@ def build_match_features(history: pd.DataFrame, home_team: str, away_team: str) 
         elif result == "A": return -1
         else: return 0
     
-    N = 5  # Últimos 5 partidos para forma reciente
-    
     features = {}
     
-    # --- Calcular features del LOCAL ---
-    print(f"Calculando features del equipo local ({home_team})...")
-    
-    home_history = history[history["HomeTeam"] == home_team].sort_values("Date")
-    
+    # Calcular features del local
     if len(home_history) > 0:
-        last_match_date = history[history["HomeTeam"] == home_team]["Date"].max()
-        # Filtrar solo partidos Estrictamente ANTERIORES al partido actual
-        home_past = home_history[home_history["Date"] < last_match_date]
+        current_date_matches = matches_to_use[matches_to_use["Date"] < home_history["Date"].max()]
         
-        if len(home_past) > 0:
-            # Últimos N partidos como local del local
-            last_n_home = home_past.tail(N).copy()
+        if len(current_date_matches) > 0:
+            last_n_home = current_date_matches[current_date_matches["HomeTeam"] == home_team].tail(N)
             
-            features["form_home_last_5"] = result_to_num(last_n_home.iloc[-1]["FTR"])
-            features["avg_home_goals_last_5"] = last_n_home["FTHG"].tail(N).mean()
-            features["home_diff_last_5"] = (last_n_home["FTHG"] - last_n_home["FTAG"]).tail(N).mean()
-            features["recent_home_form"] = result_to_num(last_n_home.iloc[-1]["FTR"])
-            
-            print(f"  ✅ Formas local: {features['form_home_last_5']} (último resultado), "
-                  f"goles promedios: {features['avg_home_goals_last_5']:.2f}")
-        else:
-            features["form_home_last_5"] = np.nan
-            features["avg_home_goals_last_5"] = np.nan
-            features["home_diff_last_5"] = np.nan
-            features["recent_home_form"] = np.nan
-            print(f"  ⚠️  No hay partidos históricos suficientes para el local")
-    else:
-        features["form_home_last_5"] = np.nan
-        features["avg_home_goals_last_5"] = np.nan
-        features["home_diff_last_5"] = np.nan
-        features["recent_home_form"] = np.nan
-        print(f"  ⚠️  El equipo {home_team} no tiene historial como local")
+            features["form_home_last_5"] = last_n_home["ResultHome"].mean() if "ResultHome" in last_n_home.columns else np.nan
+            features["avg_home_goals_last_5"] = last_n_home["FTHG"].mean() if not last_n_home.empty else np.nan
+            features["home_diff_last_5"] = (last_n_home["FTHG"] - last_n_home["FTAG"]).mean() if not last_n_home.empty else np.nan
+            features["recent_home_form"] = result_to_num(last_n_home.iloc[-1]["FTR"]) if not last_n_home.empty else np.nan
     
-    # --- Calcular features del VISITANTE ---
-    print(f"\nCalculando features del equipo visitante ({away_team})...")
-    
-    away_history = history[history["AwayTeam"] == away_team].sort_values("Date")
-    
+    # Calcular features del visitante
     if len(away_history) > 0:
-        last_match_date = history[history["AwayTeam"] == away_team]["Date"].max()
-        # Filtrar solo partidos Estrictamente ANTERIORES al partido actual
-        away_past = away_history[away_history["Date"] < last_match_date]
+        current_date_matches = matches_to_use[matches_to_use["Date"] < away_history["Date"].max()]
         
-        if len(away_past) > 0:
-            # Últimos N partidos como visitante del visitante
-            last_n_away = away_past.tail(N).copy()
+        if len(current_date_matches) > 0:
+            last_n_away = current_date_matches[current_date_matches["AwayTeam"] == away_team].tail(N)
             
-            features["form_away_last_5"] = result_to_num(last_n_away.iloc[-1]["FTR"])
-            features["avg_away_goals_last_5"] = last_n_away["FTAG"].tail(N).mean()
-            features["away_diff_last_5"] = (last_n_away["FTAG"] - last_n_away["FTHG"]).tail(N).mean()
-            features["recent_away_form"] = result_to_num(last_n_away.iloc[-1]["FTR"])
-            
-            print(f"  ✅ Formas visitante: {features['form_away_last_5']} (último resultado), "
-                  f"goles promedios: {features['avg_away_goals_last_5']:.2f}")
-        else:
-            features["form_away_last_5"] = np.nan
-            features["avg_away_goals_last_5"] = np.nan
-            features["away_diff_last_5"] = np.nan
-            features["recent_away_form"] = np.nan
-            print(f"  ⚠️  No hay partidos históricos suficientes para el visitante")
+            features["form_away_last_5"] = last_n_away["ResultAway"].mean() if "ResultAway" in last_n_away.columns else np.nan
+            features["avg_away_goals_last_5"] = last_n_away["FTAG"].mean() if not last_n_away.empty else np.nan
+            features["away_diff_last_5"] = (last_n_away["FTAG"] - last_n_away["FTHG"]).mean() if not last_n_away.empty else np.nan
+            features["recent_away_form"] = result_to_num(last_n_away.iloc[-1]["FTR"]) if not last_n_away.empty else np.nan
+    
+    # Features combinadas (siempre calcularlas, pueden ser NaN para predicción temprana)
+    if pd.notna(features.get("form_home_last_5")) and pd.notna(features.get("form_away_last_5")):
+        features["match_diff"] = features["form_home_last_5"] - features["form_away_last_5"]
     else:
-        features["form_away_last_5"] = np.nan
-        features["avg_away_goals_last_5"] = np.nan
-        features["away_diff_last_5"] = np.nan
-        features["recent_away_form"] = np.nan
-        print(f"  ⚠️  El equipo {away_team} no tiene historial como visitante")
+        # Solo hay datos de un equipo - usar NaN para match_diff
+        features["match_diff"] = np.nan
     
-    # --- Calcular features combinadas ---
-    match_diff = (features["form_home_last_5"] - features["form_away_last_5"]) \
-                 if not (pd.isna(features["form_home_last_5"]) and pd.isna(features["form_away_last_5"])) \
-                 else np.nan
+    if pd.notna(features.get("avg_home_goals_last_5")) and pd.notna(features.get("avg_away_goals_last_5")):
+        features["match_goals_expected"] = features["avg_home_goals_last_5"] + features["avg_away_goals_last_5"]
+    else:
+        # Solo hay datos de un equipo - usar NaN para match_goals_expected
+        features["match_goals_expected"] = np.nan
     
-    match_goals_expected = (features["avg_home_goals_last_5"] + features["avg_away_goals_last_5"]) \
-                          if not (pd.isna(features["avg_home_goals_last_5"]) and pd.isna(features["avg_away_goals_last_5"])) \
-                          else np.nan
+    if pd.notna(features.get("recent_home_form")) and pd.notna(features.get("recent_away_form")):
+        features["match_momentum"] = features["recent_home_form"] - features["recent_away_form"]
+    else:
+        # Solo hay datos de un equipo - usar NaN para match_momentum
+        features["match_momentum"] = np.nan
     
-    match_momentum = (features["recent_home_form"] - features["recent_away_form"]) \
-                   if not (pd.isna(features["recent_home_form"]) and pd.isna(features["recent_away_form"])) \
-                   else np.nan
-    
-    # Añadir features combinadas al dict
-    features["match_diff"] = match_diff
-    features["match_goals_expected"] = match_goals_expected
-    features["match_momentum"] = match_momentum
-    
-    print(f"\n  ✅ match_diff: {features['match_diff']}")
-    print(f"  ✅ match_goals_expected: {features['match_goals_expected']:.2f}")
-    print(f"  ✅ match_momentum: {features['match_momentum']}")
-    
-    print(f"\n{'='*60}")
-    print(f"✅ Features calculadas exitosamente para {home_team} vs {away_team}")
-    print(f"{'='*60}\n")
-    
-    return features
+    return {k: v for k, v in features.items() if k not in ["away_goals_conceded_last_5", "home_goals_conceded_last_5"]}
