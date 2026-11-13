@@ -62,23 +62,35 @@ class ModelComparison:
     criterion: str = CANDIDATE_CRITERION
 
 
+def build_xgboost(**overrides: object) -> XGBClassifier:
+    """The XGBoost of issue #6: fixed seed and library defaults, ``overrides`` win.
+
+    Issue #7 tunes the hyperparameters through this function, so the defaults
+    used by the comparison and the starting point of the search are one and the
+    same definition.
+    """
+    params: dict[str, object] = dict(
+        n_estimators=100,
+        learning_rate=0.1,
+        objective="multi:softprob",
+        eval_metric="mlogloss",
+        tree_method="hist",
+        random_state=RANDOM_STATE,
+        n_jobs=-1,
+    )
+    params.update(overrides)
+    return XGBClassifier(**params)
+
+
 def build_ensembles() -> dict[str, object]:
     """The two ensembles of issue #6, with their library defaults plus a fixed seed.
 
-    Hyperparameter search is issue #7: here the comparison has to be reproducible
-    and fair, not optimised.
+    Hyperparameter search lives in :mod:`kiniela.models.tuning` (issue #7): here
+    the comparison has to be reproducible and fair, not optimised.
     """
     return {
         FOREST_NAME: build_forest(),
-        XGBOOST_NAME: XGBClassifier(
-            n_estimators=100,
-            learning_rate=0.1,
-            objective="multi:softprob",
-            eval_metric="mlogloss",
-            tree_method="hist",
-            random_state=RANDOM_STATE,
-            n_jobs=-1,
-        ),
+        XGBOOST_NAME: build_xgboost(),
         LIGHTGBM_NAME: LGBMClassifier(
             n_estimators=100,
             learning_rate=0.1,
