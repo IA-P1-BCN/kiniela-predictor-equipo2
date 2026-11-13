@@ -174,5 +174,7 @@ Cubren el catálogo de clases, el etiquetado, la predicción, la base de datos y
 - [Despliegue](docs/deploy.md)
 - [Contrato del modelo](docs/model-contract.md)
 - [Datos para reentrenar](docs/retraining.md)
+- [Informe técnico](docs/informe/README.md)
+- [Guion de la presentación técnica](docs/presentacion/README.md)
 - [Data drift](docs/drift.md)
 - Plantilla de GitHub: `.github/ISSUE_TEMPLATE/tarea.md`
