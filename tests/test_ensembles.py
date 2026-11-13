@@ -22,7 +22,10 @@ def uniform_scores(value: float) -> FoldScores:
     """FoldScores with the same value everywhere, to test the choice in isolation."""
     fold = (value,) * N_CLASSES
     return FoldScores(
-        (value,) * CV_N_SPLITS, (value,) * CV_N_SPLITS, (fold,) * CV_N_SPLITS
+        (value,) * CV_N_SPLITS,
+        (value,) * CV_N_SPLITS,
+        (fold,) * CV_N_SPLITS,
+        (value,) * CV_N_SPLITS,
     )
 
 
