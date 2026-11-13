@@ -155,7 +155,7 @@ La app guarda cada predicción y el feedback de la persona usuaria.
 - **En local** no hay que configurar nada: se usa SQLite en `data/kiniela.db`.
 - **En producción** se usa PostgreSQL en Neon, con la variable `DATABASE_URL`. Las variables necesarias están en `.env.example`, sin valores reales.
 
-El esquema y las métricas en tiempo real están en [docs/database.md](docs/database.md). Para sacar los partidos con su clase real y reentrenar: `python -m kiniela.storage.export` ([docs/retraining.md](docs/retraining.md)). Para comparar las features de entrenamiento con un lote nuevo: `python -m kiniela.monitoring.drift` ([docs/drift.md](docs/drift.md)). Para probar un modelo nuevo junto al actual y promocionarlo si gana: `python -m kiniela.models.promote` ([docs/ab-testing.md](docs/ab-testing.md)).
+El esquema y las métricas en tiempo real están en [docs/database.md](docs/database.md). Los comandos se lanzan desde la raíz del repo con `PYTHONPATH=src` delante, porque el paquete vive en `src/`. Para sacar los partidos con su clase real y reentrenar: `python -m kiniela.storage.export` ([docs/retraining.md](docs/retraining.md)). Para comparar las features de entrenamiento con un lote nuevo: `python -m kiniela.monitoring.drift` ([docs/drift.md](docs/drift.md)). Para probar un modelo nuevo junto al actual y promocionarlo si gana: `python -m kiniela.models.promote` ([docs/ab-testing.md](docs/ab-testing.md)).
 
 ## Tests
 

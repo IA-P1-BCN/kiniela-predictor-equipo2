@@ -279,3 +279,14 @@
 - **Errores o alucinaciones del agente y cómo se corrigieron:** al editar el script con un *heredoc*, un `\n` se convirtió en un salto de línea real y rompió el f-string; lo detectó la suite antes del commit. Al probar el comando se vio que `python -m kiniela...` necesita `PYTHONPATH=src`; en esta guía se documentó así.
 - **Revisión de Gemini:** señaló que el reparto no usaba `RANDOM_STATE`. Se aceptó: el router se crea con esa semilla y un test comprueba que el reparto es reproducible. Se descartó su sugerencia de un mensaje más visible para el modelo de prueba, porque el script ya lo explica.
 - **Revisión humana:** Eva aprobó la regla y los umbrales; fusionado con *Squash and merge* (PR #48).
+
+### #36 Corrección: comando de export con `PYTHONPATH=src`
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «ok a corregir la 36», tras detectarlo durante la #37.
+- **Qué generó el agente:** `docs/retraining.md` con `PYTHONPATH=src` en cada comando (y su equivalente en PowerShell), y una nota en el README.
+- **Aceptado:** un PR aparte para no mezclarlo con la #37; rama sin enlazar y `Refs #36`, porque la issue ya está cerrada.
+- **Rechazado o cambiado, y por qué:** no se instaló el paquete (`pip install -e .`): necesitaría un `pyproject.toml`, que no está en ninguna issue.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** en la #36 el agente documentó `python -m kiniela.storage.export` sin probarlo fuera de pytest (que ya tiene `pythonpath = src`). Se vio al probar el comando de la #37.
+- **Revisión humana:** Eva aprobó la corrección.
