@@ -35,4 +35,15 @@
 - **Aceptado:** el reparto y las fechas de este PR, para que el equipo pueda escribir sin chocar.
 - **Rechazado o cambiado, y por qué:** no se dejó la sección 7 en un solo archivo (conflicto entre Mariana y Eva). Presentación técnica: una persona por parte, no «Anna / Mariana».
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** fusionada en `dev` (PR #45).
+
+### #15 Tests unitarios
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Cursor, Grok 4.7
+- **Prompt clave:** «hazlo» — cerrar #15 junto con #16.
+- **Qué generó el agente:** `kiniela.data.validate`, `kiniela.models.metrics` y tests de esquema, nulos, rangos, `target` 0-5, forma de la predicción y un caso de métricas con resultado conocido.
+- **Aceptado:** esos módulos y tests. No se duplicó lo que ya cubrían `test_target.py` y `test_predict.py`.
+- **Rechazado o cambiado, y por qué:** no se tocó la suite existente para «hacer sitio»; se añadieron archivos.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
 - **Revisión humana:** pendiente.
