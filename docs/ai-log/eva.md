@@ -227,4 +227,35 @@
 - **Pruebas:**
   - `pytest`: 99 tests.
   - Contra el PostgreSQL del Compose: la primera ejecución exporta 1 partido, la segunda 0 (sin duplicados), y `--since` filtra bien.
-- **Revisión humana:** pendiente en el PR.
+- **Revisión humana:** Eva fusionó el PR #38 con `Tests` en verde. Gemini no encontró problemas; sugirió un comentario sobre `Date` en el código, que ya estaba explicado en `docs/retraining.md`.
+
+### Revisión de PRs del equipo (12 y 13/11)
+
+- **Fecha:** 2026-11-12 y 2026-11-13
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «chequea el PR de Mariana y ciérralo con mensaje si está ok».
+- **Qué hizo el agente:**
+  - Revisó y fusionó, con un comentario de Eva, los PRs de Mariana #41 (red neuronal, #13) y #42 (data drift con PSI, #14). Antes comprobó la validación cruzada, la ausencia de fuga de datos (escalado dentro de cada fold), los casos límite del PSI y la lista de comprobación de PR.
+  - Asignó la #34 a Anna.
+  - Detectó que el PR #43 de Anna, fusionado y titulado como corrección de features, solo cambiaba su bitácora, sin código. Preparó un mensaje privado para que lo rehaga.
+- **Errores o alucinaciones:** Gemini dijo que en el #41 había un import duplicado. Era cierto a medias: no se repetía nada, pero había dos imports del mismo módulo. Se comprobó en el código antes de comentarlo.
+- **Revisión humana:** Eva decidió fusionar y comentar.
+
+### #17 Informe técnico y guion: sección de app y despliegue
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «ok» a adelantar nuestra parte de la #17. El agente preguntó cómo organizar el informe (compartido por las cuatro) y qué preparar para la presentación.
+- **Qué generó el agente:**
+  - `docs/informe/README.md`: propuesta de estructura en 9 secciones, un archivo por sección con su responsable, para que Mariana la valide.
+  - `docs/informe/06-aplicacion-y-despliegue.md`: arquitectura, contrato del modelo, base de datos, export, Docker, despliegue, calidad y límites.
+  - `docs/informe/08-forma-de-trabajo.md`: borrador sobre flujo, CI, Gemini y uso de la IA, para revisar entre todas.
+  - `docs/presentacion/`: guion de 7 diapositivas de nuestra parte, con lo que se ve, lo que se dice y las preguntas probables.
+  - Enlaces en el README.
+- **Aceptado:**
+  - Un archivo por sección (decisión de Eva), por la misma razón que las bitácoras: dos PRs nunca editan el mismo archivo.
+  - Un guion en Markdown en lugar de diapositivas (decisión de Eva), para pasarlo a la herramienta que elija el equipo.
+  - Rama **sin enlazar** a la #17 y `Refs #17`: la issue es de todo el equipo y no debe cerrarse con este PR.
+- **Rechazado o cambiado, y por qué:** crear los archivos vacíos de las otras secciones. Cada persona crea el suyo; el índice dice cuál es.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** el primer borrador decía que 63 tests cubrían esta parte. Se contaron con `pytest --collect-only` y son 64; se corrigió antes del commit.
+- **Revisión humana:** pendiente en el PR. Mariana tiene que validar la estructura del informe.
