@@ -24,4 +24,15 @@
 - **Aceptado:** el código y los tests de esta entrada, pendientes de revisión humana del PR.
 - **Rechazado o cambiado, y por qué:** no se usó Kolmogorov–Smirnov como criterio de corte; el PSI deja un umbral único y comparable por feature.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno en esta tarea.
-- **Revisión humana:** pendiente. Eva revisa el PR antes de fusionarlo.
+- **Revisión humana:** fusionada en `dev` (PR #42).
+
+### #17 Coordinación del informe y las presentaciones
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Cursor, Grok 4.7
+- **Prompt clave:** mensaje de Claudio/Eva pidiendo validar la estructura de `docs/informe/` y repartir.
+- **Qué generó el agente:** README validado, sección 7 partida en 7a/7b, esquemas de cada archivo, presentación de negocio, calendario.
+- **Aceptado:** el reparto y las fechas de este PR, para que el equipo pueda escribir sin chocar.
+- **Rechazado o cambiado, y por qué:** no se dejó la sección 7 en un solo archivo (conflicto entre Mariana y Eva). Presentación técnica: una persona por parte, no «Anna / Mariana».
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** pendiente.

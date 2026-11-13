@@ -176,5 +176,6 @@ Cubren el catálogo de clases, el etiquetado, la predicción, la base de datos y
 - [Datos para reentrenar](docs/retraining.md)
 - [Informe técnico](docs/informe/README.md)
 - [Guion de la presentación técnica](docs/presentacion/README.md)
+- [Presentación de negocio](docs/presentacion-negocio/README.md)
 - [Data drift](docs/drift.md)
 - Plantilla de GitHub: `.github/ISSUE_TEMPLATE/tarea.md`
