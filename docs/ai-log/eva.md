@@ -259,3 +259,22 @@
 - **Rechazado o cambiado, y por qué:** crear los archivos vacíos de las otras secciones. Cada persona crea el suyo; el índice dice cuál es.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** el primer borrador decía que 63 tests cubrían esta parte. Se contaron con `pytest --collect-only` y son 64; se corrigió antes del commit.
 - **Revisión humana:** pendiente en el PR. Mariana tiene que validar la estructura del informe.
+
+### #37 A/B testing y promoción automática del modelo
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «asígnanos la 37» y «ok» al plan. El agente preguntó qué regla de promoción usar y cómo repartir las predicciones entre los dos modelos.
+- **Qué generó el agente:**
+  - `src/kiniela/models/ab_testing.py`: reparto aleatorio por predicción entre el modelo actual y un candidato (`AB_CANDIDATE_SHARE`), lectura de las fichas `model_card.json`, evidencia por versión (validación + feedback) y la regla `should_promote`.
+  - `src/kiniela/models/promote.py`: script `python -m kiniela.models.promote [--dry-run]` que decide y, si el candidato gana, archiva el modelo actual en `models/archive/<versión>/`.
+  - App: la página Predecir usa el reparto y guarda la versión que ha respondido; el Historial muestra la tabla de comparación cuando hay candidato.
+  - 36 tests nuevos (regla con casos fijos, reparto, script y app de punta a punta). La suite pasa de 123 a 159.
+  - `docs/ab-testing.md`, y referencias en el contrato del modelo, el despliegue, el README, `.env.example` y `.dockerignore`.
+- **Aceptado:**
+  - Regla F1 macro + feedback (decisión de Eva): F1 macro de validación ≥ actual + 0,01, gap < 0,05, al menos 30 predicciones con feedback por versión y acierto real no menor. Umbrales como constantes, por si el equipo acuerda otros.
+  - Reparto aleatorio por predicción (decisión de Eva), que reparte el tráfico en la proporción pedida.
+  - El script decide y cambia los archivos, pero publicar pasa por PR y *Manual Deploy*: en Render el modelo va dentro de la imagen y un cambio en el contenedor se perdería sin revisión.
+- **Rechazado o cambiado, y por qué:** nada rechazado. Al probarlo, el agente vio que sin candidato el script acababa con un *traceback*; lo cambió por un mensaje claro y código de salida 1.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** al editar el script con un *heredoc*, un `\n` se convirtió en un salto de línea real y rompió el f-string; lo detectó la suite antes del commit. Al probar el comando se vio que `python -m kiniela...` necesita `PYTHONPATH=src`; en esta guía se documentó así.
+- **Revisión humana:** pendiente en el PR.
