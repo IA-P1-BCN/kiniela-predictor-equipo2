@@ -90,14 +90,9 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
                 # Últimos N partidos como local
                 last_n_home = home_past.tail(N).copy()
                 
-                # Corregido: PROMEDIO de los últimos 5 resultados (no solo el último)
                 form_home_last_5 = last_n_home["ResultHome"].mean()
-                
-                # Promedios de goles en los últimos N partidos como local
                 avg_home_goals_last_5 = last_n_home["FTHG"].tail(N).mean()
                 away_goals_conceded_last_5 = last_n_home["FTAG"].tail(N).mean()
-                
-                # Diferencia de rendimiento promedio (goles marcados - goles recibidos)
                 home_diff_last_5 = (last_n_home["FTHG"] - last_n_home["FTAG"]).tail(N).mean()
                 
                 # Forma reciente: resultado del último partido en escala ponderada
@@ -124,14 +119,9 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
                 # Últimos N partidos como visitante
                 last_n_away = away_past.tail(N).copy()
                 
-                # Corregido: PROMEDIO de los últimos 5 resultados (no solo el último)
                 form_away_last_5 = last_n_away["ResultAway"].mean()
-                
-                # Promedios de goles en los últimos N partidos como visitante
                 avg_away_goals_last_5 = last_n_away["FTAG"].tail(N).mean()
                 home_goals_conceded_last_5 = last_n_away["FTHG"].tail(N).mean()
-                
-                # Diferencia de rendimiento promedio
                 away_diff_last_5 = (last_n_away["FTAG"] - last_n_away["FTHG"]).tail(N).mean()
                 
                 # Forma reciente: resultado del último partido en escala ponderada
@@ -177,9 +167,10 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
             # Diferencias de rendimiento (promedio últimos N)
             "home_diff_last_5": home_diff_last_5,
             "away_diff_last_5": away_diff_last_5,
-            # Features combinadas
+            # Forma reciente numérica (1/0.5/0 para peso en regresión logística)
             "recent_home_form": recent_home_form,
             "recent_away_form": recent_away_form,
+            # Features combinadas
             "match_diff": match_diff,
             "match_goals_expected": match_goals_expected,
             "match_momentum": match_momentum,
@@ -218,19 +209,39 @@ def build_match_features(history: pd.DataFrame, home_team: str, away_team: str) 
     """Calcula las features para un partido específico a partir del historial.
     
     Esta función es necesaria para predecir partidos individuales desde la app,
-    donde no tenemos todo el histórico de partidos disponible.
+    donde no tenemos todo el histórico de partidos disponible. Calcula las 
+    features del local y visitante basándose solo en sus partidos anteriores 
+    (evitando data leakage).
     
     Args:
-        history: DataFrame con el histórico de partidos (HomeTeam, AwayTeam, FTHG, FTAG, FTR, Date, Season)
-        home_team: Nombre del equipo local para predecir
-        away_team: Nombre del equipo visitante para predecir
+        history: DataFrame con historial de partidos (columnas: HomeTeam, AwayTeam, 
+                 FTHG, FTAG, FTR, Date, Season)
+        home_team: Nombre del equipo que juega local
+        away_team: Nombre del equipo que juega visitante
         
     Returns:
-        diccionario con las features calculadas listas para usar en predicción
+        dict con las siguientes features:
+        - form_home_last_5: Promedio de últimos 5 resultados como local (1=W, 0=D, -1=L)
+        - form_away_last_5: Promedio de últimos 5 resultados como visitante (1=W, 0=D, -1=L)
+        - avg_home_goals_last_5: Promedio goles marcados por local en últimos 5 como local
+        - avg_away_goals_last_5: Promedio goles marcados por visitante en últimos 5 como visitante
+        - home_diff_last_5: Diferencia goles promedio de últimos 5 del local (FTHG-FTAG)
+        - away_diff_last_5: Diferencia goles promedio de últimos 5 del visitante (FTAG-FTHG)
+        - recent_home_form: Último resultado local en escala ponderada (1=W, 0.5=D, 0=L)
+        - recent_away_form: Último resultado visitante en escala ponderada (1=W, 0.5=D, 0=L)
+        - match_diff: Diferencia de forma entre equipos (form_home_last_5 - form_away_last_5)
+        - match_goals_expected: Goles esperados en el partido (avg_home + avg_away)
+        - match_momentum: Momentum reciente (recent_home_form - recent_away_form)
         
     Notes:
-    - Usa solo partidos anteriores al momento de predicción (evita data leakage)
+    - Usa solo partidos ANTERIORES al momento de predicción (evita data leakage)
     - Si no hay historial suficiente, devuelve NaN para las features
+    - Los nombres de equipo deben coincidir exactamente (case-sensitive)
+    
+    Example:
+        >>> history = pd.DataFrame({...})
+        >>> features = build_match_features(history, "Arsenal", "Chelsea")
+        >>> print(features['form_home_last_5'])  # Verificar feature local
     """
     
     if history.empty:
@@ -312,5 +323,4 @@ def build_match_features(history: pd.DataFrame, home_team: str, away_team: str) 
         # Solo hay datos de un equipo - usar NaN para match_momentum
         features["match_momentum"] = np.nan
     
-    # Eliminar columnas de goles originales que no queremos en la predicción
     return {k: v for k, v in features.items() if k not in ["away_goals_conceded_last_5", "home_goals_conceded_last_5"]}
