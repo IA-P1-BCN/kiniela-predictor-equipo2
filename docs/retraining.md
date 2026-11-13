@@ -11,11 +11,13 @@ App (feedback con clase real) ──► base de datos ──► export ──►
 
 ## Ejecutarlo
 
+Desde la raíz del repo, con el entorno virtual activo. `PYTHONPATH=src` hace falta porque el paquete `kiniela` vive en `src/` y no se instala. En PowerShell, primero `$env:PYTHONPATH = "src"` y después el comando sin el prefijo.
+
 ```bash
-python -m kiniela.storage.export                                  # todo lo nuevo
-python -m kiniela.storage.export --since 2026-11-01               # solo desde una fecha (UTC)
-python -m kiniela.storage.export --model-version reference-class-frequencies
-python -m kiniela.storage.export --output otra/ruta.csv
+PYTHONPATH=src python -m kiniela.storage.export                                  # todo lo nuevo
+PYTHONPATH=src python -m kiniela.storage.export --since 2026-11-01               # solo desde una fecha (UTC)
+PYTHONPATH=src python -m kiniela.storage.export --model-version reference-class-frequencies
+PYTHONPATH=src python -m kiniela.storage.export --output otra/ruta.csv
 ```
 
 - Lee la base de datos de `DATABASE_URL`. Sin ella, usa el SQLite local (`data/kiniela.db`).
@@ -23,7 +25,7 @@ python -m kiniela.storage.export --output otra/ruta.csv
 
   ```bash
   set -a; source .env; set +a      # .env tiene DATABASE_URL y está en .gitignore
-  python -m kiniela.storage.export
+  PYTHONPATH=src python -m kiniela.storage.export
   ```
 
 - **Es incremental.** Las filas cuyo `prediction_id` ya está en el CSV no se vuelven a escribir, así que se puede lanzar cada día sin duplicar partidos.
