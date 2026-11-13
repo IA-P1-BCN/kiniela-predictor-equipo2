@@ -22,6 +22,7 @@ from typing import Any
 import joblib
 from sqlalchemy.orm import Session
 
+from kiniela.config import RANDOM_STATE
 from kiniela.models.predict import DEFAULT_MODEL_PATH, Predictor
 from kiniela.storage.repository import feedback_stats
 
@@ -89,7 +90,8 @@ class ABRouter:
     current: Predictor
     candidate: Predictor | None = None
     share: float = 0.0
-    rng: random.Random = field(default_factory=random.Random)
+    # Seeded with RANDOM_STATE (project rule); the split still follows ``share``
+    rng: random.Random = field(default_factory=lambda: random.Random(RANDOM_STATE))
 
     def __post_init__(self) -> None:
         if not 0 <= self.share <= 1:

@@ -269,7 +269,7 @@
   - `src/kiniela/models/ab_testing.py`: reparto aleatorio por predicción entre el modelo actual y un candidato (`AB_CANDIDATE_SHARE`), lectura de las fichas `model_card.json`, evidencia por versión (validación + feedback) y la regla `should_promote`.
   - `src/kiniela/models/promote.py`: script `python -m kiniela.models.promote [--dry-run]` que decide y, si el candidato gana, archiva el modelo actual en `models/archive/<versión>/`.
   - App: la página Predecir usa el reparto y guarda la versión que ha respondido; el Historial muestra la tabla de comparación cuando hay candidato.
-  - 36 tests nuevos (regla con casos fijos, reparto, script y app de punta a punta). La suite pasa de 123 a 159.
+  - 37 tests nuevos (regla con casos fijos, reparto, script y app de punta a punta). La suite pasa de 123 a 160.
   - `docs/ab-testing.md`, y referencias en el contrato del modelo, el despliegue, el README, `.env.example` y `.dockerignore`.
 - **Aceptado:**
   - Regla F1 macro + feedback (decisión de Eva): F1 macro de validación ≥ actual + 0,01, gap < 0,05, al menos 30 predicciones con feedback por versión y acierto real no menor. Umbrales como constantes, por si el equipo acuerda otros.
@@ -277,4 +277,5 @@
   - El script decide y cambia los archivos, pero publicar pasa por PR y *Manual Deploy*: en Render el modelo va dentro de la imagen y un cambio en el contenedor se perdería sin revisión.
 - **Rechazado o cambiado, y por qué:** nada rechazado. Al probarlo, el agente vio que sin candidato el script acababa con un *traceback*; lo cambió por un mensaje claro y código de salida 1.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** al editar el script con un *heredoc*, un `\n` se convirtió en un salto de línea real y rompió el f-string; lo detectó la suite antes del commit. Al probar el comando se vio que `python -m kiniela...` necesita `PYTHONPATH=src`; en esta guía se documentó así.
-- **Revisión humana:** pendiente en el PR.
+- **Revisión de Gemini:** señaló que el reparto no usaba `RANDOM_STATE`. Se aceptó: el router se crea con esa semilla y un test comprueba que el reparto es reproducible. Se descartó su sugerencia de un mensaje más visible para el modelo de prueba, porque el script ya lo explica.
+- **Revisión humana:** Eva aprobó la regla y los umbrales; fusionado con *Squash and merge* (PR #48).

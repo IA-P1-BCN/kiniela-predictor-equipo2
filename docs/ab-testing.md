@@ -31,7 +31,7 @@ flowchart LR
   P -- gana el candidato --> N[El candidato pasa a ser el actual]
 ```
 
-1. **Reparto.** En cada predicción, la app elige el candidato con probabilidad `AB_CANDIDATE_SHARE`, y el resto de veces el actual. Es aleatorio por predicción, así el tráfico se reparte en la proporción pedida aunque se repitan los partidos.
+1. **Reparto.** En cada predicción, la app elige el candidato con probabilidad `AB_CANDIDATE_SHARE`, y el resto de veces el actual. Es aleatorio por predicción, así el tráfico se reparte en la proporción pedida aunque se repitan los partidos. El generador usa la semilla `RANDOM_STATE` de `config.py`, como todo lo aleatorio del proyecto.
 2. **Registro.** Cada predicción guarda su `model_version` (columna que ya existía, ver [base de datos](database.md)). La página Predecir muestra con qué modelo se ha predicho.
 3. **Medida.** Con el feedback se calcula el acierto real de cada versión. La página **Historial** muestra una tabla *A/B testing* con las dos versiones: F1 macro y gap de validación (de su ficha), predicciones, predicciones con feedback y acierto.
 4. **Decisión.** El script aplica la regla y, si el candidato gana, lo promociona.

@@ -1,12 +1,10 @@
 """Tests of the A/B router, the promotion rule and the promotion script (issue #37)."""
 
 import json
-import random
 
 import joblib
 import pytest
 
-from kiniela.config import RANDOM_STATE
 from kiniela.models.ab_testing import (
     CANDIDATE_CARD_NAME,
     CANDIDATE_MODEL_NAME,
@@ -95,10 +93,18 @@ def test_router_with_share_zero_never_uses_the_candidate():
 
 
 def test_router_splits_predictions_by_the_share():
-    router = ABRouter(model("v1"), model("v2"), share=0.3, rng=random.Random(RANDOM_STATE))
+    router = ABRouter(model("v1"), model("v2"), share=0.3)  # seeded with RANDOM_STATE
     chosen = [router.choose().version for _ in range(2000)]
     assert router.is_active
     assert chosen.count("v2") / len(chosen) == pytest.approx(0.3, abs=0.03)
+
+
+def test_router_split_is_reproducible():
+    def first_choices():
+        router = ABRouter(model("v1"), model("v2"), share=0.5)
+        return [router.choose().version for _ in range(20)]
+
+    assert first_choices() == first_choices()
 
 
 def test_router_with_share_one_always_uses_the_candidate():
