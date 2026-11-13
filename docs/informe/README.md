@@ -6,11 +6,11 @@ Informe final del proyecto (issue #17). Cada sección es un archivo, y cada pers
 
 | # | Sección | Archivo | Quién | Estado |
 | --- | --- | --- | --- | --- |
-| 1 | Problema, objetivo y valor para negocio | `01-problema.md` | Mariana | Pendiente |
+| 1 | Problema, objetivo y valor para negocio | [`01-problema.md`](01-problema.md) | Mariana | Escrita |
 | 2 | Datos, variable objetivo y EDA | `02-datos-y-eda.md` | Anna | Pendiente |
 | 3 | Feature engineering y control de fuga de datos | `03-features.md` | Anna | Pendiente |
 | 4 | Modelos, validación, optimización y métricas por clase | `04-modelos-y-metricas.md` | Cala | Pendiente (cuando cierren #7 y #8) |
-| 5 | Red neuronal | `05-red-neuronal.md` | Mariana | Pendiente |
+| 5 | Red neuronal | [`05-red-neuronal.md`](05-red-neuronal.md) | Mariana | Escrita |
 | 6 | Aplicación, base de datos y despliegue | [`06-aplicacion-y-despliegue.md`](06-aplicacion-y-despliegue.md) | Eva | Escrita |
 | 7a | MLOps: versiones, promoción y data drift | `07a-mlops-flujo-y-drift.md` | Mariana (#16) | Pendiente |
 | 7b | MLOps: feedback, reentrenamiento y A/B testing | `07b-mlops-feedback-ab.md` | Eva (#36, #37) | Pendiente |

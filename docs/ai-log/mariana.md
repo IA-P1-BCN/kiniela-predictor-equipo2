@@ -35,4 +35,15 @@
 - **Aceptado:** el reparto y las fechas de este PR, para que el equipo pueda escribir sin chocar.
 - **Rechazado o cambiado, y por qué:** no se dejó la sección 7 en un solo archivo (conflicto entre Mariana y Eva). Presentación técnica: una persona por parte, no «Anna / Mariana».
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** fusionada en `dev` (PR #45).
+
+### #17 Secciones 1, 5 y guiones
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Cursor, Grok 4.7
+- **Prompt clave:** «levantalo» — redactar el informe de Mariana y los guiones.
+- **Qué generó el agente:** `01-problema.md`, `05-red-neuronal.md`, guion de negocio y diapositivas técnicas 4.
+- **Aceptado:** el texto. No se inventaron F1 ni accuracy: quedan huecos para el run oficial y para Cala.
+- **Rechazado o cambiado, y por qué:** no se fusionaron #46 y #47 desde aquí (el merge pidió autorización y caducó).
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
 - **Revisión humana:** pendiente.

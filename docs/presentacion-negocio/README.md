@@ -18,5 +18,7 @@ Canva, mismo estilo visual que la presentación técnica. Guion aquí; diseño e
 
 ## Calendario
 
-- Guion en esta carpeta: **miércoles 18/11**.
+Guion: [`01-guion.md`](01-guion.md).
+
+- Guion en esta carpeta: escrito 13/11; cifras de Cala el **miércoles 18/11**.
 - Diapositivas: **viernes 20/11**, junto a las técnicas.
