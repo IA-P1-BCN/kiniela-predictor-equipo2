@@ -11,6 +11,7 @@ from sqlalchemy import Engine
 
 from kiniela.config import CLASS_NAMES
 from kiniela.data.catalog import list_teams, load_processed_matches, observed_targets
+from kiniela.models.ab_testing import ABRouter, candidate_share, load_candidate
 from kiniela.models.predict import Predictor, load_predictor
 from kiniela.storage import get_engine, init_db
 
@@ -33,6 +34,12 @@ def get_db_engine() -> Engine:
 def get_predictor() -> Predictor:
     """The promoted model, or the reference model built from the dataset's classes."""
     return load_predictor(reference_targets=observed_targets(load_processed_matches()))
+
+
+@st.cache_resource(show_spinner=False)
+def get_router() -> ABRouter:
+    """Chooses the model of each prediction: current, or candidate during an A/B test (#37)."""
+    return ABRouter(get_predictor(), load_candidate(), candidate_share())
 
 
 @st.cache_data(show_spinner=False)

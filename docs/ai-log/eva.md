@@ -227,4 +227,66 @@
 - **Pruebas:**
   - `pytest`: 99 tests.
   - Contra el PostgreSQL del Compose: la primera ejecución exporta 1 partido, la segunda 0 (sin duplicados), y `--since` filtra bien.
-- **Revisión humana:** pendiente en el PR.
+- **Revisión humana:** Eva fusionó el PR #38 con `Tests` en verde. Gemini no encontró problemas; sugirió un comentario sobre `Date` en el código, que ya estaba explicado en `docs/retraining.md`.
+
+### Revisión de PRs del equipo (12 y 13/11)
+
+- **Fecha:** 2026-11-12 y 2026-11-13
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «chequea el PR de Mariana y ciérralo con mensaje si está ok».
+- **Qué hizo el agente:**
+  - Revisó y fusionó, con un comentario de Eva, los PRs de Mariana #41 (red neuronal, #13) y #42 (data drift con PSI, #14). Antes comprobó la validación cruzada, la ausencia de fuga de datos (escalado dentro de cada fold), los casos límite del PSI y la lista de comprobación de PR.
+  - Asignó la #34 a Anna.
+  - Detectó que el PR #43 de Anna, fusionado y titulado como corrección de features, solo cambiaba su bitácora, sin código. Preparó un mensaje privado para que lo rehaga.
+- **Errores o alucinaciones:** Gemini dijo que en el #41 había un import duplicado. Era cierto a medias: no se repetía nada, pero había dos imports del mismo módulo. Se comprobó en el código antes de comentarlo.
+- **Revisión humana:** Eva decidió fusionar y comentar.
+
+### #17 Informe técnico y guion: sección de app y despliegue
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «ok» a adelantar nuestra parte de la #17. El agente preguntó cómo organizar el informe (compartido por las cuatro) y qué preparar para la presentación.
+- **Qué generó el agente:**
+  - `docs/informe/README.md`: propuesta de estructura en 9 secciones, un archivo por sección con su responsable, para que Mariana la valide.
+  - `docs/informe/06-aplicacion-y-despliegue.md`: arquitectura, contrato del modelo, base de datos, export, Docker, despliegue, calidad y límites.
+  - `docs/informe/08-forma-de-trabajo.md`: borrador sobre flujo, CI, Gemini y uso de la IA, para revisar entre todas.
+  - `docs/presentacion/`: guion de 7 diapositivas de nuestra parte, con lo que se ve, lo que se dice y las preguntas probables.
+  - Enlaces en el README.
+- **Aceptado:**
+  - Un archivo por sección (decisión de Eva), por la misma razón que las bitácoras: dos PRs nunca editan el mismo archivo.
+  - Un guion en Markdown en lugar de diapositivas (decisión de Eva), para pasarlo a la herramienta que elija el equipo.
+  - Rama **sin enlazar** a la #17 y `Refs #17`: la issue es de todo el equipo y no debe cerrarse con este PR.
+- **Rechazado o cambiado, y por qué:** crear los archivos vacíos de las otras secciones. Cada persona crea el suyo; el índice dice cuál es.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** el primer borrador decía que 63 tests cubrían esta parte. Se contaron con `pytest --collect-only` y son 64; se corrigió antes del commit.
+- **Revisión humana:** pendiente en el PR. Mariana tiene que validar la estructura del informe.
+
+### #37 A/B testing y promoción automática del modelo
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «asígnanos la 37» y «ok» al plan. El agente preguntó qué regla de promoción usar y cómo repartir las predicciones entre los dos modelos.
+- **Qué generó el agente:**
+  - `src/kiniela/models/ab_testing.py`: reparto aleatorio por predicción entre el modelo actual y un candidato (`AB_CANDIDATE_SHARE`), lectura de las fichas `model_card.json`, evidencia por versión (validación + feedback) y la regla `should_promote`.
+  - `src/kiniela/models/promote.py`: script `python -m kiniela.models.promote [--dry-run]` que decide y, si el candidato gana, archiva el modelo actual en `models/archive/<versión>/`.
+  - App: la página Predecir usa el reparto y guarda la versión que ha respondido; el Historial muestra la tabla de comparación cuando hay candidato.
+  - 37 tests nuevos (regla con casos fijos, reparto, script y app de punta a punta). La suite pasa de 123 a 160.
+  - `docs/ab-testing.md`, y referencias en el contrato del modelo, el despliegue, el README, `.env.example` y `.dockerignore`.
+- **Aceptado:**
+  - Regla F1 macro + feedback (decisión de Eva): F1 macro de validación ≥ actual + 0,01, gap < 0,05, al menos 30 predicciones con feedback por versión y acierto real no menor. Umbrales como constantes, por si el equipo acuerda otros.
+  - Reparto aleatorio por predicción (decisión de Eva), que reparte el tráfico en la proporción pedida.
+  - El script decide y cambia los archivos, pero publicar pasa por PR y *Manual Deploy*: en Render el modelo va dentro de la imagen y un cambio en el contenedor se perdería sin revisión.
+- **Rechazado o cambiado, y por qué:** nada rechazado. Al probarlo, el agente vio que sin candidato el script acababa con un *traceback*; lo cambió por un mensaje claro y código de salida 1.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** al editar el script con un *heredoc*, un `\n` se convirtió en un salto de línea real y rompió el f-string; lo detectó la suite antes del commit. Al probar el comando se vio que `python -m kiniela...` necesita `PYTHONPATH=src`; en esta guía se documentó así.
+- **Revisión de Gemini:** señaló que el reparto no usaba `RANDOM_STATE`. Se aceptó: el router se crea con esa semilla y un test comprueba que el reparto es reproducible. Se descartó su sugerencia de un mensaje más visible para el modelo de prueba, porque el script ya lo explica.
+- **Revisión humana:** Eva aprobó la regla y los umbrales; fusionado con *Squash and merge* (PR #48).
+
+### #36 Corrección: comando de export con `PYTHONPATH=src`
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «ok a corregir la 36», tras detectarlo durante la #37.
+- **Qué generó el agente:** `docs/retraining.md` con `PYTHONPATH=src` en cada comando (y su equivalente en PowerShell), y una nota en el README.
+- **Aceptado:** un PR aparte para no mezclarlo con la #37; rama sin enlazar y `Refs #36`, porque la issue ya está cerrada.
+- **Rechazado o cambiado, y por qué:** no se instaló el paquete (`pip install -e .`): necesitaría un `pyproject.toml`, que no está en ninguna issue.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** en la #36 el agente documentó `python -m kiniela.storage.export` sin probarlo fuera de pytest (que ya tiene `pythonpath = src`). Se vio al probar el comando de la #37.
+- **Revisión humana:** Eva aprobó la corrección.
