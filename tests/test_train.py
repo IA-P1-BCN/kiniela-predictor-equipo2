@@ -18,7 +18,9 @@ from kiniela.models.train import (
     train_baseline,
 )
 
-FEATURES = ("form_home", "goals_avg", "home_advantage", "goal_diff_form")
+from kiniela.features.engineering import FEATURE_COLUMNS
+
+FEATURES = FEATURE_COLUMNS
 
 
 def write_dataset(

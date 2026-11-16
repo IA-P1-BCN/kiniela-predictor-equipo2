@@ -48,6 +48,28 @@
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
 - **Revisión humana:** fusionada en `dev` (PR #46).
 
+### #15 Tests unitarios
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Cursor, Grok 4.7
+- **Prompt clave:** «hazlo» — cerrar #15 junto con #16.
+- **Qué generó el agente:** `kiniela.data.validate`, `kiniela.models.metrics` y tests de esquema, nulos, rangos, `target` 0-5, forma de la predicción y un caso de métricas con resultado conocido.
+- **Aceptado:** esos módulos y tests. No se duplicó lo que ya cubrían `test_target.py` y `test_predict.py`.
+- **Rechazado o cambiado, y por qué:** no se tocó la suite existente para «hacer sitio»; se añadieron archivos.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** fusionada en `dev` (PR #47).
+
+### #15 Recálculo con 8 features (16/11)
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Cursor, Grok 4.7
+- **Prompt clave:** Claudio: las features son 8 (#58/#61); actualizar la rama contra `dev`.
+- **Qué generó el agente:** `FEATURES` de los tests apunta a `FEATURE_COLUMNS`; drift y red usan esos nombres.
+- **Aceptado:** tests sintéticos con las 8 columnas reales.
+- **Rechazado o cambiado, y por qué:** no se entrenó la red sobre el CSV real en este PR (eso va en la sección 5 / #53).
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** fusionada en `dev` (PR #47).
+
 ### #17 Secciones 1, 5 y guiones
 
 - **Fecha:** 2026-11-13
@@ -57,7 +79,7 @@
 - **Aceptado:** el texto. No se inventaron F1 ni accuracy: quedan huecos para el run oficial y para Carla.
 - **Rechazado o cambiado, y por qué:** no se fusionaron #46 y #47 desde aquí (el merge pidió autorización y caducó).
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
-- **Revisión humana:** pendiente. Esta rama se actualizó el 16/11 contra `dev`.
+- **Revisión humana:** pendiente en #53.
 
 ### #47/#53 Revisión de Claudio (16/11)
 
@@ -68,4 +90,15 @@
 - **Aceptado:** el recálculo de la red queda como comando a relanzar, no como números inventados.
 - **Rechazado o cambiado, y por qué:** no se editaron bitácoras ajenas ni la sección 8 de Eva.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
-- **Revisión humana:** pendiente.
+- **Revisión humana:** #47 en `dev`; #53 se reabre contra `dev` tras el squash.
+
+### #53 Recálculo de la red con 8 features (16/11)
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Cursor, Grok 4.7
+- **Prompt clave:** «sigue» — rellenar la tabla de la sección 5 con el CSV actual.
+- **Qué generó el agente:** features + `target` desde `premier_league_2023_24.csv` y `python -m kiniela.models.neural`; tabla de 5.3 con las cifras de ese run.
+- **Aceptado:** las métricas de ese comando, no las de 11 features.
+- **Rechazado o cambiado, y por qué:** el CSV de modelado no se commitea; se genera al vuelo.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** el merge de #47 dejó conflicto otra vez en esta bitácora; se unieron las entradas de #15 y #17.
+- **Revisión humana:** pendiente en #53.

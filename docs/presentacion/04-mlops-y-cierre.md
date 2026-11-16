@@ -10,7 +10,7 @@
 
 **Se dice:** «La red no tiene ligas aparte. Es un MLP de scikit-learn, con L2 y early stopping, medido con los mismos cinco folds que Random Forest, XGBoost y LightGBM. Si gana, se promociona; si no, el de Carla sigue siendo el candidato y la red queda como línea neuronal.»
 
-**Dato:** `python -m kiniela.models.neural --dataset …` (8 features de Anna; sin cifras viejas).
+**Dato:** mismo comando, 8 features, 359 filas: RF F1 macro 0.180 · red 0.129 · dummy accuracy 0.443.
 
 ## 2. Tabla (un recuadro)
 
@@ -18,7 +18,7 @@
 
 **Se dice:** «Estas dos cifras salen del mismo CSV de modelado. F1 macro es la que decide, porque el acierto global premia la clase 5.»
 
-**Hueco:** pegar las cifras del comando cuando Carla y el run oficial coincidan.
+**Cifras del run (16/11):** mejor ensemble RF 0.180 F1 · red 0.129 F1 / 0.354 acc · dummy 0.443 acc / 0.102 F1.
 
 ## 3. Contrato y promoción
 

@@ -2,7 +2,7 @@
 
 **Quién:** Mariana · **Issue:** #13 · **Estado:** escrita (16/11/2026) · Código: `src/kiniela/models/neural.py` (PR #41)
 
-Las features de Anna cambiaron en las #58 y #61: ahora son **8 columnas**, y las anteriores estaban mal calculadas. Las métricas de esta red hay que **volver a sacarlas** con el CSV de modelado actual. Abajo no hay cifras de un run viejo.
+Las features de Anna cambiaron en las #58 y #61: ahora son **8 columnas**, y las anteriores estaban mal calculadas. Las cifras de abajo salen de un recálculo el 16/11/2026 sobre `data/processed/premier_league_2023_24.csv` (380 jornadas → 359 filas con historial, 21 sin él). No son las de 11 features.
 
 ## 5.1 Por qué una red, y por qué esta
 
@@ -32,7 +32,7 @@ PYTHONPATH=src python -m kiniela.models.neural \
   --dataset data/processed/premier_league_with_features_and_target.csv
 ```
 
-El CSV tiene que ser el de **después** de #58/#61 (8 features). Un run anterior no vale.
+El CSV de modelado no está en git: se arma con `build_features` + `build_target` sobre `premier_league_2023_24.csv` y se deja solo `FEATURE_COLUMNS` + `target`. Un run anterior, o uno con 11 columnas, no vale.
 
 El informe imprime, para la referencia (mayoritaria), Random Forest, XGBoost, LightGBM y la red:
 
@@ -41,28 +41,30 @@ El informe imprime, para la referencia (mayoritaria), Random Forest, XGBoost, Li
 - F1 por clase 0–5;
 - cuál es el **mejor ensemble** y el F1 de la red al lado.
 
-### Tabla (hueco — recalcular)
+### Tabla (16/11/2026 · 359 filas · 8 features · StratifiedKFold 5, seed 42)
 
 | Modelo | Accuracy | F1 macro | F1 por clase (0–5) |
 | --- | --- | --- | --- |
-| reference (majority) | _pendiente de recálculo_ | | |
-| random_forest | | | |
-| xgboost | | | |
-| lightgbm | | | |
-| **neural_network** | | | |
-| mejor ensemble | _nombre + cifras del mismo run_ | | |
+| reference (majority) | 0.443 ± 0.003 | 0.102 ± 0.001 | 0.00 0.00 0.00 0.00 0.00 0.61 |
+| random_forest | 0.228 ± 0.060 | **0.180 ± 0.058** | 0.26 0.09 0.15 0.11 0.12 0.36 |
+| xgboost | 0.262 ± 0.048 | 0.177 ± 0.041 | 0.22 0.14 0.11 0.11 0.06 0.43 |
+| lightgbm | 0.248 ± 0.038 | 0.166 ± 0.049 | 0.19 0.04 0.08 0.14 0.12 0.42 |
+| **neural_network** | 0.354 ± 0.034 | 0.129 ± 0.020 | 0.00 0.12 0.04 0.05 0.00 0.56 |
+| mejor ensemble | **random_forest** (F1 macro 0.180) | la red queda a 0.129 | accuracy de la red 0.354 |
 
 Los tests de `tests/test_neural.py` comprueban el esquema, la reproducibilidad y el texto del informe. No sustituyen este recálculo sobre el CSV real.
 
-## 5.4 Lectura prevista (sin adelantar al ensemble)
+## 5.4 Lectura (mismo run)
 
-En un problema tabular con pocas filas y mucho desbalance, un MLP de este tamaño **no suele ganar** a LightGBM o XGBoost en F1 macro. La red está para:
+La accuracy de la clase mayoritaria (0.443) gana a todos: la clase 5 es ~44 % de la temporada. F1 macro es la que cuenta. Ahí **gana Random Forest (0.180)**; la red se queda en **0.129**. El MLP acierta más que los árboles (0.354 vs 0.228) porque se pega a la clase 5 (F1 0.56) y casi no ve las clases 0 y 4 (F1 0.00). Eso no es un modelo mejor: es el mismo sesgo del dummy, un poco suavizado.
+
+La red está para:
 
 - cumplir el nivel experto del briefing con la **misma** validación;
 - dejar por escrito L2 y early stopping;
 - no vender una red que no se puede volver a entrenar.
 
-Si el F1 macro de la red queda por debajo del mejor ensemble, el modelo que se promociona a la app sigue siendo el de Carla (`python -m kiniela.models.promote`). La red no se descarta: queda como línea de base neuronal para un dataset más grande.
+El modelo que se promociona a la app **no** es esta red: sigue el de Carla vía `python -m kiniela.models.promote`, hoy el Random Forest de este run. La red queda como línea neuronal; con más temporadas se puede repetir el comando.
 
 ## 5.5 Límites
 
