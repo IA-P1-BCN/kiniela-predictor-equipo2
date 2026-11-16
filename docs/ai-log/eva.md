@@ -325,3 +325,22 @@
 - **Rechazado o cambiado, y por qué:** actualizar el estado de la 7b en `docs/informe/README.md`: lo coordina Mariana y su PR #53 edita ese archivo.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** el primer borrador decía que la base de datos rechaza un feedback incoherente; en realidad lo rechaza el código de guardado (la base de datos solo garantiza un feedback por predicción). Se corrigió tras comprobarlo en el código.
 - **Revisión humana:** pendiente en el PR.
+
+### #35 Modelo final según el contrato de la app
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «ok» a la #35 cuando entró la corrección de features, «C» al experimento con más temporadas y «hazlo».
+- **Qué generó el agente:**
+  - `src/kiniela/models/final.py`: `MatchPredictor` (contrato `Predictor`, features con `build_match_features`, solo equipos de la última temporada, probabilidades colocadas por `classes_`), descarga de temporadas con `Season`, reconstrucción del dataset, reutilización de la búsqueda de la #7 (`tune_model`) y ficha del modelo con las métricas que lee el A/B testing.
+  - `models/kiniela_model.joblib` y `models/model_card.json` (excepción documentada en `.gitignore`): `tuned-xgb-2026-11-16`, 9 temporadas (2015-16 a 2023-24), F1 macro de validación 0,172, accuracy 0,179, gap 0,0496.
+  - 16 tests nuevos en `tests/test_final.py` (incluido el artefacto versionado y la carga desde otro proceso) y uno de la app con el modelo real; los demás tests de la app se fijan al modelo de prueba. Suite: 212.
+  - Documentación: contrato del modelo, README y despliegue.
+- **Aceptado:**
+  - **9 temporadas** en lugar de una (decisión de Eva tras el experimento): con 2023-24 solo, 2 de 648 combinaciones cumplían el gap y la elegida no superaba al modelo de prueba (F1 macro 0,095 frente a 0,102, accuracy 0,111 frente a 0,443). Con 9 temporadas cumplen 496 y el F1 macro dobla al del modelo de prueba (0,172 frente a 0,080).
+  - Volver a lanzar la búsqueda de Carla sin cambiarla, en lugar de copiar sus hiperparámetros: estaban elegidos con las features antiguas.
+- **Rechazado o cambiado, y por qué:** guardar el CSV de 9 temporadas en `data/processed/`: la app lee de ahí la lista de equipos y ofrecería equipos descendidos. Va a `data/raw/`.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - Con `python -m`, joblib guardaba la clase como `__main__.MatchPredictor` y la app no habría podido cargarla (le pasa también al artefacto de `kiniela.models.tuning`). Se corrigió en el bloque `__main__` y lo comprueba un test que carga el modelo en otro proceso.
+  - Al comparar features con un CSV de fechas `dd/mm/aaaa`, el primer análisis estaba contaminado por la ordenación como texto; se repitió con fechas convertidas antes de concluir.
+- **Revisión humana:** Eva decidió las 9 temporadas y pidió el PR («hazlo»).

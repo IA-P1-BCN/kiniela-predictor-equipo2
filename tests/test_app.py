@@ -7,9 +7,14 @@ import pytest
 import streamlit as st
 from streamlit.testing.v1 import AppTest
 
+from kiniela.models.predict import load_predictor
 from kiniela.storage import get_engine, init_db, list_history, session_scope
 
 APP = str(Path(__file__).resolve().parents[1] / "app" / "streamlit_app.py")
+
+# The app's own module, imported the same way the app does, so tests can swap its models
+sys.path.insert(0, str(Path(APP).parent))
+import resources  # noqa: E402
 
 
 @pytest.fixture
@@ -17,6 +22,10 @@ def database_url(tmp_path, monkeypatch):
     """Each test gets its own SQLite database and fresh Streamlit caches."""
     url = f"sqlite:///{(tmp_path / 'app.db').as_posix()}"
     monkeypatch.setenv("DATABASE_URL", url)
+    # The app tests use the reference model unless a test asks for the committed one
+    missing_model = tmp_path / "no-model.joblib"
+    monkeypatch.setattr(resources, "load_predictor",
+                        lambda reference_targets=None: load_predictor(missing_model, reference_targets))
     st.cache_resource.clear()
     st.cache_data.clear()
     yield url
@@ -123,9 +132,6 @@ def test_history_page_without_predictions_explains_what_to_do(database_url):
 @pytest.fixture
 def candidate_in_ab_test(database_url, monkeypatch):
     """A candidate model that always predicts class 2 and receives every prediction."""
-    sys.path.insert(0, str(Path(APP).parent))
-    import resources
-
     from kiniela.models.predict import ReferencePredictor, class_frequencies
 
     candidate = ReferencePredictor(tuple(class_frequencies([2])), version="candidate-test")
@@ -154,3 +160,23 @@ def test_history_page_compares_both_models_in_an_ab_test(candidate_in_ab_test, d
     comparison = app.dataframe[0].value
     assert list(comparison["Modelo"]) == ["Actual", "Candidato"]
     assert list(comparison["Predicciones"]) == [0, 1]
+
+
+@pytest.fixture
+def committed_model(database_url, monkeypatch):
+    """Use the final model in models/kiniela_model.joblib, as in production (#35)."""
+    monkeypatch.setattr(resources, "load_predictor", load_predictor)
+
+
+def test_app_uses_the_final_model_without_the_test_model_warning(committed_model, database_url):
+    from kiniela.models.ab_testing import load_model_card
+    from kiniela.models.predict import DEFAULT_MODEL_PATH
+
+    version = load_model_card(DEFAULT_MODEL_PATH.parent / "model_card.json")["version"]
+    app = start_app()
+    assert not any("Modelo de prueba" in warning.value for warning in app.warning)
+    predict(app, "arsenal", "chelsea")
+
+    assert len(app.dataframe[0].value) == 6
+    [saved] = saved_predictions(database_url)
+    assert saved.model_version == version

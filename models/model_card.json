@@ -1,0 +1,44 @@
+{
+  "version": "tuned-xgb-2026-11-16",
+  "created_at": "2026-11-16T11:57:25+00:00",
+  "model": "XGBClassifier (issue #6), hyperparameters from the grid search of issue #7",
+  "params": {
+    "max_depth": 2,
+    "n_estimators": 300,
+    "learning_rate": 0.01,
+    "min_child_weight": 20,
+    "reg_lambda": 10,
+    "subsample": 1.0,
+    "colsample_bytree": 1.0
+  },
+  "metrics": {
+    "f1_macro": 0.17193612988248083,
+    "f1_macro_std": 0.011773852123848825,
+    "accuracy": 0.17867078825347757,
+    "train_f1_macro": 0.22156931324075907,
+    "overfitting_gap": 0.04963318335827824
+  },
+  "before_tuning": {
+    "f1_macro": 0.17968325745732355,
+    "train_f1_macro": 0.6847031248028447,
+    "overfitting_gap": 0.5050198673455211
+  },
+  "validation": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42); gap = |train f1_macro - validation f1_macro| < 0.05",
+  "features": [
+    "form_home_last_5",
+    "form_away_last_5",
+    "avg_home_goals_last_5",
+    "avg_away_goals_last_5",
+    "home_diff_last_5",
+    "away_diff_last_5",
+    "match_diff",
+    "match_goals_expected"
+  ],
+  "random_state": 42,
+  "training_data": {
+    "source": "football-data.co.uk Premier League, seasons 1516, 1617, 1718, 1819, 1920, 2021, 2122, 2223, 2324",
+    "matches": 3420,
+    "rows_used": 3235,
+    "rows_without_history": 185
+  }
+}
