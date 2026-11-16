@@ -344,3 +344,14 @@
   - Con `python -m`, joblib guardaba la clase como `__main__.MatchPredictor` y la app no habría podido cargarla (le pasa también al artefacto de `kiniela.models.tuning`). Se corrigió en el bloque `__main__` y lo comprueba un test que carga el modelo en otro proceso.
   - Al comparar features con un CSV de fechas `dd/mm/aaaa`, el primer análisis estaba contaminado por la ordenación como texto; se repitió con fechas convertidas antes de concluir.
 - **Revisión humana:** Eva decidió las 9 temporadas y pidió el PR («hazlo»).
+
+### #17 Guion de la presentación: app y despliegue al día
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «el jueves es la presentación, explícamelo todo paso a paso» y «ok» a poner al día el guion.
+- **Qué generó el agente:** `docs/presentacion/03-app-y-despliegue.md` con el modelo final en producción, una diapositiva propia para el A/B testing (Docker y despliegue pasan a una sola), 212 tests, los límites reales, los pasos de la demo y preguntas nuevas (accuracy frente a F1 macro, 9 temporadas, features iguales en app y entrenamiento, modelo en git).
+- **Aceptado:** mantener 7 diapositivas, como dice el índice de Mariana.
+- **Rechazado o cambiado, y por qué:** dar una cifra de tests «de esta parte»: con el modelo final y el A/B ya no es una frontera clara; se da el total.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** Eva pidió el cambio.
