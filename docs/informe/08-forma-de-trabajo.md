@@ -42,7 +42,7 @@ flowchart LR
 | --- | --- |
 | Eva | Claude Code (Claude Opus 5.5) |
 | Mariana | Cursor (Grok 4.7) |
-| Anna | _por completar_ |
+| Anna | Qwen 3.5 |
 | Carla | OpenCode (MiMo-V2.6-Flash) |
 
 ### Errores de la IA que detectamos (ejemplos)
