@@ -177,3 +177,18 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
 - **Qué generó el agente:** notebook nuevo que solo llama a `src/kiniela/` (dataset, `target`, distribución de clases, goles, features por clase y correlación entre features) y conclusiones escritas a partir de su ejecución.
 - **Comprobación:** todas las celdas se ejecutan con el CSV real; las cifras de las conclusiones son las que imprime el notebook. Se guarda sin salidas, como los demás notebooks del equipo.
 - **Revisión humana:** _pendiente_
+
+---
+
+### #17 Informe: sección 3 y guion de la presentación técnica
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** _por completar_
+- **Prompt clave:** recuperar la sección 3 y el guion de la presentación del commit `cf5334b`, que se subió después de fusionar la PR #51 y nunca llegó a `dev`, y corregir sus errores. Mariana dio el visto bueno para sustituir sus esquemas.
+- **Errores encontrados en la versión recuperada:**
+  - Sección 3: describía `recent_*_form` y `match_momentum` (ya eliminadas), definía `away_diff_last_5` al revés y tenía una salida de ejemplo y un recuento de tests que no eran reales.
+  - Presentación: regla de clases equivocada (diferencia de 3 goles y clase 5 como «4 goles de un equipo»), distribución de clases y tendencia de goles inventadas (una clase con «~X %»), enlaces a archivos que no existen y 12 diapositivas en lugar de 5-6.
+- **Qué generó el agente:** sección 3 reescrita con el código de la PR #58 y guion de 6 diapositivas con el formato acordado (se ve, se dice, captura).
+- **Comprobación:** todas las cifras salen del CSV real, de los tests o del notebook de EDA.
+- **Pendiente:** la sección 2 (`02-datos-y-eda.md`) sigue sin redactar.
+- **Revisión humana:** _pendiente_
