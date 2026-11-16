@@ -15,13 +15,13 @@ Esta sección explica de dónde salen los partidos, cómo se convierte cada resu
 | CSV en bruto | `data/raw/premier_league_2324_raw.csv` (EDA) y `data/raw/premier_league_1516_2324.csv` (modelo final) |
 | CSV procesado | `data/processed/premier_league_2023_24.csv` |
 
-Ninguno de los CSV se sube al repositorio (`data/raw/` y `data/processed/` están en `.gitignore`). Los de 2023-24 se regeneran con la función de descarga; los pasos están en [`docs/tarea-preparacion-dataset.md`](../tarea-preparacion-dataset.md).
+Ninguno de los CSV se sube al repositorio (`data/raw/` y `data/processed/` están en `.gitignore`). El CSV en bruto de 2023-24 es el `E0.csv` original de football-data, sin limpiar. El procesado se regenera con la función de descarga (los pasos están en [`docs/tarea-preparacion-dataset.md`](../tarea-preparacion-dataset.md)), y el de las 9 temporadas lo guarda el comando del modelo final (ver más abajo).
 
 **Limpieza.** Se descartan las filas sin equipos, goles o resultado y las filas duplicadas, se pasan los nombres de los equipos a minúsculas (`"Man City"` → `"man city"`, el formato que usa la app) y se ordena por fecha. En 2023-24 el archivo venía completo: no se perdió ningún partido.
 
 **Qué se usa.** El CSV conserva las 106 columnas del original (estadísticas del partido, cuotas de apuestas…), pero el proyecto solo usa seis: `Date`, `HomeTeam`, `AwayTeam`, `FTHG` y `FTAG` (goles del local y del visitante) y `FTR` (resultado: H, D o A). Las estadísticas del partido no pueden ser features porque se conocen después del partido (ver la sección 3).
 
-**Fechas.** El CSV guarda la fecha como texto `dd/mm/aaaa`. Antes de ordenar hay que convertirla a fecha: ordenada como texto, el 01/09/2023 quedaría antes que el 11/08/2023.
+**Fechas.** Los CSV de football-data traen la fecha como texto `dd/mm/aaaa` (2016-17 la trae como `dd/mm/aa`). `download_premier_league_data` la convierte a fecha nada más descargarla, y `build_features` acepta los dos formatos. Antes de ordenar hay que convertirla a fecha: ordenada como texto, el 01/09/2023 quedaría antes que el 11/08/2023.
 
 **Una temporada para el EDA, nueve para el modelo.** El EDA y las cifras de esta sección son de 2023-24, salvo donde se indica. Con una sola temporada las clases pequeñas tenían muy pocos ejemplos (ver 2.4), así que el modelo final se entrena con las 9 temporadas de 2015-16 a 2023-24. Las descarga y guarda una copia en `data/raw/premier_league_1516_2324.csv`, desde la raíz del repositorio:
 

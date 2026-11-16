@@ -34,8 +34,8 @@ flowchart LR
 
 - **Solo partidos con fecha anterior.** Para cada partido se filtran los de fecha estrictamente menor; los del mismo día tampoco cuentan.
 - **Fechas convertidas antes de ordenar.** El CSV trae las fechas como `dd/mm/aaaa`. Ordenadas como texto, el 01/09/2023 quedaría antes que el 11/08/2023 y entrarían partidos futuros en el «pasado». Por eso se convierten a fecha antes de nada.
-- **El historial se reinicia cada temporada.** Si el dataset tiene varias temporadas, cada una empieza sin historial.
-- **Sin historial, sin valor.** Si un equipo aún no ha jugado en esa condición, sus variables quedan vacías (`NaN`). En 2023-24 son 21 de los 380 partidos (primeras jornadas), que se descartan al entrenar: quedan 359.
+- **El historial se reinicia cada temporada.** El modelo final se entrena con 9 temporadas (#66), y cada una empieza sin historial.
+- **Sin historial, sin valor.** Si un equipo aún no ha jugado en esa condición, sus variables quedan vacías (`NaN`). Esos partidos, de las primeras jornadas, se descartan al entrenar. En 2023-24 son 21 de 380 (quedan 359). Con las 9 temporadas del modelo final son 185 de 3.420 (quedan 3.235).
 
 ## 3.3 Features de un partido nuevo (#34)
 
@@ -67,6 +67,6 @@ Del [notebook de EDA](../../notebooks/01_eda.ipynb) (#4), con los 359 partidos q
 
 ## 3.6 Límites
 
-- **Una sola temporada.** Con 359 partidos útiles, las clases pequeñas tienen pocas decenas de ejemplos (26 en la clase 4). `download_premier_league_data` ya admite varias temporadas.
+- **El EDA es de una sola temporada.** Las cifras de 3.5 salen de los 359 partidos útiles de 2023-24, donde la clase 4 tiene solo 26 ejemplos. Ese era el principal límite. El modelo final (#66) ya se entrena con 9 temporadas, de 2015-16 a 2023-24 (3.235 partidos con historial), y así su F1 macro pasa de 0,095 a 0,172 (ver la sección 2.4). Siguen siendo solo partidos de la Premier League.
 - **Solo resultados y goles.** No hay variables de tiros, lesiones, alineaciones ni descanso entre partidos.
 - **Las primeras jornadas no se pueden predecir bien.** Sin partidos previos en la temporada, las variables quedan vacías.
