@@ -140,3 +140,40 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
 
 - [AGENTS.md](<../AGENTS.md>) - Reglas de trabajo (Conventional Commits, PRs a dev)
 - [docs/model-contract.md](<./docs/model-contract.md>) - Contrato del modelo final para Cala
+
+---
+
+### #34 Features de un partido nuevo: errores corregidos
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** _por completar_
+- **Prompt clave:** revisar las ramas propias, encontrar los errores y corregirlos.
+- **Qué generó el agente:** reescritura de `engineering.py` con un único cálculo por partido (`_match_features`) que comparten `build_features` y `build_match_features`; constante `FEATURE_COLUMNS`; 21 tests nuevos en `tests/test_features.py`; actualización de `docs/tarea-preparacion-dataset.md`.
+- **Errores encontrados en el código fusionado (PRs #43, #51, #52 y #54):**
+  - `build_match_features` devolvía `form_*_last_5` y `match_diff` siempre vacíos: leía las columnas `ResultHome`/`ResultAway`, que no existen en el histórico.
+  - Descartaba el último partido de cada equipo (`Date < max`), así que la app y el entrenamiento no coincidían.
+  - El signo de la forma del visitante estaba invertido: una victoria fuera contaba como derrota.
+  - Si un equipo no tenía historial, faltaban columnas en lugar de venir vacías.
+  - Las fechas `dd/mm/aaaa` se ordenaban como texto (el 01/09 antes que el 11/08), lo que rompía el «solo partidos anteriores».
+  - Seguían `recent_*_form` y `match_momentum` (la issue pedía quitarlos) y el docstring no coincidía con el código.
+  - La tabla de clases de `docs/tarea-preparacion-dataset.md` sumaba más del 100 %; ahora tiene la distribución real (clase 5: 43,7 %).
+- **Aceptado:** función común para entrenamiento y app; `build_match_features` devuelve un DataFrame de una fila con las columnas del modelo, listo para `predict_proba` (contrato de `docs/model-contract.md`).
+- **Errores del agente y cómo se corrigieron:** la primera versión leía las fechas ISO con `dayfirst=True` y convertía `2024-09-01` en el 9 de enero; lo detectaron los tests nuevos y ahora se prueba primero el formato ISO.
+- **Comprobación:** con el CSV real, las features de la app coinciden con las de entrenamiento en los 380 partidos; `pytest`: 195 tests pasan. Los tests nuevos fallan si se reintroduce la fuga (`<=`) o el signo invertido.
+- **Revisión humana:** _pendiente_
+
+---
+
+### #4 EDA: notebook recuperado y corregido
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** _por completar_
+- **Prompt clave:** llevar a `dev` el EDA de la rama `bionic/tarea-4-eda`, que nunca se fusionó, corrigiendo sus errores. Mariana dio el visto bueno para sustituir su plantilla de `notebooks/01_eda.ipynb`.
+- **Errores encontrados en la versión de la rama:**
+  - El JSON del notebook estaba roto (Jupyter no lo abría).
+  - Nunca se había ejecutado: `build_target` recibía columnas enteras y fallaba en la segunda celda.
+  - Las conclusiones no salían de datos (sin salidas) y una recomendaba usar `FTHG`, `FTAG` y la diferencia de goles como features, que es fuga de datos.
+  - Usaba features que ya no existen y una correlación de Spearman con `target`, que es nominal.
+- **Qué generó el agente:** notebook nuevo que solo llama a `src/kiniela/` (dataset, `target`, distribución de clases, goles, features por clase y correlación entre features) y conclusiones escritas a partir de su ejecución.
+- **Comprobación:** todas las celdas se ejecutan con el CSV real; las cifras de las conclusiones son las que imprime el notebook. Se guarda sin salidas, como los demás notebooks del equipo.
+- **Revisión humana:** _pendiente_
