@@ -192,3 +192,15 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
 - **Comprobación:** todas las cifras salen del CSV real, de los tests o del notebook de EDA.
 - **Pendiente:** la sección 2 (`02-datos-y-eda.md`) sigue sin redactar.
 - **Revisión humana:** _pendiente_
+
+---
+
+### #17 Informe: sección 2 (datos, variable objetivo y EDA)
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** _por completar_
+- **Prompt clave:** redactar la sección 2 del informe. Mariana dio el visto bueno para sustituir su esquema de `02-datos-y-eda.md`.
+- **Qué generó el agente:** fuente y limpieza de los datos, regla de `target` con su diagrama, distribución de clases y conclusiones del EDA que importan al modelado, enlazando el código en lugar de copiarlo.
+- **Comprobación:** todas las cifras se han recalculado con los CSV en bruto y procesado y con `build_target`; los casos de tests citados existen en `tests/test_target.py`.
+- **Tras la revisión:** se añadieron las 9 temporadas del modelo final (#66): tabla de 2.1, distribución de clases junto a la de 2023-24 y el resultado de añadir temporadas en 2.4. La distribución, los goles y los equipos se recalcularon descargando las 9 temporadas con `download_premier_league_data` y coinciden con los de la revisión. Los F1 macro salen de la PR #66 y de `models/model_card.json`.
+- **Revisión humana:** _pendiente_
