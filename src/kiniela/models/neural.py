@@ -55,7 +55,8 @@ from kiniela.models.ensembles import build_ensembles
 NETWORK_NAME = "neural_network"
 
 # Fixed architecture. Early stopping and L2 are part of the comparison, not a
-# search: issue #7 owns hyperparameter search for the ensembles.
+# search: the hyperparameter search for the ensembles lives in
+# kiniela.models.tuning (issue #7).
 HIDDEN_LAYERS = (32, 16)
 L2_ALPHA = 1e-4
 VALIDATION_FRACTION = 0.15

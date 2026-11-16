@@ -1,6 +1,6 @@
 # 8. Forma de trabajo: repositorio, CI y uso de IA
 
-**Borrador:** Eva (#21) · **Para revisar entre todas** · Estado a 13/11/2026
+**Borrador:** Eva (#21) · **Para revisar entre todas** · Estado a 16/11/2026
 
 Cómo se organiza el equipo para que cuatro personas, cada una con su asistente de IA, trabajen en el mismo repositorio sin pisarse y con calidad comprobable.
 
@@ -41,9 +41,9 @@ flowchart LR
 | Persona | Herramienta |
 | --- | --- |
 | Eva | Claude Code (Claude Opus 5.5) |
-| Mariana | Cursor |
+| Mariana | Cursor (Grok 4.7) |
 | Anna | _por completar_ |
-| Cala | _por completar_ |
+| Carla | OpenCode (MiMo-V2.6-Flash) |
 
 ### Errores de la IA que detectamos (ejemplos)
 
@@ -52,8 +52,11 @@ flowchart LR
 | Preparación de datos (PR #20) | La IA afirmó que football-data.co.uk daba error 404 y generó datos simulados. La web funcionaba: la URL era incorrecta | Verificar lo que afirma la IA antes de construir encima |
 | Revisión de Gemini (PR #24) | Señaló como problema un orden de `COPY` en el Dockerfile que era justo el contrario | La revisión de IA orienta, pero no sustituye a la humana |
 | Despliegue (#12) | El prompt de configuración de Neon para agentes era para Node.js | Leer antes de ejecutar lo que propone una herramienta |
+| Optimización (PR #50) | Un test del límite «gap exactamente 0,05» falló por aritmética de coma flotante (`0.5 - 0.45` da `0.0499…`) | Los tests de límites necesitan valores exactos; los tests sí detectan lo que la IA no ve |
+| A/B testing (PR #48) | Gemini acertó: el reparto aleatorio no usaba `RANDOM_STATE`, como exige `AGENTS.md` | La revisión automática también encuentra fallos reales; se aceptó el cambio |
 
 ## 8.4 Lo que mejoraríamos
 
 - Varios PRs entraron con el título o la descripción sin rellenar, y uno sin el código que anunciaba (#43). La lista de comprobación de `AGENTS.md` se añadió para eso. El siguiente paso sería un check automático del título del PR.
+- Un PR (#54) entró con archivos sobrantes: un clon del repo dentro del repo y scripts personales. Se quitaron en el #55 y se añadieron al `.gitignore`. Revisar `git status` antes de cada commit.
 - Las tareas necesarias que no estaban en el backlog inicial (#34–#37) se detectaron tarde. Habría que revisar el backlog contra el briefing al empezar cada semana.

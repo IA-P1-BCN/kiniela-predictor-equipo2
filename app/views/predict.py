@@ -6,6 +6,7 @@ from resources import (
     class_label,
     get_db_engine,
     get_predictor,
+    get_router,
     get_teams,
     is_reference_model,
     team_label,
@@ -30,7 +31,8 @@ def run_prediction(home_team: str | None, away_team: str | None) -> None:
     """Predict, try to save, and keep the result in the session for the feedback form."""
     try:
         home, away = validate_teams(home_team or "", away_team or "")
-        probabilities = get_predictor().predict(home, away)
+        predictor = get_router().choose()  # current model, or the candidate in an A/B test
+        probabilities = predictor.predict(home, away)
         class_id = predicted_class(probabilities)
     except ValueError as error:
         st.session_state.pop("last_prediction", None)
@@ -46,7 +48,7 @@ def run_prediction(home_team: str | None, away_team: str | None) -> None:
                 away_team=away,
                 inputs={"home_team": home, "away_team": away},
                 probabilities=probabilities,
-                model_version=get_predictor().version,
+                model_version=predictor.version,
             ).id
     except SQLAlchemyError:
         st.warning("La predicción no se ha podido guardar en la base de datos. Se muestra igualmente.")
@@ -57,6 +59,7 @@ def run_prediction(home_team: str | None, away_team: str | None) -> None:
         "away": away,
         "class_id": class_id,
         "probabilities": probabilities,
+        "version": predictor.version,
     }
 
 
@@ -84,6 +87,7 @@ def show_result(result: dict) -> None:
             ),
         },
     )
+    st.caption(f"Predicho con el modelo `{result['version']}`")
 
 
 def show_feedback_form(result: dict) -> None:
@@ -132,7 +136,8 @@ st.caption("Equipo 2 · clasificación del tipo de resultado de un partido en 6 
 
 try:
     predictor = get_predictor()
-except (FileNotFoundError, TypeError) as error:
+    router = get_router()
+except (FileNotFoundError, TypeError, ValueError) as error:
     st.error(f"No se ha podido cargar el modelo: {error}")
     st.stop()
 
@@ -161,4 +166,10 @@ if "last_prediction" in st.session_state:
     show_result(st.session_state["last_prediction"])
     show_feedback_form(st.session_state["last_prediction"])
 
-st.caption(f"Modelo: `{predictor.version}`")
+if router.is_active:
+    st.caption(
+        f"A/B testing activo: el {router.share:.0%} de las predicciones usa el modelo candidato "
+        f"`{router.candidate.version}` y el resto, el actual `{predictor.version}`."
+    )
+else:
+    st.caption(f"Modelo: `{predictor.version}`")

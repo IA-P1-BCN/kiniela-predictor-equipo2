@@ -5,8 +5,10 @@ against the same numbers (issues #5 to #8 use it):
 
 - Splitter: ``StratifiedKFold(n_splits=CV_N_SPLITS, shuffle=True, random_state=RANDOM_STATE)``.
 - Seed: ``RANDOM_STATE`` from :mod:`kiniela.config`, used by the splitter and by the model.
-- Metrics per fold: ``accuracy``, ``f1_macro`` and F1 per class; the report shows their
-  mean and standard deviation across folds.
+- Metrics per fold: ``accuracy``, ``f1_macro`` and F1 per class on the validation
+  fold, plus the training fold's ``f1_macro`` (issue #7 measures the overfitting
+  gap as ``|mean(train) - mean(validation)|`` and requires it below 0.05); the
+  report shows their mean and standard deviation across folds.
 - Reference: a majority-class ``DummyClassifier`` evaluated on the same folds, so the
   Random Forest is always compared against the trivial baseline.
 
@@ -75,11 +77,19 @@ VERSION_PREFIX = "baseline-rf"
 
 @dataclass(frozen=True)
 class FoldScores:
-    """Accuracy and F1 of each fold of the cross-validation."""
+    """Accuracy and F1 of each fold of the cross-validation.
+
+    ``accuracy``, ``f1_macro`` and ``f1_per_class`` are measured on the held-out
+    (validation) fold. ``train_f1_macro`` is measured on the fold the model was
+    trained on and exists to quantify overfitting: issue #7 declares the gap as
+    ``|mean(train F1 macro) - mean(validation F1 macro)|`` and requires it below
+    0.05 (see :func:`f1_macro_gap`).
+    """
 
     accuracy: tuple[float, ...]
     f1_macro: tuple[float, ...]
     f1_per_class: tuple[tuple[float, ...], ...]  # one row per fold, one value per class
+    train_f1_macro: tuple[float, ...]  # same folds, scored on their training rows
 
     @property
     def accuracy_mean(self) -> float:
@@ -96,6 +106,19 @@ class FoldScores:
     @property
     def f1_macro_std(self) -> float:
         return float(np.std(self.f1_macro))
+
+    @property
+    def train_f1_macro_mean(self) -> float:
+        return float(np.mean(self.train_f1_macro))
+
+    @property
+    def train_f1_macro_std(self) -> float:
+        return float(np.std(self.train_f1_macro))
+
+    @property
+    def f1_macro_gap(self) -> float:
+        """Overfitting gap of issue #7: absolute train-vs-validation F1 macro difference."""
+        return abs(self.train_f1_macro_mean - self.f1_macro_mean)
 
     @property
     def f1_per_class_mean(self) -> tuple[float, ...]:
@@ -178,11 +201,14 @@ def cross_validate_model(
             the other models balance through their own parameter.
 
     Returns:
-        The accuracy, F1 macro and F1 per class of each of the ``CV_N_SPLITS`` folds.
+        The accuracy, F1 macro and F1 per class of each of the ``CV_N_SPLITS``
+        validation folds, plus the F1 macro of each training fold (issue #7 uses
+        the difference between the two means as the overfitting gap).
     """
     accuracy: list[float] = []
     f1_macro: list[float] = []
     f1_per_class: list[tuple[float, ...]] = []
+    train_f1_macro: list[float] = []
     for train_index, test_index in stratified_cv().split(X, y):
         fold_model = clone(estimator)
         if balanced:
@@ -195,6 +221,14 @@ def cross_validate_model(
         f1_macro.append(
             f1_score(y[test_index], predictions, average="macro", zero_division=0)
         )
+        train_f1_macro.append(
+            f1_score(
+                y[train_index],
+                fold_model.predict(X[train_index]),
+                average="macro",
+                zero_division=0,
+            )
+        )
         f1_per_class.append(
             tuple(
                 f1_score(
@@ -206,7 +240,9 @@ def cross_validate_model(
                 )
             )
         )
-    return FoldScores(tuple(accuracy), tuple(f1_macro), tuple(f1_per_class))
+    return FoldScores(
+        tuple(accuracy), tuple(f1_macro), tuple(f1_per_class), tuple(train_f1_macro)
+    )
 
 
 def prepare_xy(

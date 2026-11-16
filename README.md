@@ -27,7 +27,7 @@ El umbral entre victoria clara y ajustada, y la precedencia de la clase 5, se ci
 | Persona | Rol |
 | --- | --- |
 | Anna | Scrum Master y Data & EDA Lead |
-| Cala | Modeling Lead |
+| Carla | Modeling Lead |
 | Eva | App & Backend Lead |
 | Mariana | Product Owner y MLOps & Neural Networks Lead |
 
@@ -124,7 +124,7 @@ Detalles de la imagen:
 - Parte de `python:3.12-slim` e instala solo `requirements.txt`.
 - La app se ejecuta con un usuario sin privilegios, no como root.
 - No incluye `.env`, datos, notebooks, tests ni entornos virtuales (ver `.dockerignore`). Los secretos se pasan al arrancar, con `-e` o `--env-file .env`.
-- De `models/` solo entran el modelo promocionado (`kiniela_model.joblib`) y su ficha (`model_card.json`), si existen.
+- De `models/` solo entran el modelo promocionado (`kiniela_model.joblib`), el candidato del A/B testing (`candidate_model.joblib`) y sus fichas, si existen.
 
 ### Docker Compose (app + PostgreSQL)
 
@@ -155,7 +155,7 @@ La app guarda cada predicción y el feedback de la persona usuaria.
 - **En local** no hay que configurar nada: se usa SQLite en `data/kiniela.db`.
 - **En producción** se usa PostgreSQL en Neon, con la variable `DATABASE_URL`. Las variables necesarias están en `.env.example`, sin valores reales.
 
-El esquema y las métricas en tiempo real están en [docs/database.md](docs/database.md). Para sacar los partidos con su clase real y reentrenar: `python -m kiniela.storage.export` ([docs/retraining.md](docs/retraining.md)). Para comparar las features de entrenamiento con un lote nuevo: `python -m kiniela.monitoring.drift` ([docs/drift.md](docs/drift.md)).
+El esquema y las métricas en tiempo real están en [docs/database.md](docs/database.md). Los comandos se lanzan desde la raíz del repo con `PYTHONPATH=src` delante, porque el paquete vive en `src/`. Para sacar los partidos con su clase real y reentrenar: `python -m kiniela.storage.export` ([docs/retraining.md](docs/retraining.md)). Para comparar las features de entrenamiento con un lote nuevo: `python -m kiniela.monitoring.drift` ([docs/drift.md](docs/drift.md)). Para probar un modelo nuevo junto al actual y promocionarlo si gana: `python -m kiniela.models.promote` ([docs/ab-testing.md](docs/ab-testing.md)).
 
 ## Tests
 
@@ -177,5 +177,7 @@ Cubren el catálogo de clases, el etiquetado, la validación del dataset (esquem
 - [Informe técnico](docs/informe/README.md)
 - [Guion de la presentación técnica](docs/presentacion/README.md)
 - [Presentación de negocio](docs/presentacion-negocio/README.md)
+- [Operación de modelos (MLOps)](docs/mlops.md)
 - [Data drift](docs/drift.md)
+- [A/B testing y promoción del modelo](docs/ab-testing.md)
 - Plantilla de GitHub: `.github/ISSUE_TEMPLATE/tarea.md`

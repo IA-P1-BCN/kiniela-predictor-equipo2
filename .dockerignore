@@ -34,11 +34,13 @@ docs
 Dockerfile
 .dockerignore
 
-# Only the promoted model and its metadata go into the image
+# Only the promoted model, the A/B candidate (#37) and their metadata go into the image
 models/*
 !models/.gitkeep
 !models/kiniela_model.joblib
 !models/model_card.json
+!models/candidate_model.joblib
+!models/candidate_model_card.json
 
 # Orchestration files, not needed inside the image
 docker-compose.yml

@@ -1,5 +1,6 @@
 """End-to-end tests of the Streamlit app with Streamlit's AppTest (no browser)."""
 
+import sys
 from pathlib import Path
 
 import pytest
@@ -117,3 +118,39 @@ def test_history_page_without_predictions_explains_what_to_do(database_url):
     app = start_app()
     app.switch_page("views/history.py").run()
     assert "Todavía no hay predicciones" in app.info[0].value
+
+
+@pytest.fixture
+def candidate_in_ab_test(database_url, monkeypatch):
+    """A candidate model that always predicts class 2 and receives every prediction."""
+    sys.path.insert(0, str(Path(APP).parent))
+    import resources
+
+    from kiniela.models.predict import ReferencePredictor, class_frequencies
+
+    candidate = ReferencePredictor(tuple(class_frequencies([2])), version="candidate-test")
+    monkeypatch.setattr(resources, "load_candidate", lambda: candidate)
+    monkeypatch.setenv("AB_CANDIDATE_SHARE", "1")
+    return candidate
+
+
+def test_ab_test_sends_predictions_to_the_candidate_and_saves_its_version(candidate_in_ab_test,
+                                                                          database_url):
+    app = start_app()
+    assert any("A/B testing activo" in caption.value for caption in app.caption)
+    predict(app, "arsenal", "chelsea")
+
+    assert app.metric[0].value.startswith("2 ·")
+    [saved] = saved_predictions(database_url)
+    assert saved.model_version == "candidate-test"
+
+
+def test_history_page_compares_both_models_in_an_ab_test(candidate_in_ab_test, database_url):
+    app = start_app()
+    predict(app, "arsenal", "chelsea")
+    app.switch_page("views/history.py").run()
+
+    assert not app.exception
+    comparison = app.dataframe[0].value
+    assert list(comparison["Modelo"]) == ["Actual", "Candidato"]
+    assert list(comparison["Predicciones"]) == [0, 1]

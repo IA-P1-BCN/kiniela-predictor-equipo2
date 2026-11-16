@@ -20,7 +20,7 @@ Datos, variable objetivo, features y análisis exploratorio. También mantiene e
 
 Antes de cerrar el etiquetado, Anna escribe el umbral entre victoria clara y ajustada, y si un partido de 4+ goles pasa siempre a la clase 5.
 
-## Cala — Modeling Lead
+## Carla — Modeling Lead
 
 Baseline, ensembles, control de overfitting y el informe de métricas.
 
@@ -31,7 +31,7 @@ Baseline, ensembles, control de overfitting y el informe de métricas.
 | #7 Optimización | Hiperparámetros finales y diferencia train/validación inferior a 0.05 |
 | #8 Informe de métricas | Accuracy, precision/recall/F1 por clase, matriz de confusión, importancia y errores |
 
-Cala no cambia el significado de `target`. Si el desbalance impide una métrica justa, lo documenta y lo habla con Anna y Mariana.
+Carla no cambia el significado de `target`. Si el desbalance impide una métrica justa, lo documenta y lo habla con Anna y Mariana.
 
 ## Eva — App & Backend Lead
 
@@ -61,7 +61,7 @@ Red neuronal, drift, tests y la documentación de operación. Coordina el cierre
 ## Orden de trabajo
 
 1. Anna deja datos, `target` y features.
-2. Cala entrena y compara modelos.
+2. Carla entrena y compara modelos.
 3. Eva publica la app cuando hay un modelo elegido.
 4. Mariana añade la red, el drift y los tests sobre el código ya estable.
 5. El equipo cierra informe y presentaciones.

@@ -14,6 +14,7 @@ Persona usuaria ──► Render: contenedor Docker de la app ──► Neon: Po
 | Variable | Dónde | Valor | ¿Secreta? |
 | --- | --- | --- | --- |
 | `DATABASE_URL` | Render → *Environment* | Cadena de conexión de Neon (`postgresql://…?sslmode=require`) | **Sí**: solo en el panel de Render, nunca en el repo |
+| `AB_CANDIDATE_SHARE` | Render → *Environment* (opcional) | De 0 a 1: parte de las predicciones para el modelo candidato. Sin definir, no hay A/B testing ([A/B testing](ab-testing.md)) | No |
 | `PORT` | La pone Render | Puerto donde escucha la app; el `Dockerfile` lo lee | No |
 
 Sin `DATABASE_URL`, la app usa SQLite dentro del contenedor, y en Render ese archivo **se borra en cada despliegue**. Por eso en producción es obligatoria.
@@ -63,6 +64,8 @@ Antes de una demo, conviene abrir la URL un par de minutos antes.
 ## El modelo en producción
 
 La imagen incluye `models/kiniela_model.joblib` y `models/model_card.json` si están en el repo (ver [contrato del modelo](model-contract.md)). Mientras no exista el modelo entrenado, la app usa el modelo de prueba y lo avisa en pantalla.
+
+Para probar un modelo nuevo junto al actual y promocionarlo, ver [A/B testing](ab-testing.md). Promocionar cambia archivos del repo: después hay que hacer un PR y un *Manual Deploy*.
 
 ## En la entrega: pasar a `main`
 

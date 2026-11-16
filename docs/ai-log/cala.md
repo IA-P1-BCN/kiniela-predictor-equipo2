@@ -55,3 +55,31 @@
   - Al crear la rama con `git checkout -b 6-ensemble-models origin/dev`, git la configuró para hacer *push* a `origin/dev`; se le quitó el upstream antes de subirla, para que un `push` sin argumentos no pudiera tocar `dev`.
   - XGBoost no admite `class_weight` como sklearn: sin el ajuste por `sample_weight` la comparación habría sido injusta (el RF y LightGBM sí se equilibraban).
 - **Revisión humana:** pendiente en el PR. Puntos a mirar: que el candidato se justifique con F1 macro y no con accuracy, que los dos ensembles usen el mismo esquema que la #5, y que la semilla esté en todos los modelos.
+
+### #7 Optimización y control de overfitting (XGBoost)
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** OpenCode, MiMo-V2.6-Flash.
+- **Prompt clave:** «crea la rama y mírame esto pero no lo subas, déjame los archivos allí», con el texto de la issue #7 (optimizar hiperparámetros y garantizar overfitting inferior al 5%).
+- **Qué generó el agente:**
+  - `src/kiniela/models/tuning.py`: `tune_model()` con búsqueda en **rejilla** (grid, 648 combinaciones) sobre `SEARCH_SPACE` documentado en el docstring — `max_depth` 1/2, `n_estimators` 25/100/300, `learning_rate` 0.01/0.03/0.1, `min_child_weight` 1/5/20, `reg_lambda` 10/100/500, `subsample` y `colsample_bytree` 0.7/1.0 —, con el mismo `stratified_cv()` y los mismos `sample_weight` balanceados por fold que la #6.
+  - Métrica del gap **declarada**: `GAP_METRIC = "f1_macro"`; el gap es `|mean(train f1_macro) - mean(validation f1_macro)|` calculado por folds (`FoldScores.f1_macro_gap`) y el umbral `GAP_THRESHOLD = 0.05` es estricto, como pide la issue.
+  - Selección: mayor F1 macro de validación **solo entre las combinaciones con gap < 0.05**; el accuracy solo desempata (misma regla que la #6); si ninguna combinación es viable lanza `ValueError` en vez de devolver un modelo sobreajustado en silencio.
+  - En `train.py`: `FoldScores` gana `train_f1_macro` (se puntúa en cada fold de entrenamiento dentro de `cross_validate_model`), para que #8 reutilice el mismo gap.
+  - En `ensembles.py`: `build_xgboost(**overrides)` extraído, para que los defaults de #6 y el punto de partida de la búsqueda sean la misma definición.
+  - Artefacto `models/tuned_xgboost.joblib` (`TunedXGBoost`) con los hiperparámetros finales y el gap **dentro** del modelo, nunca en `kiniela_model.joblib` (guard como en #5); informe `format_tuning()` puro, solo `main()` imprime.
+  - 14 tests nuevos → **137 en verde**. El CSV real y el `.joblib` siguen en `.gitignore`.
+- **Aceptado:**
+  - **Tabla gap antes/después** (datos reales, esquema fijo, seed 42): antes `0.958 train / 0.166 val → gap 0.792`; después `0.148 / 0.104 → gap 0.044 < 0.05`. De 648 combinaciones, **15 son viables**.
+  - **Hiperparámetros finales registrados con el modelo**: `max_depth=1, n_estimators=25, learning_rate=0.1, min_child_weight=20, reg_lambda=100, subsample=1.0, colsample_bytree=1.0` (dentro del artefacto y en la salida del informe).
+  - **Grid en lugar de Optuna**: sin dependencias nuevas, el espacio queda descrito en el docstring y el resultado es reproducible y revisable en el diff.
+  - El gap se mide con **F1 macro**, la misma métrica que eligió al candidato en #6, no con accuracy.
+- **Rechazado o cambiado, y por qué:**
+  - Optuna o búsqueda aleatoria: la issue admite grid y el espacio es pequeño; además Optuna metería una dependencia nueva solo por comodidad.
+  - **Trade-off honesto que hay que defender en el PR**: cumplir el gap < 0.05 cuesta métrica. El XGBoost por defecto de #6 tenía el mejor F1 (0.166) pero un gap de 0.792 (se memoriza el train); el mejor viable baja a **0.104 de F1 con gap 0.044**, de la altura de la referencia (0.102). La mejor combinación sin restricción (0.165) tiene gap 0.141 y queda fuera. Con una sola temporada y features débiles es un problema de datos, no del código; el accuracy también baja (0.254 → 0.114) y queda en la tabla para #8.
+  - Tunear LightGBM o el Random Forest: la #6 eligió XGBoost como candidato, la búsqueda es solo sobre él.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - El primer test del límite «gap exactamente 0.05» falló por aritmética de coma flotante (`0.5 - 0.45 = 0.0499…` era `< 0.05` y el combo entraba como viable); corregido usando el propio `GAP_THRESHOLD` como valor de train, cuya resta da exactamente `0.05`.
+  - La rejilla pequeña de los tests no era viable en el dataset sintético (hasta un solo stump daba gap 0.095): se cambió a `min_child_weight` 1/100, donde el combo regularizado colapsa a predicción casi constante (gap 0) y el sobreajustado queda fuera — justo el comportamiento que el test debe probar.
+  - El test de la CLI tardaba 6 minutos: sin argumento de espacio, `main()` ejecutaba las 648 combinaciones completas; se parchea `SEARCH_SPACE` en ese test para que solo corra la rejilla pequeña.
+- **Revisión humana:** pendiente en el PR. Puntos a mirar: que el gap declarado sea F1 macro y estrictamente menor que 0.05, que la tabla compare antes/después con el mismo esquema y solo cambien los hiperparámetros, que los parámetros finales viajen dentro del artefacto, y que el trade-off de F1 quede claro para el informe de #8.

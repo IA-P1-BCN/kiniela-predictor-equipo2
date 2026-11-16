@@ -2,9 +2,16 @@
 
 import pandas as pd
 import streamlit as st
-from resources import class_label, get_db_engine, get_predictor, team_label
+from resources import class_label, get_db_engine, get_predictor, get_router, team_label
 from sqlalchemy.exc import SQLAlchemyError
 
+from kiniela.models.ab_testing import (
+    CANDIDATE_CARD_NAME,
+    CURRENT_CARD_NAME,
+    MODELS_DIR,
+    load_model_card,
+    version_evidence,
+)
 from kiniela.storage import feedback_stats, list_history, session_scope
 
 HISTORY_LIMIT = 50
@@ -30,6 +37,29 @@ def show_stats(stats: dict, title: str) -> None:
     accuracy_col.metric("Acierto según el feedback", "—" if accuracy is None else f"{accuracy:.0%}")
 
 
+def comparison_rows(session, router) -> list[dict]:
+    """One row per model in the A/B test: validation metrics and live feedback."""
+    models = [
+        ("Actual", router.current, CURRENT_CARD_NAME),
+        ("Candidato", router.candidate, CANDIDATE_CARD_NAME),
+    ]
+    rows = []
+    for role, model, card_name in models:
+        evidence = version_evidence(session, model.version, load_model_card(MODELS_DIR / card_name))
+        rows.append(
+            {
+                "Modelo": role,
+                "Versión": evidence.version,
+                "F1 macro (validación)": evidence.f1_macro,
+                "Gap train/validación": evidence.overfitting_gap,
+                "Predicciones": evidence.predictions,
+                "Con feedback": evidence.with_feedback,
+                "Acierto (feedback)": evidence.accuracy,
+            }
+        )
+    return rows
+
+
 st.title("Historial")
 st.caption("Las últimas predicciones y cuánto acierta el modelo según el feedback de las personas usuarias.")
 
@@ -38,6 +68,8 @@ try:
         current_version = get_predictor().version
         overall = feedback_stats(session)
         current = feedback_stats(session, model_version=current_version)
+        router = get_router()
+        comparison = comparison_rows(session, router) if router.candidate is not None else []
         rows = [
             {
                 "Fecha": prediction.created_at,
@@ -55,6 +87,24 @@ except SQLAlchemyError:
 
 show_stats(current, f"Modelo actual (`{current_version}`)")
 show_stats(overall, "Todos los modelos")
+
+if comparison:
+    st.divider()
+    st.subheader("A/B testing")
+    st.dataframe(
+        pd.DataFrame(comparison),
+        hide_index=True,
+        width="stretch",
+        column_config={
+            "F1 macro (validación)": st.column_config.NumberColumn(format="%.3f"),
+            "Gap train/validación": st.column_config.NumberColumn(format="%.3f"),
+            "Acierto (feedback)": st.column_config.NumberColumn(format="percent"),
+        },
+    )
+    st.caption(
+        "La promoción la decide `python -m kiniela.models.promote` con la regla de "
+        "`docs/ab-testing.md`."
+    )
 
 st.divider()
 if not rows:

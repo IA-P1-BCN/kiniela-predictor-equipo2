@@ -12,7 +12,7 @@ Informe final del proyecto (issue #17). Cada sección es un archivo, y cada pers
 | 4 | Modelos, validación, optimización y métricas por clase | `04-modelos-y-metricas.md` | Cala | Pendiente (cuando cierren #7 y #8) |
 | 5 | Red neuronal | `05-red-neuronal.md` | Mariana | Pendiente |
 | 6 | Aplicación, base de datos y despliegue | [`06-aplicacion-y-despliegue.md`](06-aplicacion-y-despliegue.md) | Eva | Escrita |
-| 7a | MLOps: versiones, promoción y data drift | `07a-mlops-flujo-y-drift.md` | Mariana (#16) | Pendiente |
+| 7a | MLOps: versiones, promoción y data drift | [`07a-mlops-flujo-y-drift.md`](07a-mlops-flujo-y-drift.md) | Mariana (#16) | Escrita |
 | 7b | MLOps: feedback, reentrenamiento y A/B testing | `07b-mlops-feedback-ab.md` | Eva (#36, #37) | Pendiente |
 | 8 | Forma de trabajo: repositorio, CI y uso de IA | [`08-forma-de-trabajo.md`](08-forma-de-trabajo.md) | Eva (borrador; revisamos entre todas) | Borrador |
 | 9 | Conclusiones, límites y próximos pasos | `09-conclusiones.md` | Mariana (compila; cada una manda 4–6 líneas) | Pendiente |

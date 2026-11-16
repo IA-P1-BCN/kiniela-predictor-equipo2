@@ -16,7 +16,7 @@ assignees: ""
 
 ## Asignado a
 
-<!-- Anna | Cala | Eva | Mariana | Todo el equipo -->
+<!-- Anna | Carla | Eva | Mariana | Todo el equipo -->
 
 ## Dependencias
 
