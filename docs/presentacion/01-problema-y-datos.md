@@ -14,11 +14,16 @@
 
 ## 2. De dónde salen los datos
 
-**Se ve:** el logo o la URL de football-data.co.uk y tres cifras grandes: **380 partidos · 20 equipos · temporada 2023-24** (11/08/2023 – 19/05/2024).
+**Se ve:** el logo o la URL de football-data.co.uk y dos filas de cifras grandes:
 
-**Se dice:** «Usamos resultados reales de la Premier League, descargados de football-data.co.uk con `download_premier_league_data`. Se quitan filas incompletas y duplicadas, se normalizan los nombres de los equipos y las fechas se convierten a fecha, porque vienen como día/mes/año. El CSV no se sube al repositorio.»
+| | Partidos | Equipos | Temporadas |
+| --- | --- | --- | --- |
+| EDA | 380 | 20 | 2023-24 |
+| Modelo final | 3.420 | 33 | 2015-16 a 2023-24 (9) |
 
-**Dato:** en esta temporada el local ganó el 46,1 % de los partidos, hubo empate en el 21,6 % y ganó el visitante en el 32,4 %; 3,28 goles por partido.
+**Se dice:** «Usamos resultados reales de la Premier League, descargados de football-data.co.uk con `download_premier_league_data`. Se quitan filas incompletas y duplicadas, se normalizan los nombres de los equipos y las fechas se convierten a fecha, porque vienen como día/mes/año. El análisis lo hicimos con la última temporada; el modelo final se entrena con nueve, y en un momento os cuento por qué.»
+
+**Dato:** en 2023-24 hubo 3,28 goles por partido; la media de las 9 temporadas es 2,82. Fue la temporada con más goles de las nueve.
 
 ---
 
@@ -44,13 +49,14 @@ flowchart TD
 
 ## 4. Clases desbalanceadas
 
-**Se ve:** el gráfico de barras de la distribución de clases del [notebook de EDA](../../notebooks/01_eda.ipynb).
+**Se ve:** el gráfico de barras de la distribución de clases del [notebook de EDA](../../notebooks/01_eda.ipynb) y, debajo, la tabla con las dos distribuciones.
 
-| Clase | 0 | 1 | 2 | 3 | 4 | 5 |
+| % de partidos | 0 | 1 | 2 | 3 | 4 | 5 |
 | --- | --- | --- | --- | --- | --- | --- |
-| % de partidos | 11,1 | 13,9 | 12,9 | 11,6 | 6,8 | **43,7** |
+| 2023-24 | 11,1 | 13,9 | 12,9 | 11,6 | 6,8 | **43,7** |
+| 9 temporadas | 12,1 | 17,2 | 17,0 | 13,8 | 7,9 | **31,9** |
 
-**Se dice:** «Casi la mitad de los partidos son clase 5, y la victoria visitante clara solo el 6,8 %. Por eso la accuracy engaña: decir siempre "clase 5" ya acierta casi la mitad. Validamos con `StratifiedKFold` y comparamos modelos con F1 macro. Y la frontera es estrecha: hay 80 partidos con 3 goles y 80 con 4, un gol cambia la clase.»
+**Se dice:** «En 2023-24 casi la mitad de los partidos son clase 5. Esa temporada tuvo muchos goles: con las nueve temporadas la clase 5 baja al 32 %, pero sigue siendo la más grande, y la victoria visitante clara sigue siendo la más pequeña. Con este desequilibrio, decir siempre "clase 5" ya acierta mucho sin saber nada; por eso la accuracy engaña, y Carla os contará cómo lo medimos. Además, la frontera es estrecha: en 2023-24 hubo 80 partidos con 3 goles y 80 con 4. Un gol cambia la clase.»
 
 **Captura:** gráfico de barras e histograma de goles con la línea en 4 goles (notebook de EDA, secciones 2 y 3).
 
@@ -62,14 +68,27 @@ flowchart TD
 
 **Se dice:** «El modelo no puede ver el resultado que predice. Cada variable se calcula solo con partidos de fecha anterior: la forma, los goles marcados y la diferencia de goles de los últimos 5 partidos en casa del local y fuera del visitante, más dos combinadas. La app calcula las de un partido nuevo con la misma función que el entrenamiento, y un test comprueba que dan exactamente lo mismo.»
 
-**Dato:** al comparar con partidos reales encontramos que la app no calculaba lo mismo que el entrenamiento. Se corrigió con una función común, y ahora coinciden en los 380 partidos (PR #58).
+**Dato:** al comparar con partidos reales encontramos que la app no calculaba lo mismo que el entrenamiento. Se corrigió con una función común (#34), y ahora coinciden en los 380 partidos de 2023-24. El modelo final usa esa misma función.
 
 ---
 
 ## 6. Qué nos dicen los datos
 
-**Se ve:** la tabla de medias por clase del notebook de EDA, resaltando `match_diff`: 0,44 en la clase 0 y −0,02 en la clase 4.
+**Se ve:** la tabla de medias por clase del notebook de EDA, resaltando `match_diff`: 0,44 en la clase 0 y −0,02 en la clase 4. Al lado, dos cifras: **26 → 245** partidos útiles de la clase 4 (una temporada → nueve).
 
-**Se dice:** «Las variables separan bien la victoria local de la visitante, pero poco el resto; y la clase 5 apenas se distingue con ellas. Con una sola temporada quedan 359 partidos útiles y solo 26 de la clase 4. Eso marca el techo del modelo, y es lo que Carla va a contar ahora con las métricas.»
+**Se dice:** «Las variables separan bien la victoria local de la visitante, pero poco el resto, y la clase 5 apenas se distingue con ellas. Con las nueve temporadas el patrón se mantiene, así que no es casualidad de un año. El problema era la cantidad: con una sola temporada quedaban 359 partidos útiles y solo 26 de la clase 4, muy poco para aprender las clases pequeñas. Con nueve temporadas tenemos 3.235 partidos útiles y 245 de la clase 4. Cuánto mejora el modelo con eso es lo que Carla va a contar ahora con las métricas.»
 
 **Paso a Carla:** modelos, validación y métricas.
+
+---
+
+## Preguntas probables
+
+| Pregunta | Respuesta |
+| --- | --- |
+| ¿Por qué la clase 5 va antes que las demás? | Es la regla acordada con el equipo: un partido de 4 o más goles es «muchos goles» aunque también sea un empate o una victoria clara. Así cada partido tiene una sola clase |
+| ¿Por qué un umbral de 2 goles y no de 3? | Con la clase 5 por delante, un umbral de 3 dejaría la victoria clara solo en el 3-0 y el 0-3, con muy pocos partidos |
+| ¿Por qué el EDA es de una temporada y el modelo de nueve? | El EDA se hizo primero, con la temporada más reciente. Al entrenar vimos que una temporada daba muy pocos ejemplos de las clases pequeñas, y añadimos ocho más |
+| ¿Por qué no usáis tiros, córners o posesión? | Se conocen al acabar el partido: usarlos sería fuga de datos. Solo usamos lo que se sabe antes |
+| ¿Por qué los últimos 5 partidos? | Es lo bastante corto para reflejar la racha y lo bastante largo para no depender de un solo resultado |
+| ¿Cómo sabéis que no hay fuga de datos? | Hay tests que cambian el resultado de un partido y comprueban que sus variables no cambian, y otros que fallan si se usan partidos del mismo día |

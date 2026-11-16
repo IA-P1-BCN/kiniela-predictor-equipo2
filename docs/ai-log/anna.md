@@ -146,7 +146,7 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
 ### #34 Features de un partido nuevo: errores corregidos
 
 - **Fecha:** 2026-11-16
-- **Herramienta y modelo:** _por completar_
+- **Herramienta y modelo:** Claude Code (extensión de VS Code), Claude Opus 5.5.
 - **Prompt clave:** revisar las ramas propias, encontrar los errores y corregirlos.
 - **Qué generó el agente:** reescritura de `engineering.py` con un único cálculo por partido (`_match_features`) que comparten `build_features` y `build_match_features`; constante `FEATURE_COLUMNS`; 21 tests nuevos en `tests/test_features.py`; actualización de `docs/tarea-preparacion-dataset.md`.
 - **Errores encontrados en el código fusionado (PRs #43, #51, #52 y #54):**
@@ -167,7 +167,7 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
 ### #4 EDA: notebook recuperado y corregido
 
 - **Fecha:** 2026-11-16
-- **Herramienta y modelo:** _por completar_
+- **Herramienta y modelo:** Claude Code (extensión de VS Code), Claude Opus 5.5.
 - **Prompt clave:** llevar a `dev` el EDA de la rama `bionic/tarea-4-eda`, que nunca se fusionó, corrigiendo sus errores. Mariana dio el visto bueno para sustituir su plantilla de `notebooks/01_eda.ipynb`.
 - **Errores encontrados en la versión de la rama:**
   - El JSON del notebook estaba roto (Jupyter no lo abría).
@@ -183,7 +183,7 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
 ### #17 Informe: sección 3 y guion de la presentación técnica
 
 - **Fecha:** 2026-11-16
-- **Herramienta y modelo:** _por completar_
+- **Herramienta y modelo:** Claude Code (extensión de VS Code), Claude Opus 5.5.
 - **Prompt clave:** recuperar la sección 3 y el guion de la presentación del commit `cf5334b`, que se subió después de fusionar la PR #51 y nunca llegó a `dev`, y corregir sus errores. Mariana dio el visto bueno para sustituir sus esquemas.
 - **Errores encontrados en la versión recuperada:**
   - Sección 3: describía `recent_*_form` y `match_momentum` (ya eliminadas), definía `away_diff_last_5` al revés y tenía una salida de ejemplo y un recuento de tests que no eran reales.
@@ -198,7 +198,7 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
 ### #17 Informe: sección 2 (datos, variable objetivo y EDA)
 
 - **Fecha:** 2026-11-16
-- **Herramienta y modelo:** _por completar_
+- **Herramienta y modelo:** Claude Code (extensión de VS Code), Claude Opus 5.5.
 - **Prompt clave:** redactar la sección 2 del informe. Mariana dio el visto bueno para sustituir su esquema de `02-datos-y-eda.md`.
 - **Qué generó el agente:** fuente y limpieza de los datos, regla de `target` con su diagrama, distribución de clases y conclusiones del EDA que importan al modelado, enlazando el código en lugar de copiarlo.
 - **Comprobación:** todas las cifras se han recalculado con los CSV en bruto y procesado y con `build_target`; los casos de tests citados existen en `tests/test_target.py`.
@@ -221,4 +221,15 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
   - `data/processed/premier_league_2023_24.csv` estaba versionado desde mi commit del 11/11, contra la regla de no subir datasets.
 - **Qué generó el agente:** la función de descarga reescrita (mismos partidos, `Season` con varias temporadas, error si una fecha no se lee, orden estable, textos en inglés), 7 tests sin red en `tests/test_dataset.py`, el docstring de `target.py` y el documento corregidos, y el CSV sacado del repositorio con `git rm --cached` (sigue en local).
 - **Comprobación:** con las 9 temporadas reales la función nueva devuelve los mismos 3.420 partidos que la anterior, 380 por temporada, y 185 sin historial, como la ficha del modelo. Con 2023-24 coincide con el CSV que se saca del repositorio. Los tests nuevos fallan con el código anterior. `pytest` pasa entero.
+- **Revisión humana:** _pendiente_
+
+---
+
+### #17 Informe y presentación: puesta al día con el modelo final
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Claude Code (extensión de VS Code), Claude Opus 5.5.
+- **Prompt clave:** comprobar si los cambios de `dev` rompían mi trabajo, poner al día la sección 3 y mejorar mi guion de la presentación con las 9 temporadas del modelo final (#66). Completar el campo «Herramienta y modelo» de mis entradas.
+- **Qué generó el agente:** sección 3 con los partidos sin historial de las 9 temporadas (3.2) y los límites actualizados (3.6). En el guion: las cifras del modelo final en la diapositiva 2, las dos distribuciones de clases en la 4, la diapositiva 6 cerrando con el salto de 26 a 245 partidos útiles de la clase 4, y una tabla de preguntas probables. Mariana solo había cambiado «Cala» por «Carla» en dos líneas del guion, y se mantiene.
+- **Comprobación:** `pytest` y la app sobre `dev` funcionan; las features de la app coinciden con las de entrenamiento en el modelo final. Las cifras de las 9 temporadas (3.420 partidos, 185 sin historial, 3.235 útiles, 245 de la clase 4, `match_diff` 0,45 en la clase 0 y −0,04 en la 4) se recalcularon con `build_features` y `build_target` y coinciden con `models/model_card.json`. El F1 macro del modelo final no se repite en el guion: lo cuentan Carla y Eva en sus partes.
 - **Revisión humana:** _pendiente_
