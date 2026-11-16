@@ -1,145 +1,23 @@
-# 📘 Bitácora - Anna (Tareas #1-#4 y correcciones)
+# Bitácora de IA · Anna
 
-**Rama:** `34-match-features-corrections`  
-**Fecha:** 2026-11-13  
-**Estado:** ✅ **PR empujado a dev para Issue #34**
+| Herramienta | Modelo | Coste | Alcance |
+| --- | --- | --- | --- |
+| Bionic (app) | Qwen 3.5 | Gratuito | Tareas del 11 al 13/11/2026: primeras versiones de #1, #2, #3 y #4 y primeras correcciones de #34 |
+| Claude Code (extensión de VS Code) | Claude Opus 5.5 | De pago (plan Pro de Claude) | Entradas desde el 16/11/2026: revisión y corrección de mis tareas (#1, #2, #3, #4 y #34), secciones 2 y 3 del informe y mi guion de la presentación técnica (#17). El agente redacta el código y estas entradas; yo decido, reviso y apruebo cada subida |
 
----
+## Entradas
 
-## 🎯 Resumen de Trabajos Completados
+### #1 a #4 y #34 Primeras versiones de datos, target y features (11-13/11)
 
-### ✅ Issue #1 - Preparación del Dataset
-**PR fusionado:** `feat(data): download and clean real Premier League matches`  
-**Closes:** #1  
-
-#### Cambios:
-- **`src/kiniela/data/dataset.py`**: Función `download_premier_league_data()` con API real de football-data.co.uk
-- **`data/processed/premier_league_2023_24.csv`**: 380 partidos reales (H=46.1%, A=32.4%, D=21.6%)
-
----
-
-### ✅ Issue #2 - Creación de la variable objetivo  
-**PR fusionado:** `feat(data): add 6-class target labelling with difference threshold >= 2`  
-**Closes:** #2  
-
-#### Cambios:
-- **`src/kiniela/data/target.py`**: Función `build_target()` con umbral diferencia ≥ 2 y precedencia clase 5
-- **`tests/test_target.py`**: 18 tests cubriendo todos los casos (sin duplicados)
-
-#### Tests Pasan: 18/18 ✅
-
----
-
-### ✅ Issue #3 - Feature Engineering (Correcciones aplicadas)
-**PR:** `feat(features): add historical features for Premier League prediction`  
-**Closes:** #3  
-
-#### Cambios:
-- **`src/kiniela/features/engineering.py`**: Implementación inicial de 12+ features históricas
-- **`docs/tarea-preparacion-dataset.md`**: Documentación del dataset preparation
-
----
-
-### ✅ Issue #4 - Análisis Exploratorio (EDA)  
-**PR fusionado:** `feat(eda): complete exploratory data analysis for multiclass classification`  
-**Closes:** #4  
-
-#### Cambios:
-- **`notebooks/01_eda.ipynb`**: Análisis completo de distribución de clases, correlaciones y conclusiones
-
----
-
-## ✅ Correcciones Issues #3 y #34 (PR empujado a dev)
-
-**PR:** `feat(features): correct docstrings for form_*_last_5 and recent_*_form`  
-**Rama:** `34-match-features-corrections` → Pushed to origin ✅  
-
-### Cambios aplicados:
-
-#### 1. Corregido: Semántica de las features
-- **Corregido**: `form_*_last_5` es PROMEDIO de últimos 5 resultados anteriores al partido actual
-- **Corregido**: `recent_*_form` es el resultado del ÚLTIMO partido en escala ponderada (1=último W, 0.5=D, 0=último L)
-- **Eliminadas**: Features duplicadas (`avg_*_goals_conceded_last_5`, columnas de goles concedidos no devueltas)
-
-#### 2. Corregido: Docstrings consistentes  
-- ✅ `recent_home_form` ≠ `form_home_last_5` (son diferentes)
-- ✅ `match_momentum` es `recent_home_form - recent_away_form`, no copia de `match_diff`
-- ✅ Docstring describe exactamente las features que se devuelven
-
-#### 3. Función `build_match_features()` para predicción desde app
-```python
-from kiniela.features import engineering
-
-# Predecir un partido desde la app sin todo el histórico
-features = engineering.build_match_features(
-    history, 
-    home_team="Arsenal", 
-    away_team="Chelsea"
-)
-# features contiene todas las columnas que usa el modelo
-```
-
-#### 4. Tests de no-fuga
-- ✅ Test verifica que cambiar resultado de un partido NO afecta sus propias features anteriores
-- ✅ 7 tests nuevos en `tests/test_features.py` (7/7 pasan)
-
----
-
-## 📊 Estado Final del Work - Issues #3 y #34
-
-| Issue | Archivo Clave | Cambios | Tests | PR | Estado |
-|-------|---------------|---------|-------|-----|--------|
-| **#3** | engineering.py (+123 líneas) | Correcciones de duplicados y semántica | 7/7 ✅ | 🟢 Empujado a dev, pendiente squash merge |
-| **#34** | tests/test_features.py (142 líneas) | Función build_match_features + test no-fuga | 7/7 ✅ | 🟢 Merge con el PR de #3 o separado según decisión del equipo |
-
----
-
-## 🚀 Estado Actual
-
-### Resumen de archivos modificados:
-
-| Archivo | Líneas | Descripción |
-|---------|--------|-------------|
-| `src/kiniela/features/engineering.py` | +123 | Correcciones semánticas y docstrings |
-| `tests/test_features.py` | 142 (nuevo) | Tests para validación y no-fuga |
-
-### Estadísticas de tests:
-
-```bash
-pytest tests/test_target.py tests/test_features.py -q
-# Result: 25 passed in 0.51s ✅
-```
-
----
-
-## 📝 Bitácora actualizada
-
-**`docs/ai-log/anna.md`**: Actualizada con progreso de todas las tareas y correcciones aplicadas.
-
----
-
-## 🔗 PR empujado a dev
-
-**URL del PR:**
-```
-https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-features-corrections
-```
-
-### Checklist del PR:
-
-- [x] Título en inglés con Conventional Commits ✅
-- [x] Descripción completa con plantilla ✅  
-- [x] Closes #3 y #34 indicado ✅
-- [x] pytest verde (25 tests pasan) ✅
-- [x] Bitácora actualizada ✅
-- [x] No hay datasets, modelos o .env en el PR ✅
-
----
-
-## 📚 Referencias
-
-- [AGENTS.md](<../../AGENTS.md>) - Reglas de trabajo (Conventional Commits, PRs a dev)
-- [docs/model-contract.md](<../model-contract.md>) - Contrato del modelo final para Cala
+- **Fecha:** 2026-11-11 a 2026-11-13
+- **Herramienta y modelo:** Bionic (app), Qwen 3.5.
+- **PRs:** #26 (#1 y #2: descarga de datos reales y variable objetivo), #29 (#3: features y descarga de varias temporadas) y #51 y #52 (correcciones de features, #34).
+- **Qué se hizo:** descarga y limpieza de la Premier League 2023-24 (`download_premier_league_data`), `build_target` con umbral de 2 goles y la clase 5 por delante (18 tests), primera versión de las features (11 columnas, con `recent_*_form` y `match_momentum`) y primera versión de `build_match_features`.
+- **Errores que quedaron y se corrigieron después** (entradas siguientes):
+  - Las features de la app no coincidían con las de entrenamiento, las fechas se ordenaban como texto y había features duplicadas (#34).
+  - El notebook de EDA de la rama `bionic/tarea-4-eda` nunca llegó a `dev` (#4).
+  - La descarga no añadía la columna `Season` con varias temporadas y el CSV procesado se subió al repositorio (#1).
+- **Revisión humana:** PRs fusionadas en `dev`.
 
 ---
 
@@ -232,4 +110,28 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
 - **Prompt clave:** comprobar si los cambios de `dev` rompían mi trabajo, poner al día la sección 3 y mejorar mi guion de la presentación con las 9 temporadas del modelo final (#66). Completar el campo «Herramienta y modelo» de mis entradas.
 - **Qué generó el agente:** sección 3 con los partidos sin historial de las 9 temporadas (3.2) y los límites actualizados (3.6). En el guion: las cifras del modelo final en la diapositiva 2, las dos distribuciones de clases en la 4, la diapositiva 6 cerrando con el salto de 26 a 245 partidos útiles de la clase 4, y una tabla de preguntas probables. Mariana solo había cambiado «Cala» por «Carla» en dos líneas del guion, y se mantiene.
 - **Comprobación:** `pytest` y la app sobre `dev` funcionan; las features de la app coinciden con las de entrenamiento en el modelo final. Las cifras de las 9 temporadas (3.420 partidos, 185 sin historial, 3.235 útiles, 245 de la clase 4, `match_diff` 0,45 en la clase 0 y −0,04 en la 4) se recalcularon con `build_features` y `build_target` y coinciden con `models/model_card.json`. El F1 macro del modelo final no se repite en el guion: lo cuentan Carla y Eva en sus partes.
+- **Revisión humana:** _pendiente_
+
+---
+
+### #4 EDA y documentación: correcciones tras sacar el CSV del repositorio
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Claude Code (extensión de VS Code), Claude Opus 5.5.
+- **Prompt clave:** comprobar que todo funciona después de fusionar las PRs #68 y #69 y solucionar todos los errores antes de subir nada.
+- **Errores encontrados:**
+  - Al sacar el CSV procesado del repositorio (#68), cada persona lo regenera con `download_premier_league_data`, que guarda las fechas en ISO (`2023-08-11`). El notebook de EDA las leía con `dayfirst=True`, que solo sirve para `dd/mm/aaaa`, y fallaba en la segunda celda de código.
+  - El notebook decía que el CSV «se genera con» la descarga, sin el paso de guardarlo, y su conclusión 6 aún proponía añadir temporadas, que ya se hizo en el modelo final.
+  - `docs/tarea-preparacion-dataset.md` proponía guardar el dataset de 9 temporadas en `data/processed/`. La app toma los equipos del CSV más reciente de esa carpeta: habría ofrecido 33 equipos, y el modelo rechaza los descendidos.
+  - La sección 3 decía que, si se vuelve a meter la fuga, fallan 8 tests; con los tests de la #68 son 9.
+  - La parte antigua de esta bitácora no seguía la plantilla del equipo y tenía datos falsos o desfasados: una PR de EDA «fusionada» que nunca llegó a `dev`, features que ya no existen, recuentos de tests viejos y estados de PR caducados.
+- **Qué generó el agente:**
+  - El notebook usa `_sorted_by_date`, la misma función que convierte las fechas en las features y en `models/final.py`, y acepta los dos formatos. También corrige sus dos textos.
+  - Aviso en el documento de preparación del dataset y cifra corregida en la sección 3.
+  - Cabecera de la bitácora según la plantilla y la parte antigua resumida en una entrada con datos comprobados con `git` y GitHub.
+- **Comprobación:**
+  - El notebook se ejecuta entero con el CSV regenerado y con fechas `dd/mm/aaaa`, con la misma salida en los dos casos. Las cifras son las del informe (43,7 %, 80 y 80 partidos, 359 útiles, `match_diff` 0,44 y −0,02).
+  - Con un CSV de 9 temporadas, el catálogo de la app ofrece 33 equipos y el modelo rechaza `watford`.
+  - Con `<=` en lugar de `<` fallan 9 tests.
+  - `pytest` pasa entero.
 - **Revisión humana:** _pendiente_

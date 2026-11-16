@@ -56,7 +56,7 @@ Los tests están en [`tests/test_features.py`](../../tests/test_features.py) (21
 | `test_form_is_the_mean_of_the_last_5_results` | La forma es la media de 5 resultados, no solo el último |
 | `test_away_win_counts_as_a_win_for_the_away_team` | Una victoria fuera suma para el visitante |
 
-Además, con el CSV real de 2023-24, las variables de la app coinciden con las de entrenamiento en los 380 partidos. Si se vuelve a meter la fuga (`<=` en lugar de `<`), fallan 8 tests.
+Además, con el CSV real de 2023-24, las variables de la app coinciden con las de entrenamiento en los 380 partidos. Si se vuelve a meter la fuga (`<=` en lugar de `<`), fallan 9 tests: 8 de las features y el de la descarga que comprueba que el historial se reinicia en cada temporada.
 
 ## 3.5 Qué dice el EDA de estas variables
 
