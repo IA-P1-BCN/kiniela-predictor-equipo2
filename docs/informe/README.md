@@ -6,14 +6,14 @@ Informe final del proyecto (issue #17). Cada sección es un archivo, y cada pers
 
 | # | Sección | Archivo | Quién | Estado |
 | --- | --- | --- | --- | --- |
-| 1 | Problema, objetivo y valor para negocio | `01-problema.md` | Mariana | Pendiente |
+| 1 | Problema, objetivo y valor para negocio | [`01-problema.md`](01-problema.md) | Mariana | Escrita |
 | 2 | Datos, variable objetivo y EDA | `02-datos-y-eda.md` | Anna | Pendiente |
-| 3 | Feature engineering y control de fuga de datos | `03-features.md` | Anna | Pendiente |
-| 4 | Modelos, validación, optimización y métricas por clase | `04-modelos-y-metricas.md` | Cala | Pendiente (cuando cierren #7 y #8) |
-| 5 | Red neuronal | `05-red-neuronal.md` | Mariana | Pendiente |
+| 3 | Feature engineering y control de fuga de datos | [`03-features.md`](03-features.md) | Anna | Escrita |
+| 4 | Modelos, validación, optimización y métricas por clase | `04-modelos-y-metricas.md` | Carla | Pendiente (cuando cierren #7 y #8) |
+| 5 | Red neuronal | [`05-red-neuronal.md`](05-red-neuronal.md) | Mariana | Escrita |
 | 6 | Aplicación, base de datos y despliegue | [`06-aplicacion-y-despliegue.md`](06-aplicacion-y-despliegue.md) | Eva | Escrita |
 | 7a | MLOps: versiones, promoción y data drift | [`07a-mlops-flujo-y-drift.md`](07a-mlops-flujo-y-drift.md) | Mariana (#16) | Escrita |
-| 7b | MLOps: feedback, reentrenamiento y A/B testing | `07b-mlops-feedback-ab.md` | Eva (#36, #37) | Pendiente |
+| 7b | MLOps: feedback, reentrenamiento y A/B testing | [`07b-mlops-feedback-ab.md`](07b-mlops-feedback-ab.md) | Eva (#36, #37) | Escrita |
 | 8 | Forma de trabajo: repositorio, CI y uso de IA | [`08-forma-de-trabajo.md`](08-forma-de-trabajo.md) | Eva (borrador; revisamos entre todas) | Borrador |
 | 9 | Conclusiones, límites y próximos pasos | `09-conclusiones.md` | Mariana (compila; cada una manda 4–6 líneas) | Pendiente |
 
@@ -22,12 +22,12 @@ Informe final del proyecto (issue #17). Cada sección es un archivo, y cada pers
 1. **Problema y negocio (Mariana).** Kiniela, las 6 clases, para quién es el producto y qué decide una predicción.
 2. **Datos y EDA (Anna).** Fuente, temporadas, limpieza, regla de `target` (umbral y precedencia de la clase 5), distribución y conclusiones del EDA.
 3. **Features (Anna).** Variables de forma, goles y localía; cómo se evitó la fuga de datos; features de un partido nuevo (#34) si ya está.
-4. **Modelos (Cala).** Baseline, ensembles, esquema de validación, overfitting < 5 %, métricas por clase, matriz y errores. Sin números inventados: si #7/#8 no están, se deja el hueco marcado.
+4. **Modelos (Carla).** Baseline, ensembles, esquema de validación, overfitting < 5 %, métricas por clase, matriz y errores. Sin números inventados: si #7/#8 no están, se deja el hueco marcado.
 5. **Red neuronal (Mariana).** Arquitectura, misma validación que los ensembles, regularización, tabla de comparación.
 6. **App (Eva).** Ya escrita.
 7a. **MLOps flujo y drift (Mariana).** Cómo se versiona un modelo, cómo se promociona a `kiniela_model.joblib`, umbral PSI y qué hacer si salta la alerta.
 7b. **MLOps feedback y A/B (Eva).** Feedback en la app, export incremental (#36) y sustitución A/B (#37) cuando exista.
-8. **Forma de trabajo (Eva).** Borrador a revisar: Anna y Cala completan su fila de herramienta de IA.
+8. **Forma de trabajo (Eva).** Borrador a revisar: Anna y Carla completan su fila de herramienta de IA.
 9. **Conclusiones (Mariana).** Cada persona envía límites y un aprendizaje; Mariana unifica el relato.
 
 ## Calendario
@@ -35,7 +35,7 @@ Informe final del proyecto (issue #17). Cada sección es un archivo, y cada pers
 | Cuándo | Qué |
 | --- | --- |
 | **Lunes 16/11** | Cada una tiene el archivo de su sección creado (aunque sea esquema). |
-| **Miércoles 18/11, 18:00** | Secciones 1–8 listas para revisión. Cala puede dejar métricas pendientes si #7/#8 no han cerrado, marcadas como «pendiente de cifra». |
+| **Miércoles 18/11, 18:00** | Secciones 1–8 listas para revisión. Carla puede dejar métricas pendientes si #7/#8 no han cerrado, marcadas como «pendiente de cifra». |
 | **Jueves 19/11** | Mariana revisa el relato completo (criterio de la #17: que coincida con el producto). Comentarios en el PR o en el tablero. |
 | **Viernes 20/11** | Sección 9 unificada + diapositivas finales. |
 

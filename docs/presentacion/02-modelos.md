@@ -1,6 +1,6 @@
 # Presentación técnica · Modelos y métricas
 
-**Presenta:** Cala · **Duración:** unos 3–4 minutos · Detalle en la sección 4 del informe
+**Presenta:** Carla · **Duración:** unos 3–4 minutos · Detalle en la sección 4 del informe
 
 ## Cubrir (5–6 diapositivas)
 

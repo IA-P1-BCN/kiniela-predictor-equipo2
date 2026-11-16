@@ -70,6 +70,6 @@ flowchart TD
 
 **Se ve:** la tabla de medias por clase del notebook de EDA, resaltando `match_diff`: 0,44 en la clase 0 y −0,02 en la clase 4.
 
-**Se dice:** «Las variables separan bien la victoria local de la visitante, pero poco el resto; y la clase 5 apenas se distingue con ellas. Con una sola temporada quedan 359 partidos útiles y solo 26 de la clase 4. Eso marca el techo del modelo, y es lo que Cala va a contar ahora con las métricas.»
+**Se dice:** «Las variables separan bien la victoria local de la visitante, pero poco el resto; y la clase 5 apenas se distingue con ellas. Con una sola temporada quedan 359 partidos útiles y solo 26 de la clase 4. Eso marca el techo del modelo, y es lo que Carla va a contar ahora con las métricas.»
 
-**Paso a Cala:** modelos, validación y métricas.
+**Paso a Carla:** modelos, validación y métricas.
