@@ -37,6 +37,17 @@
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
 - **Revisión humana:** fusionada en `dev` (PR #45).
 
+### #16 Documentación MLOps
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Cursor, Grok 4.7
+- **Prompt clave:** «hazlo»: fusionar la estructura del informe y seguir con #16 y #15.
+- **Qué generó el agente:** `docs/mlops.md` (versiones, promoción, feedback, drift y alerta) y la sección 7a del informe.
+- **Aceptado:** el documento operativo; el detalle de export y A/B se enlaza a Eva (7b), no se duplica.
+- **Rechazado o cambiado, y por qué:** no se inventó un cron de drift; el comando se lanza cuando hay lote nuevo.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** fusionada en `dev` (PR #46).
+
 ### #17 Secciones 1, 5 y guiones
 
 - **Fecha:** 2026-11-13
@@ -46,4 +57,4 @@
 - **Aceptado:** el texto. No se inventaron F1 ni accuracy: quedan huecos para el run oficial y para Cala.
 - **Rechazado o cambiado, y por qué:** no se fusionaron #46 y #47 desde aquí (el merge pidió autorización y caducó).
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
-- **Revisión humana:** pendiente.
+- **Revisión humana:** pendiente. Esta rama se actualizó el 16/11 contra `dev`.

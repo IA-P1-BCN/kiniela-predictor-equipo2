@@ -27,7 +27,7 @@ El umbral entre victoria clara y ajustada, y la precedencia de la clase 5, se ci
 | Persona | Rol |
 | --- | --- |
 | Anna | Scrum Master y Data & EDA Lead |
-| Cala | Modeling Lead |
+| Carla | Modeling Lead |
 | Eva | App & Backend Lead |
 | Mariana | Product Owner y MLOps & Neural Networks Lead |
 
@@ -177,6 +177,7 @@ Cubren el catálogo de clases, el etiquetado, la predicción, la base de datos y
 - [Informe técnico](docs/informe/README.md)
 - [Guion de la presentación técnica](docs/presentacion/README.md)
 - [Presentación de negocio](docs/presentacion-negocio/README.md)
+- [Operación de modelos (MLOps)](docs/mlops.md)
 - [Data drift](docs/drift.md)
 - [A/B testing y promoción del modelo](docs/ab-testing.md)
 - Plantilla de GitHub: `.github/ISSUE_TEMPLATE/tarea.md`

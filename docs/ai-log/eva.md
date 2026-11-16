@@ -79,7 +79,7 @@
   - El README (instalación y Docker), `AGENTS.md` (comandos, dónde va cada dependencia y cómo conecta cada IA con `AGENTS.md`) y `.gitignore` (`CLAUDE.md`, `GEMINI.md` y los ajustes locales son personales).
 - **Aceptado:**
   - Separar los requirements: la imagen solo lleva lo necesario para predecir, como pide el briefing («un requirements.txt limpio»).
-  - Para el despliegue (#12), versionar en git solo el modelo final y su `model_card.json`, sin volúmenes ni descargas. Queda por acordar con Cala, que genera el artefacto.
+  - Para el despliegue (#12), versionar en git solo el modelo final y su `model_card.json`, sin volúmenes ni descargas. Queda por acordar con Carla, que genera el artefacto.
   - Quitar de la imagen las librerías NVIDIA NCCL que instala XGBoost para entrenar con varias GPU: la app predice con CPU. La imagen baja de 1,89 GB a 1,23 GB, y XGBoost y LightGBM siguen funcionando.
   - Cada persona tiene su `CLAUDE.md` o `GEMINI.md` fuera de git, con `@AGENTS.md` para cargar las reglas comunes.
 - **Rechazado o cambiado, y por qué:**
@@ -140,7 +140,7 @@
 - **Aceptado:**
   - Modelo de prueba con frecuencias de clase (decisión de Eva): es honesto, la app lo avisa en pantalla y no invade el trabajo de modelado.
   - Equipos sacados del dataset procesado, con la lista de la Premier 2023-24 como respaldo (decisión de Eva). Dentro de Docker no hay `data/`, y la app tiene que funcionar igual.
-  - La app solo conoce el contrato `Predictor`. Cuando Cala entregue el modelo, la app no se toca.
+  - La app solo conoce el contrato `Predictor`. Cuando Carla entregue el modelo, la app no se toca.
   - La validación de equipos sale de `src/` y se usa en la app y en la base de datos, sin duplicarla. La app traduce los mensajes al español.
   - Si la base de datos falla, la predicción se muestra igualmente, con un aviso.
 - **Rechazado o cambiado, y por qué:**
@@ -290,3 +290,38 @@
 - **Rechazado o cambiado, y por qué:** no se instaló el paquete (`pip install -e .`): necesitaría un `pyproject.toml`, que no está en ninguna issue.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** en la #36 el agente documentó `python -m kiniela.storage.export` sin probarlo fuera de pytest (que ya tiene `pythonpath = src`). Se vio al probar el comando de la #37.
 - **Revisión humana:** Eva aprobó la corrección.
+
+### Limpieza: archivos sobrantes del PR #54
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «chequea el proyecto si hay nuevos PR o cambios en dev» y «sí a todo».
+- **Qué hizo el agente:** al revisar `dev` vio que el PR #54 solo añadía archivos sobrantes: un repositorio anidado (`kiniela-predictor-equipo2`, que aparece como submódulo roto) y scripts de prueba en `scratchpad/` con una ruta local. Los quitó y los añadió al `.gitignore`.
+- **Aceptado:** un PR de limpieza aparte, con `Refs #34`, sin tocar el código de features.
+- **Rechazado o cambiado, y por qué:** reescribir el historial para quitar el commit del #54 o arreglar su título: `dev` es compartida y no se reescribe.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** Eva aprobó la limpieza.
+
+### Nombre de Carla en la documentación
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «cambia el nombre de Cala en las tareas, está mal: se llama Carla».
+- **Qué hizo el agente:** cambió «Cala» por «Carla» en los archivos compartidos (README, backlog, asignación, plantillas de daily e issue, índice de bitácoras) y en los de Eva (sección 8 y esta bitácora). También en la plantilla que quedó en la issue #39.
+- **Aceptado:** no tocar los archivos de otras personas (bitácoras de Carla y Anna, secciones 4 y 9, guiones, notebook), por la regla de `AGENTS.md`; se avisa a cada una. El archivo `cala.md` mantiene su nombre hasta que Carla decida.
+- **Rechazado o cambiado, y por qué:** cambiar también los índices del informe y de la presentación: los coordina Mariana y su PR #53 los está editando.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** Eva pidió el cambio.
+
+### #17 Informe: sección 7b y actualización de la 8
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «ok» a escribir la 7b y completar la 8 mientras Anna corrige las features.
+- **Qué generó el agente:**
+  - `docs/informe/07b-mlops-feedback-ab.md`: feedback y clase real, export incremental para reentrenar (#36), A/B testing y regla de promoción (#37), decisiones con sus alternativas, calidad y límites. Enlaza la 7a, `docs/mlops.md` y la documentación técnica en lugar de repetirlas.
+  - `docs/informe/08-forma-de-trabajo.md`: herramientas de IA de Mariana y Carla (sacadas de sus bitácoras), dos ejemplos nuevos de errores o aciertos de la IA y la lección del PR #54.
+- **Aceptado:** marcar como ilustrativas las versiones del ejemplo de salida del script, porque todavía no hay dos modelos reales.
+- **Rechazado o cambiado, y por qué:** actualizar el estado de la 7b en `docs/informe/README.md`: lo coordina Mariana y su PR #53 edita ese archivo.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** el primer borrador decía que la base de datos rechaza un feedback incoherente; en realidad lo rechaza el código de guardado (la base de datos solo garantiza un feedback por predicción). Se corrigió tras comprobarlo en el código.
+- **Revisión humana:** pendiente en el PR.
