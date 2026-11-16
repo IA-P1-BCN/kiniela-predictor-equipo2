@@ -46,4 +46,26 @@
 - **Aceptado:** el documento operativo; el detalle de export y A/B se enlaza a Eva (7b), no se duplica.
 - **Rechazado o cambiado, y por qué:** no se inventó un cron de drift; el comando se lanza cuando hay lote nuevo.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** fusionada en `dev` (PR #46).
+
+### #15 Tests unitarios
+
+- **Fecha:** 2026-11-13
+- **Herramienta y modelo:** Cursor, Grok 4.7
+- **Prompt clave:** «hazlo» — cerrar #15 junto con #16.
+- **Qué generó el agente:** `kiniela.data.validate`, `kiniela.models.metrics` y tests de esquema, nulos, rangos, `target` 0-5, forma de la predicción y un caso de métricas con resultado conocido.
+- **Aceptado:** esos módulos y tests. No se duplicó lo que ya cubrían `test_target.py` y `test_predict.py`.
+- **Rechazado o cambiado, y por qué:** no se tocó la suite existente para «hacer sitio»; se añadieron archivos.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** pendiente.
+
+### #15 Recálculo con 8 features (16/11)
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Cursor, Grok 4.7
+- **Prompt clave:** Claudio: las features son 8 (#58/#61); actualizar la rama contra `dev`.
+- **Qué generó el agente:** `FEATURES` de los tests apunta a `FEATURE_COLUMNS`; drift y red usan esos nombres.
+- **Aceptado:** tests sintéticos con las 8 columnas reales.
+- **Rechazado o cambiado, y por qué:** no se entrenó la red sobre el CSV real en este PR (eso va en la sección 5 / #53).
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
 - **Revisión humana:** pendiente.

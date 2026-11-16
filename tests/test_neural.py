@@ -20,7 +20,7 @@ from kiniela.models.neural import (
     main,
 )
 
-from test_train import write_dataset
+from test_train import FEATURES, write_dataset
 
 ENSEMBLES = (FOREST_NAME, XGBOOST_NAME, LIGHTGBM_NAME)
 
@@ -34,7 +34,7 @@ def test_network_uses_six_outputs_l2_and_early_stopping(tmp_path):
     assert network.hidden_layer_sizes == HIDDEN_LAYERS
     assert network.alpha == L2_ALPHA
     assert network.random_state == RANDOM_STATE
-    features = frame[["form_home", "goals_avg", "home_advantage", "goal_diff_form"]]
+    features = frame[list(FEATURES)]
     network.fit(features, frame["target"])
     assert network.network_.early_stopping is True
     assert network.predict_proba(features).shape[1] == N_CLASSES

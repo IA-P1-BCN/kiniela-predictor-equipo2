@@ -163,7 +163,7 @@ El esquema y las métricas en tiempo real están en [docs/database.md](docs/data
 pytest
 ```
 
-Cubren el catálogo de clases, el etiquetado, la predicción, la base de datos y la app de punta a punta. La app se prueba con `AppTest` de Streamlit, sin navegador: predicción, entradas inválidas, feedback e historial.
+Cubren el catálogo de clases, el etiquetado, la validación del dataset (esquema, nulos, rangos y `target` 0-5), la predicción, un caso fijo de métricas, la base de datos y la app de punta a punta. La app se prueba con `AppTest` de Streamlit, sin navegador: predicción, entradas inválidas, feedback e historial.
 
 ## Documentación de trabajo
 
