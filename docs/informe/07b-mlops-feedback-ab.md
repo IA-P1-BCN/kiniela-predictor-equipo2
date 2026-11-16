@@ -73,7 +73,7 @@ El candidato sustituye al actual **solo si se cumplen las cuatro condiciones**:
 | # | Condición | Umbral | Por qué |
 | --- | --- | --- | --- |
 | 1 | Gap train/validación del candidato | < 0,05 | Regla del proyecto contra el sobreajuste |
-| 2 | F1 macro de validación frente al actual | ≥ actual + 0,01 | F1 macro es la métrica declarada (clases desbalanceadas). El margen evita cambiar de modelo por ruido |
+| 2 | F1 macro de validación del candidato frente al F1 macro de validación del actual (los dos de su ficha) | ≥ actual + 0,01 | F1 macro es la métrica declarada (clases desbalanceadas). El margen evita cambiar de modelo por ruido |
 | 3 | Predicciones con feedback por versión | ≥ 30 | Con pocos datos, el acierto real no es fiable |
 | 4 | Acierto según el feedback | No menor que el actual | Mejor sobre el papel y no peor con partidos reales |
 
