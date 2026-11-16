@@ -27,7 +27,7 @@ El umbral entre victoria clara y ajustada, y la precedencia de la clase 5, se ci
 | Persona | Rol |
 | --- | --- |
 | Anna | Scrum Master y Data & EDA Lead |
-| Cala | Modeling Lead |
+| Carla | Modeling Lead |
 | Eva | App & Backend Lead |
 | Mariana | Product Owner y MLOps & Neural Networks Lead |
 

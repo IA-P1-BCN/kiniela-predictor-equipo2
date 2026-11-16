@@ -20,7 +20,7 @@ Clasificación multiclase (6 clases) del tipo de resultado de un partido de fút
 | Persona | Rol | Épicas |
 | --- | --- | --- |
 | Anna | Scrum Master + Data & EDA Lead | Datos, feature engineering y EDA |
-| Cala | Modeling Lead | Modelado, optimización y métricas |
+| Carla | Modeling Lead | Modelado, optimización y métricas |
 | Eva | App & Backend Lead | Streamlit, Docker, base de datos y despliegue |
 | Mariana | Product Owner + MLOps & Neural Networks Lead | Red neuronal, data drift, tests y MLOps |
 
@@ -47,10 +47,10 @@ Clasificación multiclase (6 clases) del tipo de resultado de un partido de fút
 | #2 | Creación de la variable objetivo | Anna | #1 |
 | #3 | Feature engineering | Anna | #1, #2 |
 | #4 | Análisis exploratorio (EDA) | Anna | #2, #3 |
-| #5 | Modelo baseline | Cala | #2, #3 |
-| #6 | Modelos ensemble | Cala | #5 |
-| #7 | Optimización y control de overfitting | Cala | #6 |
-| #8 | Informe de métricas | Cala | #7 |
+| #5 | Modelo baseline | Carla | #2, #3 |
+| #6 | Modelos ensemble | Carla | #5 |
+| #7 | Optimización y control de overfitting | Carla | #6 |
+| #8 | Informe de métricas | Carla | #7 |
 | #9 | Aplicación Streamlit | Eva | #8 |
 | #10 | Dockerización | Eva | #9 |
 | #11 | Base de datos y feedback | Eva | #9 |
@@ -129,13 +129,13 @@ Etiquetas sugeridas: `epic:datos`, `datos`, `eda`
 
 ---
 
-## Épica 2: Modelado (Asignada a Cala)
+## Épica 2: Modelado (Asignada a Carla)
 
 Etiquetas sugeridas: `epic:modelado`, `modelado`, `metricas`
 
 ### Issue #5: Modelo Baseline
 
-**Asignado a**: Cala  
+**Asignado a**: Carla  
 **Etiquetas**: `modelado`  
 **Depende de**: #2, #3  
 **Descripción**: Entrenar un modelo baseline (Random Forest o Logistic Regression) con StratifiedKFold.
@@ -150,7 +150,7 @@ Etiquetas sugeridas: `epic:modelado`, `modelado`, `metricas`
 
 ### Issue #6: Modelos Ensemble
 
-**Asignado a**: Cala  
+**Asignado a**: Carla  
 **Etiquetas**: `modelado`  
 **Depende de**: #5  
 **Descripción**: Entrenar y comparar XGBoost y LightGBM.
@@ -164,7 +164,7 @@ Etiquetas sugeridas: `epic:modelado`, `modelado`, `metricas`
 
 ### Issue #7: Optimización y control de Overfitting
 
-**Asignado a**: Cala  
+**Asignado a**: Carla  
 **Etiquetas**: `modelado`  
 **Depende de**: #6  
 **Descripción**: Optimizar hiperparámetros y garantizar overfitting inferior al 5%.
@@ -179,7 +179,7 @@ Etiquetas sugeridas: `epic:modelado`, `modelado`, `metricas`
 
 ### Issue #8: Informe de Métricas
 
-**Asignado a**: Cala  
+**Asignado a**: Carla  
 **Etiquetas**: `modelado`, `metricas`  
 **Depende de**: #7  
 **Descripción**: Generar métricas completas (accuracy, precision/recall/F1 por clase, matriz de confusión, feature importance y análisis de errores).
