@@ -312,3 +312,16 @@
 - **Rechazado o cambiado, y por qué:** cambiar también los índices del informe y de la presentación: los coordina Mariana y su PR #53 los está editando.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
 - **Revisión humana:** Eva pidió el cambio.
+
+### #17 Informe: sección 7b y actualización de la 8
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «ok» a escribir la 7b y completar la 8 mientras Anna corrige las features.
+- **Qué generó el agente:**
+  - `docs/informe/07b-mlops-feedback-ab.md`: feedback y clase real, export incremental para reentrenar (#36), A/B testing y regla de promoción (#37), decisiones con sus alternativas, calidad y límites. Enlaza la 7a, `docs/mlops.md` y la documentación técnica en lugar de repetirlas.
+  - `docs/informe/08-forma-de-trabajo.md`: herramientas de IA de Mariana y Carla (sacadas de sus bitácoras), dos ejemplos nuevos de errores o aciertos de la IA y la lección del PR #54.
+- **Aceptado:** marcar como ilustrativas las versiones del ejemplo de salida del script, porque todavía no hay dos modelos reales.
+- **Rechazado o cambiado, y por qué:** actualizar el estado de la 7b en `docs/informe/README.md`: lo coordina Mariana y su PR #53 edita ese archivo.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** el primer borrador decía que la base de datos rechaza un feedback incoherente; en realidad lo rechaza el código de guardado (la base de datos solo garantiza un feedback por predicción). Se corrigió tras comprobarlo en el código.
+- **Revisión humana:** pendiente en el PR.
