@@ -8,8 +8,9 @@ La clasificación se determina por orden de prioridad:
 2. **Clase 0**: Local gana con diferencia ≥ 2 (FTHG - FTAG >= 2)
 3. **Clase 4**: Visitante gana con diferencia ≥ 2 (FTAG - FTHG >= 2)  
 4. **Clase 1-3**: Resultados ajustados:
-   - Home > Away sin diferencia clara: Clase 1, 2 o 3
-   - Away > Home sin diferencia clara: Clase 3 o 4
+   - Local gana por 1 gol: Clase 1
+   - Empate: Clase 2
+   - Visitante gana por 1 gol: Clase 3
 
 ## Distribución esperada con datos reales Premier League 2023-24
 

@@ -1,105 +1,66 @@
 """Lectura del histórico de partidos."""
 
+from collections.abc import Sequence
 from pathlib import Path
-import datetime as dt
 
 import pandas as pd
 
+BASE_URL = "https://www.football-data.co.uk/mmz4281/"
+MATCH_COLUMNS = ["HomeTeam", "AwayTeam", "FTHG", "FTAG", "FTR"]
 
-def download_premier_league_data(season: str | list[str] = "2324") -> pd.DataFrame:
-    """Descarga y limpia datos reales de Premier League desde football-data.co.uk.
-    
+
+def download_premier_league_data(season: str | Sequence[str] = "2324") -> pd.DataFrame:
+    """Download and clean real Premier League matches from football-data.co.uk.
+
     Args:
-        season: Código de temporada (ej: '2324' para 2023-24).
-                 También acepta una lista de temporadas para descarga múltiple,
-                 ej: ['1516', '1617', ..., '2324'].
-        
+        season: football-data.co.uk season code, e.g. ``"2324"`` for 2023-24, or a
+            list of codes, e.g. ``["1516", "1617", ..., "2324"]``.
+
     Returns:
-        DataFrame con partidos limpios incluyendo goles, equipos, resultado y fecha.
-        Si season es una lista, el DataFrame resultante tendrá la columna 'Season'.
-    
-    Ejemplo de uso para todas las temporadas (2015-2025):
-        SEASONS = ["1516", "1617", "1718", "1819", "1920", "2021", "2122", "2223", "2324", "2425"]
-        matches = download_premier_league_data(SEASONS)
+        One row per match, sorted by date: teams in lowercase without apostrophes,
+        goals, result and ``Date`` as a datetime. With a list of seasons it also has a
+        ``Season`` column with each code, so the features restart every season (see
+        :func:`kiniela.features.engineering.build_features`).
+
+    Nothing is saved to disk: write the result with ``DataFrame.to_csv``
+    (see ``docs/tarea-preparacion-dataset.md``).
     """
-    url_base = "https://www.football-data.co.uk/mmz4281/"
-    
-    if isinstance(season, str):
-        seasons = [season]
-    else:
-        seasons = season if isinstance(season, list) else [season]
-    
+    several = not isinstance(season, str)
+    seasons = list(season) if several else [season]
+
     frames = []
-    
-    for s in seasons:
-        url = f"{url_base}{s}/E0.csv"
-        print(f"\n{'='*60}")
-        print(f"Descargando datos de Premier League {s} desde {url}...")
-        print(f"{'='*60}\n")
-        
-        df = pd.read_csv(url, encoding="utf-8")
-        main_cols = ["HomeTeam", "AwayTeam", "FTHG", "FTAG", "FTR"]
-        date_col = "Date"
-        
-        available_main = [col for col in main_cols if col in df.columns]
-        has_date = date_col in df.columns
-        
-        print(f"✅ Columnas principales disponibles: {available_main}")
-        
-        if not has_date:
-            print(f"   ⚠️  La columna '{date_col}' no está disponible en esta temporada")
-        
-        df = df.dropna(subset=main_cols)
-        print(f"✅ Filas después de eliminar NaN: {len(df)}")
-        
-        df_original = len(df)
-        df = df.drop_duplicates()
-        duplicates_removed = df_original - len(df)
-        if duplicates_removed > 0:
-            print(f"   Eliminados {duplicates_removed} filas duplicadas")
-        
-        def normalize_team(name):
-            return name.lower().replace("'", "").strip() if isinstance(name, str) else name
-        
-        df["HomeTeam"] = df["HomeTeam"].apply(normalize_team)
-        df["AwayTeam"] = df["AwayTeam"].apply(normalize_team)
-        print(f"   Equipos normalizados")
-        
-        if has_date:
-            try:
-                df["Date"] = pd.to_datetime(df["Date"], dayfirst=True)
-                print(f"✅ Fechas convertidas a datetime")
-            except Exception as e:
-                print(f"   ⚠️  Error al convertir fechas: {e}")
-        
-        frames.append(df)
-    
-    if len(frames) == 1:
-        matches = frames[0]
-    else:
-        matches = pd.concat(frames, ignore_index=True)
-        print(f"\n{'='*60}")
-        print(f"✅ Dataset unificado de todas las temporadas")
-        print(f"   Total partidos: {len(matches)}")
-    
+    for code in seasons:
+        url = f"{BASE_URL}{code}/E0.csv"
+        print(f"Downloading Premier League {code} from {url}")
+        frame = pd.read_csv(url, encoding="utf-8")
+
+        frame = frame.dropna(subset=MATCH_COLUMNS).drop_duplicates()
+        for column in ("HomeTeam", "AwayTeam"):
+            frame[column] = frame[column].map(_normalize_team)
+        if "Date" in frame.columns:
+            # Most seasons use dd/mm/yyyy and 2016-17 uses dd/mm/yy: parse each value
+            # day first. A date that cannot be parsed raises instead of staying as text,
+            # because text dates sort in the wrong order.
+            frame["Date"] = pd.to_datetime(frame["Date"], dayfirst=True, format="mixed")
+        else:
+            print(f"Warning: season {code} has no Date column")
+        if several:
+            frame["Season"] = str(code)
+        frames.append(frame)
+
+    matches = pd.concat(frames, ignore_index=True)
     if "Date" in matches.columns:
-        matches = matches.sort_values("Date").reset_index(drop=True)
-        print(f"✅ Partidos ordenados por fecha")
-    
-    if "FTR" in matches.columns:
-        tr_results = matches["FTR"].value_counts()
-        print(f"\n✅ Distribución de resultados (FTR):")
-        for result, count in tr_results.items():
-            print(f"   {result}: {count} ({count/len(matches)*100:.1f}%)")
-    
-    print(f"\n{'='*60}")
-    if len(seasons) == 1:
-        print(f"✅ Dataset de Premier League {seasons[0]}")
-    else:
-        print(f"✅ Dataset unificado de Premier League ({seasons[0]}-{seasons[-1]})")
-    print(f"   Partidos totales: {len(matches)}")
-    
+        # Stable sort: matches on the same day keep the order of the file.
+        matches = matches.sort_values("Date", kind="mergesort").reset_index(drop=True)
+
+    label = seasons[0] if len(seasons) == 1 else f"{seasons[0]} to {seasons[-1]}"
+    print(f"Premier League {label}: {len(matches)} matches")
     return matches
+
+
+def _normalize_team(name):
+    """Team name as the app writes it: lowercase, no apostrophes ("Nott'm Forest" -> "nottm forest")."""
+    return name.lower().replace("'", "").strip() if isinstance(name, str) else name
 
 
 def load_matches(path: str | Path) -> pd.DataFrame:

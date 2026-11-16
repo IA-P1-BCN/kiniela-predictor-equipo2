@@ -6,10 +6,10 @@ Descargar, limpiar y preparar datos reales de partidos de la Premier League para
 
 ## Fuente de Datos
 
-Los datos provienen de [football-data.co.uk](https://www.football-data.co.uk/) (API gratuita).
+Los datos provienen de [football-data.co.uk](https://www.football-data.co.uk/), que publica un CSV gratuito por temporada.
 
-- **URL base**: `https://www.football-data.co.uk/mmz4281/`
-- **Temporadas disponibles**: 2015-16 hasta la más reciente
+- **URL de cada temporada**: `https://www.football-data.co.uk/mmz4281/{temporada}/E0.csv`, con el código de temporada de 4 cifras (`2324` = 2023-24)
+- **Temporadas usadas**: 2023-24 para el EDA; de 2015-16 a 2023-24 (9 temporadas) para el modelo final
 - **Competición**: Premier League (`E0`)
 - **Columnas principales**: HomeTeam, AwayTeam, FTHG (goles locales), FTAG (goles visitantes), FTR (resultado: H/A/D)
 
@@ -20,17 +20,19 @@ Los datos provienen de [football-data.co.uk](https://www.football-data.co.uk/) (
 La función `download_premier_league_data()` descarga y limpia datos reales:
 
 ```python
-matches = download_premier_league_data(season="2324")  # Temporada 2023-24
+matches = download_premier_league_data("2324")                  # una temporada
+matches = download_premier_league_data(["2223", "2324"])        # varias: añade la columna Season
 ```
 
 **Limpieza realizada:**
 - Elimina filas con valores NaN en columnas principales
 - Elimina duplicados
-- Normaliza nombres de equipos (lowercase, sin apóstrofes)
-- Convierte fechas al formato datetime (`dayfirst=True` por convención británica)
+- Normaliza nombres de equipos (minúsculas, sin apóstrofes: `"Nott'm Forest"` → `"nottm forest"`)
+- Convierte las fechas a fecha leyendo primero el día (`dd/mm/aaaa`, y `dd/mm/aa` en 2016-17); si una fecha no se puede leer, da error en lugar de dejarla como texto
 - Ordena partidos por fecha
+- Con varias temporadas, añade la columna `Season` con el código de cada una, para que las features reinicien el historial en cada temporada
 
-**Salida:** Dataset limpio en `data/processed/premier_league_XX.csv`
+**Salida:** devuelve un `DataFrame`; no guarda nada en disco. Para guardarlo, ver el flujo de trabajo de abajo.
 
 ### 2. Feature Engineering (`src/kiniela/features/engineering.py`)
 
@@ -48,7 +50,7 @@ Se eliminaron `recent_home_form`, `recent_away_form` y `match_momentum` porque d
 **Principios clave:**
 - **No data leakage**: Solo se usan partidos de fechas anteriores al partido actual (los del mismo día tampoco cuentan)
 - **Fechas**: Las fechas `dd/mm/aaaa` del CSV se convierten a fecha antes de ordenar; ordenadas como texto, el 1 de septiembre quedaría antes que el 11 de agosto
-- **Adaptable**: Funciona con datasets de una sola temporada o múltiples temporadas concatenadas
+- **Adaptable**: Funciona con una temporada o con varias, siempre que tengan la columna `Season` (la añade `download_premier_league_data` al pedir varias)
 - **Granularidad**: Features separadas por localía para capturar el contexto específico
 
 ### 3. Target Labelling (`src/kiniela/data/target.py`)
@@ -98,8 +100,8 @@ Desde la raíz del repositorio, con `PYTHONPATH=src`:
 from kiniela.data.dataset import download_premier_league_data, load_matches
 from kiniela.features import engineering
 
-# 1. Descarga de datos (una sola temporada)
-download_premier_league_data("2324")
+# 1. Descarga de datos (una sola temporada) y copia local (data/processed/ no se versiona)
+download_premier_league_data("2324").to_csv("data/processed/premier_league_2023_24.csv", index=False)
 
 # 2. Feature engineering
 matches = load_matches("data/processed/premier_league_2023_24.csv")
@@ -113,31 +115,42 @@ features_df = engineering.build_features(matches)
 ### Datos Reales vs Simulados
 - ✅ **Usar datos reales** desde football-data.co.uk
 - ❌ **No usar datos simulados** (generan goles, equipos y resultados al azar)
-- La API `football-data.co.uk` funciona correctamente con la URL: `/Premier/{year}.txt`
 
-### Temporadas Disponibles
-El modelo necesita múltiples temporadas para evitar sobreajuste. Se recomienda descargar al menos 2015-16 hasta la temporada más reciente disponible.
+### Varias temporadas: el modelo final
 
-**Ejemplo con múltiples temporadas:**
+Con una sola temporada el modelo no superaba al modelo de prueba, así que el modelo final (#66) se entrena con las 9 temporadas de 2015-16 a 2023-24. Desde la raíz del repositorio, este comando las descarga, guarda una copia en `data/raw/premier_league_1516_2324.csv` y entrena y guarda el modelo:
+
+```bash
+PYTHONPATH=src python -m kiniela.models.final
+```
+
+Para trabajar con las mismas temporadas desde Python:
+
 ```python
 SEASONS = ["1516", "1617", "1718", "1819", "1920", "2021", "2122", "2223", "2324"]
-matches = download_premier_league_data(SEASONS)
+matches = download_premier_league_data(SEASONS)  # 3.420 partidos, con la columna Season
 ```
 
 ### Consideraciones de Data Leakage
-- Las features históricas deben usar **solo partidos anteriores** al partido actual
-- El dataset final debe estar ordenado por fecha antes del train/test split
-- Validación cruzada temporal (time-based CV) es preferible a k-fold aleatorio
+
+- Las features históricas deben usar **solo partidos anteriores** al partido actual (lo garantiza `build_features`, ver la sección 3 del informe)
+- Los modelos se validan con `StratifiedKFold` (5 folds, con mezcla y `RANDOM_STATE`), que mantiene la proporción de clases en cada fold. No hay fuga porque cada fila ya lleva solo información anterior al partido. Una validación temporal (entrenar con temporadas pasadas y validar con la siguiente) sería una mejora posible, pero no es la que usa el proyecto.
 
 ## Guardado del Dataset Final
 
-El dataset unificado con features y target debe guardarse en:
+El dataset unificado con features y target (el que usan los comandos de entrenamiento y de drift) se guarda en `data/processed/premier_league_with_features_and_target.csv`. Se genera con `build_modelling_dataset`, la misma función que usa el modelo final:
 
-```
-data/processed/premier_league_with_features_and_target.csv
+```python
+from kiniela.data.dataset import download_premier_league_data
+from kiniela.models.final import build_modelling_dataset
+
+matches = download_premier_league_data("2324")  # o la lista de 9 temporadas
+build_modelling_dataset(matches).to_csv(
+    "data/processed/premier_league_with_features_and_target.csv", index=False
+)
 ```
 
-Este archivo **NO** debe ser versionado en Git, ya que contiene datos dinámicos.
+Ni este archivo ni ningún otro CSV de `data/` se suben a Git: se regeneran con el código.
 
 ## Referencias
 
