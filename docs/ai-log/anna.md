@@ -138,8 +138,8 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
 
 ## 📚 Referencias
 
-- [AGENTS.md](<../AGENTS.md>) - Reglas de trabajo (Conventional Commits, PRs a dev)
-- [docs/model-contract.md](<./docs/model-contract.md>) - Contrato del modelo final para Cala
+- [AGENTS.md](<../../AGENTS.md>) - Reglas de trabajo (Conventional Commits, PRs a dev)
+- [docs/model-contract.md](<../model-contract.md>) - Contrato del modelo final para Cala
 
 ---
 
