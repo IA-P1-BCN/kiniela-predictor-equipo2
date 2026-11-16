@@ -204,3 +204,21 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
 - **Comprobación:** todas las cifras se han recalculado con los CSV en bruto y procesado y con `build_target`; los casos de tests citados existen en `tests/test_target.py`.
 - **Tras la revisión:** se añadieron las 9 temporadas del modelo final (#66): tabla de 2.1, distribución de clases junto a la de 2023-24 y el resultado de añadir temporadas en 2.4. La distribución, los goles y los equipos se recalcularon descargando las 9 temporadas con `download_premier_league_data` y coinciden con los de la revisión. Los F1 macro salen de la PR #66 y de `models/model_card.json`.
 - **Revisión humana:** _pendiente_
+
+---
+
+### #1 Datos: descarga con varias temporadas y documentación corregida
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Claude Code (extensión de VS Code), Claude Opus 5.5.
+- **Prompt clave:** revisar si mis tareas tenían errores después de los últimos cambios de `dev` y corregirlos todos.
+- **Errores encontrados:**
+  - `download_premier_league_data` no añadía la columna `Season` con varias temporadas, aunque su docstring lo decía; las features no reiniciaban el historial en cada temporada. El modelo final lo evitaba descargando temporada a temporada.
+  - Si una fecha no se podía leer, se avisaba y la columna se quedaba como texto, que se ordena mal. Además, pandas avisaba porque 2016-17 usa `dd/mm/aa`.
+  - Textos de `print` en español y con emojis (fallaban en consolas de Windows sin UTF-8) y un `import` sin usar.
+  - El docstring de `target.py` asignaba mal las clases ajustadas («clase 1, 2 o 3», «clase 3 o 4»).
+  - `docs/tarea-preparacion-dataset.md`: decía que la descarga guardaba un CSV (no guarda nada, así que el flujo de trabajo no funcionaba), citaba una URL inexistente (`/Premier/{year}.txt`), recomendaba validación temporal (el proyecto usa `StratifiedKFold`) y no explicaba cómo generar el dataset con features y target.
+  - `data/processed/premier_league_2023_24.csv` estaba versionado desde mi commit del 11/11, contra la regla de no subir datasets.
+- **Qué generó el agente:** la función de descarga reescrita (mismos partidos, `Season` con varias temporadas, error si una fecha no se lee, orden estable, textos en inglés), 7 tests sin red en `tests/test_dataset.py`, el docstring de `target.py` y el documento corregidos, y el CSV sacado del repositorio con `git rm --cached` (sigue en local).
+- **Comprobación:** con las 9 temporadas reales la función nueva devuelve los mismos 3.420 partidos que la anterior, 380 por temporada, y 185 sin historial, como la ficha del modelo. Con 2023-24 coincide con el CSV que se saca del repositorio. Los tests nuevos fallan con el código anterior. `pytest` pasa entero.
+- **Revisión humana:** _pendiente_
