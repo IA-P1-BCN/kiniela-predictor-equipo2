@@ -43,7 +43,7 @@ flowchart LR
 | Eva | Claude Code (Claude Opus 5.5) |
 | Mariana | Cursor |
 | Anna | _por completar_ |
-| Cala | _por completar_ |
+| Carla | _por completar_ |
 
 ### Errores de la IA que detectamos (ejemplos)
 
