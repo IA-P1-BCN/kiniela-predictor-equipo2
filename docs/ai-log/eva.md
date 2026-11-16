@@ -355,3 +355,14 @@
 - **Rechazado o cambiado, y por qué:** dar una cifra de tests «de esta parte»: con el modelo final y el A/B ya no es una frontera clara; se da el total.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
 - **Revisión humana:** Eva pidió el cambio.
+
+### #17 Sección 8: herramienta de IA de Anna
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «Anna usa Qwen 3.5».
+- **Qué generó el agente:** completó la fila de Anna en la tabla de herramientas de la sección 8; la tabla queda completa.
+- **Aceptado:** poner solo el modelo, porque no se sabe con qué programa lo usa.
+- **Rechazado o cambiado, y por qué:** nada.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** Eva dio el dato y aprobó el PR.
