@@ -35,7 +35,7 @@ Entregar un ciclo completo, no un notebook:
 
 1. Datos reales y `target` de 6 clases (Anna).
 2. Features sin fuga del partido que se predice (Anna).
-3. Modelos comparables con el mismo `StratifiedKFold` (Cala) y una red neuronal en las mismas condiciones (Mariana).
+3. Modelos comparables con el mismo `StratifiedKFold` (Carla) y una red neuronal en las mismas condiciones (Mariana).
 4. Una app desplegada, con historial y feedback (Eva).
 5. Operación: versiones, drift y camino a reentrenar (Mariana y Eva).
 

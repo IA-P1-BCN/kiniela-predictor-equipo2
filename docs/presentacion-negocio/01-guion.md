@@ -2,7 +2,7 @@
 
 **Presenta:** Mariana · **Duración:** ~6 minutos · **7 diapositivas** · Canva (enlace cuando esté el archivo)
 
-Cifras de acierto: las pone Cala en la sección 4; hasta entonces la diapositiva 5 lleva el hueco «F1 macro = …».
+Cifras de acierto: las pone Carla en la sección 4; hasta entonces la diapositiva 5 lleva el hueco «F1 macro = …».
 
 ---
 
@@ -34,9 +34,9 @@ Cifras de acierto: las pone Cala en la sección 4; hasta entonces la diapositiva
 
 ## 5. Qué tan bien predice
 
-**Se ve:** una métrica grande (F1 macro del candidato de Cala) y la clase que peor sale.
+**Se ve:** una métrica grande (F1 macro del candidato de Carla) y la clase que peor sale.
 
-**Se dice:** «La métrica que nos importa pondera las seis clases igual. El modelo de prueba de la web, hoy, es el reparto histórico; el modelo entrenado se enchufa sin cambiar la app cuando Cala y el contrato coincidan.»
+**Se dice:** «La métrica que nos importa pondera las seis clases igual. El modelo de prueba de la web, hoy, es el reparto histórico; el modelo entrenado se enchufa sin cambiar la app cuando Carla y el contrato coincidan.»
 
 **Hueco:** `F1 macro = ___` · clase más débil = `___`.
 
@@ -50,4 +50,4 @@ Cifras de acierto: las pone Cala en la sección 4; hasta entonces la diapositiva
 
 **Se ve:** tres límites y un siguiente paso.
 
-**Se dice:** «No prometemos el marcador. El plan gratuito duerme la app. Hasta promocionar el modelo final, avisamos que es un modelo de prueba. El siguiente paso es conectar el candidato de Cala a la app y seguir recogiendo feedback real.»
+**Se dice:** «No prometemos el marcador. El plan gratuito duerme la app. Hasta promocionar el modelo final, avisamos que es un modelo de prueba. El siguiente paso es conectar el candidato de Carla a la app y seguir recogiendo feedback real.»

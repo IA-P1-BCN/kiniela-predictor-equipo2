@@ -8,9 +8,9 @@
 
 **Se ve:** MLP 32-16, 6 salidas, «mismo StratifiedKFold, misma semilla».
 
-**Se dice:** «La red no tiene ligas aparte. Es un MLP de scikit-learn, con L2 y early stopping, medido con los mismos cinco folds que Random Forest, XGBoost y LightGBM. Si gana, se promociona; si no, el de Cala sigue siendo el candidato y la red queda como línea neuronal.»
+**Se dice:** «La red no tiene ligas aparte. Es un MLP de scikit-learn, con L2 y early stopping, medido con los mismos cinco folds que Random Forest, XGBoost y LightGBM. Si gana, se promociona; si no, el de Carla sigue siendo el candidato y la red queda como línea neuronal.»
 
-**Dato:** `python -m kiniela.models.neural --dataset …`
+**Dato:** `python -m kiniela.models.neural --dataset …` (8 features de Anna; sin cifras viejas).
 
 ## 2. Tabla (un recuadro)
 
@@ -18,13 +18,13 @@
 
 **Se dice:** «Estas dos cifras salen del mismo CSV de modelado. F1 macro es la que decide, porque el acierto global premia la clase 5.»
 
-**Hueco:** pegar las cifras del comando cuando Cala y el run oficial coincidan.
+**Hueco:** pegar las cifras del comando cuando Carla y el run oficial coincidan.
 
 ## 3. Contrato y promoción
 
-**Se ve:** enchufe `Predictor`: `version` + 6 probabilidades → `models/kiniela_model.joblib`.
+**Se ve:** enchufe `Predictor` y el comando `python -m kiniela.models.promote`.
 
-**Se dice:** «La app no importa un notebook. Carga un objeto con versión y predict. Promocionar es copiar ese objeto al path que ella lee. Si el archivo no está, usa frecuencias de clase y lo dice en pantalla. Por eso Eva pudo desplegar antes de que existiera el modelo final.»
+**Se dice:** «La app no importa un notebook. Carga un objeto con versión y predict. Promocionar no es copiar a mano: el script de la #37 decide si el candidato gana y deja `kiniela_model.joblib` más su ficha. Esos dos van en git, porque Render construye desde el repo. Si no están, usa frecuencias de clase y lo dice en pantalla.»
 
 ## 4. Drift
 

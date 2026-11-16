@@ -54,7 +54,18 @@
 - **Herramienta y modelo:** Cursor, Grok 4.7
 - **Prompt clave:** «levantalo» — redactar el informe de Mariana y los guiones.
 - **Qué generó el agente:** `01-problema.md`, `05-red-neuronal.md`, guion de negocio y diapositivas técnicas 4.
-- **Aceptado:** el texto. No se inventaron F1 ni accuracy: quedan huecos para el run oficial y para Cala.
+- **Aceptado:** el texto. No se inventaron F1 ni accuracy: quedan huecos para el run oficial y para Carla.
 - **Rechazado o cambiado, y por qué:** no se fusionaron #46 y #47 desde aquí (el merge pidió autorización y caducó).
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
 - **Revisión humana:** pendiente. Esta rama se actualizó el 16/11 contra `dev`.
+
+### #47/#53 Revisión de Claudio (16/11)
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Cursor, Grok 4.7
+- **Prompt clave:** conflictos con `dev`; 8 features; `promote`; modelo en git; Carla; 7b escrita.
+- **Qué generó el agente:** merge con `dev`, `docs/mlops.md` y 7a alineados con #37/#35, sección 5 sin cifras viejas y tabla-hueco, Cala→Carla en archivos de Mariana.
+- **Aceptado:** el recálculo de la red queda como comando a relanzar, no como números inventados.
+- **Rechazado o cambiado, y por qué:** no se editaron bitácoras ajenas ni la sección 8 de Eva.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** pendiente.

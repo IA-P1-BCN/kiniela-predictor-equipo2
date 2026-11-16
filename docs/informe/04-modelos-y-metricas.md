@@ -1,6 +1,6 @@
 # 4. Modelos, validación, optimización y métricas por clase
 
-**Quién:** Cala · **Issues:** #5, #6, #7, #8 · **Estado:** pendiente de redacción
+**Quién:** Carla · **Issues:** #5, #6, #7, #8 · **Estado:** pendiente de redacción
 
 ## Cubrir
 

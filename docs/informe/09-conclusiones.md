@@ -1,6 +1,6 @@
 # 9. Conclusiones, límites y próximos pasos
 
-**Quién:** Mariana compila · **Aportan:** Anna, Cala, Eva, Mariana · **Estado:** se escribe el jueves 19/11, no antes
+**Quién:** Mariana compila · **Aportan:** Anna, Carla, Eva, Mariana · **Estado:** se escribe el jueves 19/11, no antes
 
 Cada persona manda **4–6 líneas** (un límite real y un aprendizaje) en un comentario de la issue #17 o en su PR. Mariana las une aquí para que el relato cierre igual que el producto.
 

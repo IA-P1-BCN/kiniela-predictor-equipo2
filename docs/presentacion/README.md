@@ -6,8 +6,8 @@ Guion de la presentación técnica (issue #17), por partes. Cada persona escribe
 
 | Parte | Archivo | Quién | Diapositivas (orientativo) | Estado |
 | --- | --- | --- | --- | --- |
-| Problema y datos | `01-problema-y-datos.md` | Anna | 5–6 | Pendiente |
-| Modelos y métricas | `02-modelos.md` | Cala | 5–6 | Pendiente |
+| Problema y datos | [`01-problema-y-datos.md`](01-problema-y-datos.md) | Anna | 5–6 | Escrita |
+| Modelos y métricas | `02-modelos.md` | Carla | 5–6 | Pendiente |
 | App, base de datos y despliegue | [`03-app-y-despliegue.md`](03-app-y-despliegue.md) | Eva | 7 | Escrita |
 | MLOps, red neuronal y cierre | [`04-mlops-y-cierre.md`](04-mlops-y-cierre.md) | Mariana | 6 | Escrita |
 
