@@ -290,3 +290,14 @@
 - **Rechazado o cambiado, y por qué:** no se instaló el paquete (`pip install -e .`): necesitaría un `pyproject.toml`, que no está en ninguna issue.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** en la #36 el agente documentó `python -m kiniela.storage.export` sin probarlo fuera de pytest (que ya tiene `pythonpath = src`). Se vio al probar el comando de la #37.
 - **Revisión humana:** Eva aprobó la corrección.
+
+### Limpieza: archivos sobrantes del PR #54
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «chequea el proyecto si hay nuevos PR o cambios en dev» y «sí a todo».
+- **Qué hizo el agente:** al revisar `dev` vio que el PR #54 solo añadía archivos sobrantes: un repositorio anidado (`kiniela-predictor-equipo2`, que aparece como submódulo roto) y scripts de prueba en `scratchpad/` con una ruta local. Los quitó y los añadió al `.gitignore`.
+- **Aceptado:** un PR de limpieza aparte, con `Refs #34`, sin tocar el código de features.
+- **Rechazado o cambiado, y por qué:** reescribir el historial para quitar el commit del #54 o arreglar su título: `dev` es compartida y no se reescribe.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** Eva aprobó la limpieza.
