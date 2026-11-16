@@ -32,18 +32,29 @@ En la práctica, el objeto envuelve dos cosas:
 - **El cálculo de las features del partido** (#3): forma reciente, goles y localía, a partir del histórico y usando solo partidos anteriores, para que no haya fuga de datos.
 - **El modelo entrenado**, que debe exponer `predict_proba` con las clases en orden 0-5.
 
-```python
-# Sketch only: the class lives in src/kiniela/models/ so joblib can load it in the app
-class MatchModel:
-    def __init__(self, pipeline, history, version):
-        self.pipeline, self.history, self.version = pipeline, history, version
+El modelo final es `MatchPredictor` ([`src/kiniela/models/final.py`](../src/kiniela/models/final.py), #35). Guarda el XGBoost entrenado y el histórico de partidos jugados, y en cada predicción calcula las features con `build_match_features`, **la misma función del entrenamiento** (#34).
 
-    def predict(self, home_team, away_team):
-        features = build_match_features(self.history, home_team, away_team)  # from #3
-        return self.pipeline.predict_proba(features)[0].tolist()
+La clase tiene que estar en `src/kiniela/`. `joblib` guarda la ruta de importación del objeto y no lo podría cargar si la clase está definida en un notebook, o si se guarda desde un script lanzado con `python -m` sin cuidado (quedaría como `__main__`). `final.py` lo evita y lo comprueba un test.
+
+## El modelo final (#35)
+
+Se entrena y se guarda con un comando, desde la raíz del repo:
+
+```bash
+PYTHONPATH=src python -m kiniela.models.final            # descarga 2015-16 a 2023-24
+PYTHONPATH=src python -m kiniela.models.final --matches data/raw/<archivo>.csv
 ```
 
-La clase tiene que estar en `src/kiniela/`. `joblib` guarda la ruta de importación del objeto y no lo podría cargar si la clase está definida en un notebook.
+1. Descarga las 9 temporadas con la función de datos de la #1, les añade la columna `Season` y deja una copia en `data/raw/` (no se versiona).
+2. Calcula las features (#3, #34) y el `target` (#2).
+3. Vuelve a lanzar la búsqueda de hiperparámetros de la #7 (`tune_model`: mismo `StratifiedKFold`, `RANDOM_STATE` y gap < 0,05), así los hiperparámetros siempre corresponden a las features actuales.
+4. Escribe `models/kiniela_model.joblib` y `models/model_card.json`.
+
+**Por qué 9 temporadas:** con solo 2023-24 (359 partidos útiles), únicamente 2 de 648 combinaciones cumplían el gap, y la elegida no superaba al modelo de prueba (F1 macro 0,095 frente a 0,102). Con 2015-16 a 2023-24 (3.235 partidos útiles) lo cumplen 496 y el F1 macro dobla al del modelo de prueba. Las cifras exactas están en la ficha.
+
+El modelo solo acepta los equipos de la **última temporada**: un equipo descendido no tiene historial en ella y su predicción no tendría sentido.
+
+**Excepción documentada:** `kiniela_model.joblib` y `model_card.json` sí se versionan (ver `.gitignore`), porque Render construye la imagen Docker desde el repo. El resto de `models/` no.
 
 ## Cómo comprobarlo
 
@@ -55,7 +66,7 @@ probabilities = predictor.predict("arsenal", "chelsea")
 predicted_class(probabilities)          # falla si no son 6 probabilidades válidas
 ```
 
-`tests/test_predict.py` comprueba el contrato con un modelo guardado y con un objeto que no lo cumple.
+`tests/test_predict.py` comprueba el contrato con un modelo guardado y con un objeto que no lo cumple. `tests/test_final.py` comprueba el modelo final: el contrato, que usa las features del entrenamiento, la ficha y el artefacto versionado en `models/`.
 
 ## Junto al modelo
 

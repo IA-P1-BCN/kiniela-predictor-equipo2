@@ -7,7 +7,7 @@ Clasificación multiclase del tipo de resultado de un partido de fútbol para un
 **Organización**: [IA-P1-BCN](https://github.com/IA-P1-BCN)  
 **Tablero**: [GitHub Projects](https://github.com/orgs/IA-P1-BCN/projects/56)
 
-Mientras no haya un modelo entrenado en `models/`, la app usa un modelo de prueba y lo avisa en pantalla.
+La app usa el modelo final (`models/kiniela_model.joblib`): un XGBoost entrenado con 9 temporadas de la Premier League (2015-16 a 2023-24). Sus métricas están en `models/model_card.json`.
 
 ## Clases
 
@@ -100,7 +100,7 @@ Se abre en http://localhost:8501 y tiene dos páginas:
 
 - Si eliges un equipo que falta, o el mismo equipo dos veces, la app muestra un mensaje y no predice.
 - Si la base de datos falla, la predicción se muestra igualmente, con un aviso de que no se ha guardado.
-- **Modelo de prueba.** Mientras no haya un modelo en `models/kiniela_model.joblib`, la app usa el reparto de clases observado en el dataset, igual para cualquier partido, y lo avisa en pantalla. El modelo real tiene que cumplir el [contrato del modelo](docs/model-contract.md).
+- **Modelo.** La app carga `models/kiniela_model.joblib`, que cumple el [contrato del modelo](docs/model-contract.md). Para entrenarlo de nuevo: `PYTHONPATH=src python -m kiniela.models.final`. Si el archivo no existe, la app usa un modelo de prueba (el reparto de clases observado) y lo avisa en pantalla.
 - Los equipos salen del dataset de `data/processed/`. Si no está, como dentro de Docker, se usan los 20 equipos de la Premier 2023-24.
 
 ## Docker

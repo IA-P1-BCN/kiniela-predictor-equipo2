@@ -63,7 +63,7 @@ Antes de una demo, conviene abrir la URL un par de minutos antes.
 
 ## El modelo en producción
 
-La imagen incluye `models/kiniela_model.joblib` y `models/model_card.json` si están en el repo (ver [contrato del modelo](model-contract.md)). Mientras no exista el modelo entrenado, la app usa el modelo de prueba y lo avisa en pantalla.
+La imagen incluye `models/kiniela_model.joblib` y `models/model_card.json`, que están versionados en el repo como excepción (ver [contrato del modelo](model-contract.md)). Si se vuelve a entrenar el modelo, hay que subir los dos archivos con un PR y lanzar *Manual Deploy* en Render. Sin el archivo, la app usaría el modelo de prueba y lo avisaría en pantalla.
 
 Para probar un modelo nuevo junto al actual y promocionarlo, ver [A/B testing](ab-testing.md). Promocionar cambia archivos del repo: después hay que hacer un PR y un *Manual Deploy*.
 
