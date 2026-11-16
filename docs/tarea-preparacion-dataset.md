@@ -144,11 +144,13 @@ El dataset unificado con features y target (el que usan los comandos de entrenam
 from kiniela.data.dataset import download_premier_league_data
 from kiniela.models.final import build_modelling_dataset
 
-matches = download_premier_league_data("2324")  # o la lista de 9 temporadas
+matches = download_premier_league_data("2324")
 build_modelling_dataset(matches).to_csv(
     "data/processed/premier_league_with_features_and_target.csv", index=False
 )
 ```
+
+**Solo temporadas con los equipos actuales en `data/processed/`.** La app saca la lista de equipos del CSV más reciente de esa carpeta, y el modelo final solo acepta los 20 de la última temporada. Si se guarda ahí un dataset de varias temporadas, la app ofrecería también equipos descendidos (33 en total) y su predicción daría error. El de las 9 temporadas lo guarda `python -m kiniela.models.final` en `data/raw/`.
 
 Ni este archivo ni ningún otro CSV de `data/` se suben a Git: se regeneran con el código.
 
