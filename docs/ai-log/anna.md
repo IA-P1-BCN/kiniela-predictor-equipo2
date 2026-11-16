@@ -161,3 +161,19 @@ https://github.com/IA-P1-BCN/kiniela-predictor-equipo2/pull/new/34-match-feature
 - **Errores del agente y cómo se corrigieron:** la primera versión leía las fechas ISO con `dayfirst=True` y convertía `2024-09-01` en el 9 de enero; lo detectaron los tests nuevos y ahora se prueba primero el formato ISO.
 - **Comprobación:** con el CSV real, las features de la app coinciden con las de entrenamiento en los 380 partidos; `pytest`: 195 tests pasan. Los tests nuevos fallan si se reintroduce la fuga (`<=`) o el signo invertido.
 - **Revisión humana:** _pendiente_
+
+---
+
+### #4 EDA: notebook recuperado y corregido
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** _por completar_
+- **Prompt clave:** llevar a `dev` el EDA de la rama `bionic/tarea-4-eda`, que nunca se fusionó, corrigiendo sus errores. Mariana dio el visto bueno para sustituir su plantilla de `notebooks/01_eda.ipynb`.
+- **Errores encontrados en la versión de la rama:**
+  - El JSON del notebook estaba roto (Jupyter no lo abría).
+  - Nunca se había ejecutado: `build_target` recibía columnas enteras y fallaba en la segunda celda.
+  - Las conclusiones no salían de datos (sin salidas) y una recomendaba usar `FTHG`, `FTAG` y la diferencia de goles como features, que es fuga de datos.
+  - Usaba features que ya no existen y una correlación de Spearman con `target`, que es nominal.
+- **Qué generó el agente:** notebook nuevo que solo llama a `src/kiniela/` (dataset, `target`, distribución de clases, goles, features por clase y correlación entre features) y conclusiones escritas a partir de su ejecución.
+- **Comprobación:** todas las celdas se ejecutan con el CSV real; las cifras de las conclusiones son las que imprime el notebook. Se guarda sin salidas, como los demás notebooks del equipo.
+- **Revisión humana:** _pendiente_
