@@ -58,3 +58,14 @@
 - **Rechazado o cambiado, y por qué:** no se tocó la suite existente para «hacer sitio»; se añadieron archivos.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
 - **Revisión humana:** pendiente.
+
+### #15 Recálculo con 8 features (16/11)
+
+- **Fecha:** 2026-11-16
+- **Herramienta y modelo:** Cursor, Grok 4.7
+- **Prompt clave:** Claudio: las features son 8 (#58/#61); actualizar la rama contra `dev`.
+- **Qué generó el agente:** `FEATURES` de los tests apunta a `FEATURE_COLUMNS`; drift y red usan esos nombres.
+- **Aceptado:** tests sintéticos con las 8 columnas reales.
+- **Rechazado o cambiado, y por qué:** no se entrenó la red sobre el CSV real en este PR (eso va en la sección 5 / #53).
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** pendiente.

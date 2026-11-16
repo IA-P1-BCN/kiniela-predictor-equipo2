@@ -29,14 +29,14 @@ def test_identical_batches_have_no_drift(tmp_path):
 def test_a_shifted_feature_flags_global_drift(tmp_path):
     reference = write_dataset(tmp_path / "reference.csv")
     frame = pd.read_csv(reference)
-    frame["form_home"] = frame["form_home"] + 8.0
+    frame["form_home_last_5"] = frame["form_home_last_5"] + 8.0
     current = tmp_path / "current.csv"
     frame.to_csv(current, index=False)
 
     report = compute_drift(reference, current)
     by_name = {feature.name: feature for feature in report.features}
-    assert by_name["form_home"].drifted is True
-    assert by_name["form_home"].psi >= PSI_DRIFT_THRESHOLD
+    assert by_name["form_home_last_5"].drifted is True
+    assert by_name["form_home_last_5"].psi >= PSI_DRIFT_THRESHOLD
     assert report.drifted is True
 
 
@@ -63,7 +63,7 @@ def test_format_mentions_the_threshold_and_the_flag(tmp_path, capsys):
     assert "PSI" in text
     assert f"{PSI_DRIFT_THRESHOLD:.2f}" in text
     assert "global drift: NO" in text
-    assert "form_home" in text
+    assert "form_home_last_5" in text
 
 
 def test_cli_returns_zero_when_there_is_no_drift(tmp_path, capsys):
@@ -76,7 +76,7 @@ def test_cli_returns_zero_when_there_is_no_drift(tmp_path, capsys):
 def test_cli_returns_one_when_there_is_drift(tmp_path, capsys):
     reference = write_dataset(tmp_path / "reference.csv")
     frame = pd.read_csv(reference)
-    frame["goals_avg"] = frame["goals_avg"] + 10.0
+    frame["avg_home_goals_last_5"] = frame["avg_home_goals_last_5"] + 10.0
     current = tmp_path / "current.csv"
     frame.to_csv(current, index=False)
     assert main(["--reference", str(reference), "--current", str(current)]) == 1
