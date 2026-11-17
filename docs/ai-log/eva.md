@@ -377,3 +377,13 @@
 - **Rechazado o cambiado, y por qué:** inventar lo que se dijo en cada reunión: solo consta lo que hay en el repositorio.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** el primer borrador atribuía a Anna el backlog inicial; lo creó Mariana (autora de las issues #1–#18). Se comprobó con `gh issue view` y se corrigió.
 - **Revisión humana:** pendiente en el PR.
+
+### #17 Guion: número de tests
+
+- **Fecha:** 2026-11-17
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «sí» a cambiar 212 por 231 tests en el guion.
+- **Qué generó el agente:** la diapositiva 7 de `docs/presentacion/03-app-y-despliegue.md` dice 231 tests, la cifra actual de `dev` tras los tests de la descarga de Anna (#68), comprobada con `pytest --co`.
+- **Aceptado / rechazado:** nada más.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
+- **Revisión humana:** Eva lo pidió.

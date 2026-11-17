@@ -68,9 +68,9 @@ y un dibujo de un enchufe: la app a un lado, «modelo de prueba» y «modelo fin
 
 ## 7. Calidad y límites
 
-**Se ve:** «212 tests en cada PR · la app probada sin navegador · probado con PostgreSQL real y en Docker», y abajo los límites.
+**Se ve:** «231 tests en cada PR · la app probada sin navegador · probado con PostgreSQL real y en Docker», y abajo los límites.
 
-**Se dice:** «Ningún cambio entra en `dev` sin pasar 212 tests automáticos, y la app se prueba de punta a punta sin navegador. Los límites que conocemos: el modelo acierta poco en accuracy porque reparte sus predicciones entre las seis clases; el plan gratuito duerme la app tras 15 minutos; el feedback depende de que la gente lo dé, y nadie verifica la clase real que indica. Para cada uno sabemos cómo se resolvería.»
+**Se dice:** «Ningún cambio entra en `dev` sin pasar 231 tests automáticos, y la app se prueba de punta a punta sin navegador. Los límites que conocemos: el modelo acierta poco en accuracy porque reparte sus predicciones entre las seis clases; el plan gratuito duerme la app tras 15 minutos; el feedback depende de que la gente lo dé, y nadie verifica la clase real que indica. Para cada uno sabemos cómo se resolvería.»
 
 ---
 
