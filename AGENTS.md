@@ -132,7 +132,7 @@ Cursor, GitHub Copilot and Codex read this file automatically. Other tools need 
 
 ## AI log (one file per person)
 
-Each person keeps **their own** AI log in `docs/ai-log/<name>.md` (`anna.md`, `cala.md`, `eva.md`, `mariana.md`). The template and the shared rules are in `docs/ai-log/README.md`.
+Each person keeps **their own** AI log in `docs/ai-log/<name>.md` (`anna.md`, `carla.md`, `eva.md`, `mariana.md`). The template and the shared rules are in `docs/ai-log/README.md`.
 
 - Write only in your own file. Never edit somebody else's.
 - Add one entry per task or PR, in the same PR as the change.

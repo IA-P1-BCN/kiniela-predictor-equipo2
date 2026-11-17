@@ -7,7 +7,7 @@ Registro de cómo usa la IA cada persona del equipo: qué herramienta y modelo, 
 | Persona | Archivo |
 | --- | --- |
 | Anna | [anna.md](anna.md) |
-| Carla | [cala.md](cala.md) |
+| Carla | [carla.md](carla.md) |
 | Eva | [eva.md](eva.md) |
 | Mariana | [mariana.md](mariana.md) |
 

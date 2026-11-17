@@ -1,4 +1,4 @@
-# Bitácora de IA · Cala
+# Bitácora de IA · Carla
 
 | Herramienta | Modelo | Coste | Alcance |
 | --- | --- | --- | --- |
@@ -107,4 +107,29 @@
   - No pude leer la imagen que adjuntó (el modelo no admite imágenes); pedí el texto y él llegó en el mensaje siguiente con los criterios de #5 y #6. No inventé nada a partir de la captura.
   - El primer borrador decía «esa es la cambio» y la diapositiva 2 llevaba «no Decide»; corregido antes de dejar los archivos.
   - No hice commit, push ni PR: los cambios quedan en la rama para que yo revise el diff antes de subirlos.
-- **Revisión humana:** pendiente. Puntos a mirar: que las cifras coincidan con `model_card.json` y con la sección 5, que #8 siga marcada como pendiente, y que el guion no contradiga el informe ni la parte de Eva.
+- **Revisión humana:** pendiente. Puntos a mirar: que las cifras coincidan con `model_card.json` y con la sección 5, y que el guion no contradiga el informe ni la parte de Eva.
+
+### #8 Informe de métricas completas
+
+- **Fecha:** 2026-11-17
+- **Herramienta y modelo:** OpenCode, Big Pickle.
+- **Prompt clave:** «vale, ahora haz otra rama y añade esto», con los criterios de aceptación de la #8 (accuracy, precision/recall/F1 por clase, matriz, importance, confusiones y ejemplos).
+- **Qué generó el agente:**
+  - Rama `8-metrics-report` desde `origin/dev`, sin upstream.
+  - `src/kiniela/models/report.py`: `build_report()` reconstruye el dataset desde el `MatchPredictor` guardado y puntúa con predicciones fuera de fold del `StratifiedKFold` fijo, con los hiperparámetros de la ficha y pesos de clase por fold; `format_report()` es puro y `main()` escribe el Markdown.
+  - `docs/metrics-report.md`: accuracy 0,1787, precision/recall/F1 de las 6 clases, matriz etiquetada, 5 confusiones con 10 partidos reales, importance de las 8 features y límites.
+  - `tests/test_report.py`: 3 tests, los 3 en verde.
+  - Enlace en el README y actualización de la sección 4 del informe y de la diapositiva 5 del guion, que dejan de estar pendientes.
+- **Aceptado:**
+  - Medir fuera de fold y no puntuar el entrenamiento con el modelo final: la accuracy reproduce la de la ficha (0,1786707882534776), así que la reconstrucción del dataset es correcta.
+  - Explicar que el F1 macro agregado (0,175) y el de la ficha (0,1719) son dos formas de agregar el mismo esquema, no dos modelos.
+  - Cifras del informe: clase 1 peor recuperada (recall 0,098), clase 4 menos fiable (precision 0,122), confusión 5→4 en 288 partidos y `avg_away_goals_last_5` como feature con más gain (0,2187).
+- **Rechazado o cambiado, y por qué:**
+  - No rellenar la matriz con predicciones del modelo entrenado sobre todas las filas: habría inflado las métricas y no cumpliría el criterio de evaluación honesta.
+  - No tocar los AI logs de las demás ni las secciones del informe de Anna, Eva o Mariana.
+  - No hice commit, push ni PR: los cambios quedan en la rama para que Carla revise el diff antes de subirlos.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - El primer `pytest` completo se quedó sin respuesta después de 10 minutos en este entorno; al repetirlo pasaron las 234 pruebas en 2:55, y cada archivo de tests también pasó por separado.
+  - El primer borrador de los tests usaba una matriz 3x3 con un bucle de 6 clases y un dataset sintético sin columnas de partido; corregido con `matrix.shape` y columnas `Date`/equipos/goles.
+  - Las primeras cifras salían con separador decimal inglés y fechas con hora; corregido en `format_report()` y en `_examples()`.
+- **Revisión humana:** pendiente. Puntos a mirar: que la matriz y el F1 por clase salgan de fuera de fold y que el informe enlazado tenga los seis criterios. La suite completa (234 tests) pasa en 2:55.

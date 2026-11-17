@@ -180,4 +180,5 @@ Cubren el catálogo de clases, el etiquetado, la validación del dataset (esquem
 - [Operación de modelos (MLOps)](docs/mlops.md)
 - [Data drift](docs/drift.md)
 - [A/B testing y promoción del modelo](docs/ab-testing.md)
+- [Informe de métricas del modelo (#8)](docs/metrics-report.md), generable con `PYTHONPATH=src python -m kiniela.models.report`
 - Plantilla de GitHub: `.github/ISSUE_TEMPLATE/tarea.md`
