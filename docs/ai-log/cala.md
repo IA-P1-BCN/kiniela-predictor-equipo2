@@ -83,3 +83,28 @@
   - La rejilla pequeña de los tests no era viable en el dataset sintético (hasta un solo stump daba gap 0.095): se cambió a `min_child_weight` 1/100, donde el combo regularizado colapsa a predicción casi constante (gap 0) y el sobreajustado queda fuera — justo el comportamiento que el test debe probar.
   - El test de la CLI tardaba 6 minutos: sin argumento de espacio, `main()` ejecutaba las 648 combinaciones completas; se parchea `SEARCH_SPACE` en ese test para que solo corra la rejilla pequeña.
 - **Revisión humana:** pendiente en el PR. Puntos a mirar: que el gap declarado sea F1 macro y estrictamente menor que 0.05, que la tabla compare antes/después con el mismo esquema y solo cambien los hiperparámetros, que los parámetros finales viajen dentro del artefacto, y que el trade-off de F1 quede claro para el informe de #8.
+
+### #17 Informe y presentación: modelos y métricas
+
+- **Fecha:** 2026-11-17
+- **Herramienta y modelo:** OpenCode, Big Pickle.
+- **Prompt clave:** «en mi proyecto de kiniela mirame porque no me instala el npm» y «haz una rama y arreglame lo mio soy carla», con los criterios de aceptación de las issues #5 y #6 y el aviso de mi compañera de que mi parte «solo tiene el esquema, sin texto ni cifras».
+- **Qué generó el agente:**
+  - Rama `17-models-metrics-section` desde `origin/dev`, sin upstream (un `push` sin argumentos no puede tocar `dev`).
+  - `docs/informe/04-modelos-y-metricas.md`: sección completa con el esquema fijo (#5), la comparación reference/RF/XGB/LGBM de 16/11 con 8 features (#5/#6), la rejilla y el antes/después del gap (#7), el modelo final `tuned-xgb-2026-11-16` (#66) y el hueco marcado de #8.
+  - `docs/presentacion/02-modelos.md`: 5 diapositivas con título, qué se ve, qué se dice (30–45 s) y captura, con las mismas cifras.
+  - Esta entrada en mi bitácora.
+- **Aceptado:**
+  - Cifras solo de fuentes del repo: `models/model_card.json` para el modelo final (F1 macro 0,1719 ± 0,0118, accuracy 0,1787, gap 0,0496, 3.235 filas de 3.420) y la tabla de 8 features de la sección 5 para la comparación de una temporada (reference 0,443/0,102, RF 0,228/0,180, XGB 0,262/0,177, LGBM 0,248/0,166).
+  - Separar explícitamente la comparación de una temporada del modelo final de nueve: no se mezclan sus números.
+  - Decir que la elección entre RF (0,180) y XGB (0,177) en la tabla de 8 features está dentro de la desviación; el modelo entregado es el XGBoost ajustado de #66 porque cumple el gap.
+  - Marcar como «pendiente de cifra (#8)» la matriz de confusión, la feature importance, el F1 por clase del modelo final y el análisis de errores, como permite el README del informe.
+- **Rechazado o cambiado, y por qué:**
+  - No añadir `package.json`, `npm install` ni archivos de Node: este repo es Python (requirements + Streamlit). El error de npm venía de la política de ejecución de PowerShell en su máquina (`npm.ps1` bloqueado), no del proyecto; además `python` no está en el PATH de esa consola. No era un cambio de repositorio.
+  - No rellenar el informe con el F1 por clase de la comparación de una temporada ni con el `score_multiclass()` de la #15: no son las métricas del modelo final de 9 temporadas.
+  - No tocar los archivos de Anna, Eva ni Mariana (README del informe y de la presentación incluidos): cada persona edita solo su sección.
+- **Errores o alucinaciones del agente y cómo se corrigieron:**
+  - No pude leer la imagen que adjuntó (el modelo no admite imágenes); pedí el texto y él llegó en el mensaje siguiente con los criterios de #5 y #6. No inventé nada a partir de la captura.
+  - El primer borrador decía «esa es la cambio» y la diapositiva 2 llevaba «no Decide»; corregido antes de dejar los archivos.
+  - No hice commit, push ni PR: los cambios quedan en la rama para que yo revise el diff antes de subirlos.
+- **Revisión humana:** pendiente. Puntos a mirar: que las cifras coincidan con `model_card.json` y con la sección 5, que #8 siga marcada como pendiente, y que el guion no contradiga el informe ni la parte de Eva.
