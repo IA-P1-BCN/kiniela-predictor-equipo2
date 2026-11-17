@@ -366,3 +366,14 @@
 - **Rechazado o cambiado, y por qué:** nada.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
 - **Revisión humana:** Eva dio el dato y aprobó el PR.
+
+### #18 Dailies del equipo (10/11 a 17/11)
+
+- **Fecha:** 2026-11-17
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «chequea las dailies que tenemos y haz las que faltan de todo el equipo».
+- **Qué generó el agente:** `docs/dailies/` con un archivo por día (10, 11, 12, 13, 16 y 17/11) según `docs/DAILY_TEMPLATE.md` y un índice. Las de días pasados se reconstruyeron con los PRs, las issues y las bitácoras, y lo dicen; en la de hoy, el «Hoy» de Anna, Carla y Mariana es una propuesta sacada del tablero, marcada como tal.
+- **Aceptado:** un archivo por día en `docs/dailies/` (decisión de Eva), en lugar de comentarios en la issue #40, que estaba vacía como la #39.
+- **Rechazado o cambiado, y por qué:** inventar lo que se dijo en cada reunión: solo consta lo que hay en el repositorio.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** el primer borrador atribuía a Anna el backlog inicial; lo creó Mariana (autora de las issues #1–#18). Se comprobó con `gh issue view` y se corrigió.
+- **Revisión humana:** pendiente en el PR.

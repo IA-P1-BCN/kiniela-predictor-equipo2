@@ -169,7 +169,7 @@ Cubren el catálogo de clases, el etiquetado, la validación del dataset (esquem
 
 - [Issues](docs/ISSUES.md)
 - [Asignación de tareas](docs/ASIGNACION_TAREAS.md)
-- [Plantilla de daily](docs/DAILY_TEMPLATE.md)
+- [Dailies](docs/dailies/README.md) y su [plantilla](docs/DAILY_TEMPLATE.md)
 - [Base de datos](docs/database.md)
 - [Despliegue](docs/deploy.md)
 - [Contrato del modelo](docs/model-contract.md)
