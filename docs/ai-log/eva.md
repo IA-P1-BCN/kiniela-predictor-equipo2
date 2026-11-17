@@ -387,3 +387,14 @@
 - **Aceptado / rechazado:** nada más.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno.
 - **Revisión humana:** Eva lo pidió.
+
+### #17 Enlace de Canva y estado de los guiones
+
+- **Fecha:** 2026-11-17
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «fíjate si hay que agregar algo, añade lo que nos falta» (con el enlace de Canva).
+- **Qué generó el agente:** el enlace de Canva en `docs/presentacion/README.md`, el estado real de cada guion (la parte 2 es solo un esquema; la parte 4 tiene cifras de una temporada) y la fecha corregida (jueves 19/11, no viernes 20/11). En la daily de hoy, el bloqueo de Canva pasa a «en marcha» y se añade el de los guiones desactualizados.
+- **Aceptado:** cambiar solo los archivos comunes y los de Eva; para los guiones de Carla y Mariana, mensajes a cada una.
+- **Rechazado o cambiado, y por qué:** editar `02-modelos.md`, `04-mlops-y-cierre.md` y `docs/presentacion-negocio/`, porque cada parte es de su autora.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** el agente no pudo leer las diapositivas (Canva las carga con JavaScript y solo devuelve el título), así que revisó los guiones del repo y no el contenido de Canva.
+- **Revisión humana:** pendiente en el PR.
