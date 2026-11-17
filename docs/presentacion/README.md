@@ -2,7 +2,7 @@
 
 Guion de la presentación técnica (issue #17), por partes. Cada persona escribe la suya en su archivo. Las diapositivas finales se montan en **Canva** a partir de estos guiones, para no perder el contenido si Canva no se comparte.
 
-**Diapositivas:** [Presentación Kiniela Predictor en Canva](https://www.canva.com/design/DAHbKFFuh3Y/HSJNXF2EQxH5zcTxWqhD7Q/edit) (archivo creado por Mariana). Si cambia un dato, se corrige primero en el guion y luego en Canva.
+**Diapositivas:** el archivo de Canva que ha creado Mariana, [Presentación Kiniela Predictor](https://www.canva.com/design/DAHbKFFuh3Y/HSJNXF2EQxH5zcTxWqhD7Q/edit), tiene a 17/11 las 8 diapositivas de la presentación de negocio. Las de esta presentación técnica aún no están. Si cambia un dato, se corrige primero en el guion y luego en Canva.
 
 **Decisión de Mariana (13/11/2026):** una persona, una parte. Así no hay dos PRs sobre el mismo archivo.
 

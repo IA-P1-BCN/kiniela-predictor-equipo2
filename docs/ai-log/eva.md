@@ -396,5 +396,5 @@
 - **Qué generó el agente:** el enlace de Canva en `docs/presentacion/README.md`, el estado real de cada guion (la parte 2 es solo un esquema; la parte 4 tiene cifras de una temporada) y la fecha corregida (jueves 19/11, no viernes 20/11). En la daily de hoy, el bloqueo de Canva pasa a «en marcha» y se añade el de los guiones desactualizados.
 - **Aceptado:** cambiar solo los archivos comunes y los de Eva; para los guiones de Carla y Mariana, mensajes a cada una.
 - **Rechazado o cambiado, y por qué:** editar `02-modelos.md`, `04-mlops-y-cierre.md` y `docs/presentacion-negocio/`, porque cada parte es de su autora.
-- **Errores o alucinaciones del agente y cómo se corrigieron:** el agente no pudo leer las diapositivas (Canva las carga con JavaScript y solo devuelve el título), así que revisó los guiones del repo y no el contenido de Canva.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** el agente no pudo abrir Canva (pide sesión), así que Eva exportó el PDF y el agente lo leyó por partes. Con el PDF se vio que el archivo tiene solo la presentación de negocio, no la técnica, y se corrigió el README. El agente comparó las cifras del PDF con los datos: «~44 % de clase 5» y «26 partidos de clase 4» son correctos para 2023-24.
 - **Revisión humana:** pendiente en el PR.
