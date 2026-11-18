@@ -408,4 +408,15 @@
 - **Aceptado:** marcar como propuesta lo que no consta en el repo, en lugar de inventarlo.
 - **Rechazado o cambiado, y por qué:** nada.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** el bloqueo del PR #77 (LightGBM fuera de `requirements.txt`) se comprobó cargando el modelo sin LightGBM; la carga falla con `ModuleNotFoundError`.
+- **Revisión humana:** Eva aprobó el PR (#78).
+
+### #17 Sección 6 al día, presentación definitiva y conclusiones
+
+- **Fecha:** 2026-11-18
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «escribe mi parte [de las conclusiones] y actualiza el link de la presentación en el repo, usaremos la versión corta».
+- **Qué generó el agente:** la sección 6 del informe al día (modelo final en producción desde el 16/11, modelo provisional solo como respaldo, 234 tests y límites actuales); el enlace a la presentación definitiva de 19 diapositivas en `docs/presentacion/README.md` y en el índice del informe, con el reparto por persona; y las líneas de Eva para la sección 9, en un comentario de la issue #17 para que Mariana las compile.
+- **Aceptado:** dejar el enlace de Canva como primer borrador, sustituido por la presentación definitiva.
+- **Rechazado o cambiado, y por qué:** escribir directamente en `09-conclusiones.md`, porque la compila Mariana.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno; la cifra de tests se comprobó con `pytest --co` (234). Al fusionar con `dev` chocaron las dos entradas de esta bitácora; se conservaron las dos.
 - **Revisión humana:** pendiente en el PR.

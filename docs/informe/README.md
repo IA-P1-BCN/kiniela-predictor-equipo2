@@ -55,7 +55,7 @@ Si una sección depende de una issue abierta, se escribe igual lo ya hecho y se 
 | Entregable | Dónde | Quién cierra |
 | --- | --- | --- |
 | Informe técnico | Esta carpeta | Cada una su sección; Mariana el relato |
-| Presentación técnica | [`docs/presentacion/`](../presentacion/) | Guion en el repo; diapositivas finales en **Canva** |
+| Presentación (negocio y técnica) | [Diapositivas definitivas](https://claude.ai/artifact/HzBveW66dk1MBBkcHhDaHy) · guiones en [`docs/presentacion/`](../presentacion/) | Todo el equipo |
 | Presentación de negocio | [`docs/presentacion-negocio/`](../presentacion-negocio/) | **Mariana** |
 | App desplegada | https://kiniela-predictor.onrender.com | Eva |
 | Tablero | https://github.com/orgs/IA-P1-BCN/projects/56 | Anna |
