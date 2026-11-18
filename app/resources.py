@@ -42,9 +42,12 @@ def get_router() -> ABRouter:
     return ABRouter(get_predictor(), load_candidate(), candidate_share())
 
 
-@st.cache_data(show_spinner=False)
 def get_teams() -> list[str]:
-    """Teams available in the selectors."""
+    """Teams the current model can predict; the test model uses the dataset list."""
+    predictor = get_predictor()
+    teams = getattr(predictor, "teams", None)
+    if teams:
+        return list(teams)
     return list_teams(load_processed_matches())
 
 

@@ -51,6 +51,8 @@ def test_exports_only_feedback_with_the_real_class(database_url):
     row = rows.iloc[0]
     assert (row["HomeTeam"], row["AwayTeam"], row["target"]) == ("arsenal", "chelsea", 4)
     assert (row["predicted_class"], bool(row["is_correct"]), row["model_version"]) == (1, False, "v1")
+    assert "Date" not in rows.columns
+    assert "T" in row["predicted_at"]  # ISO datetime of the prediction, not a match day
 
 
 def test_correct_predictions_are_labelled_with_the_predicted_class(database_url):

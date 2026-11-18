@@ -44,8 +44,16 @@ def _predict(engine, model_version="v1", probabilities=PROBABILITIES):
 
 def test_defaults_to_local_sqlite(monkeypatch):
     monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("RENDER", raising=False)
     assert resolve_database_url().startswith("sqlite:///")
     assert resolve_database_url().endswith("data/kiniela.db")
+
+
+def test_render_without_database_url_refuses_sqlite(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.setenv("RENDER", "true")
+    with pytest.raises(RuntimeError, match="DATABASE_URL is required on Render"):
+        resolve_database_url()
 
 
 def test_reads_database_url_from_environment(monkeypatch):

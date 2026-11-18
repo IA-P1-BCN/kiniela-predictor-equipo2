@@ -102,3 +102,14 @@
 - **Rechazado o cambiado, y por qué:** el CSV de modelado no se commitea; se genera al vuelo.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** el merge de #47 dejó conflicto otra vez en esta bitácora; se unieron las entradas de #15 y #17.
 - **Revisión humana:** pendiente en #53.
+
+### Auditoría de código en `dev` (18/11)
+
+- **Fecha:** 2026-11-18
+- **Herramienta y modelo:** Cursor, Grok 4.6
+- **Prompt clave:** «realizame una auditoria de codigo» y luego «arreglalo».
+- **Qué generó el agente:** tope de 20 predicciones por sesión; `predicted_at` en el export (ya no se finge `Date` de partido); selectores = `predictor.teams`; Render exige `DATABASE_URL`; caps de versiones y LightGBM solo en dev; CODEOWNERS del `.joblib`.
+- **Aceptado:** los must-fix y should-fix que cabían sin migrar Neon ni reescribir el pickle.
+- **Rechazado o cambiado, y por qué:** no Alembic (no hay columna nueva); el límite es por sesión, no por IP.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** el clone local estaba en `main` viejo; se trabajó sobre `origin/dev`.
+- **Revisión humana:** este PR.

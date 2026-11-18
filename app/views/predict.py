@@ -14,6 +14,7 @@ from resources import (
 )
 from sqlalchemy.exc import SQLAlchemyError
 
+from kiniela import config
 from kiniela.config import CLASS_NAMES
 from kiniela.models.predict import predicted_class, validate_teams
 from kiniela.storage import save_feedback, save_prediction, session_scope
@@ -29,6 +30,10 @@ def use_example_match(teams: list[str]) -> None:
 
 def run_prediction(home_team: str | None, away_team: str | None) -> None:
     """Predict, try to save, and keep the result in the session for the feedback form."""
+    if st.session_state.get("prediction_count", 0) >= config.MAX_PREDICTIONS_PER_SESSION:
+        st.session_state.pop("last_prediction", None)
+        st.error("Has llegado al límite de predicciones de esta sesión. Prueba más tarde.")
+        return
     try:
         home, away = validate_teams(home_team or "", away_team or "")
         predictor = get_router().choose()  # current model, or the candidate in an A/B test
@@ -53,6 +58,7 @@ def run_prediction(home_team: str | None, away_team: str | None) -> None:
     except SQLAlchemyError:
         st.warning("La predicción no se ha podido guardar en la base de datos. Se muestra igualmente.")
 
+    st.session_state["prediction_count"] = st.session_state.get("prediction_count", 0) + 1
     st.session_state["last_prediction"] = {
         "id": prediction_id,
         "home": home,
