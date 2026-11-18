@@ -431,3 +431,14 @@
 - **Rechazado o cambiado, y por qué:** el primer borrador compilaba las conclusiones de todas a partir del informe. Eva lo rechazó: cada persona escribe su propia entrada. Tampoco se recalculó la red neuronal con 9 temporadas, por falta de tiempo.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno detectado. Son archivos de Mariana: Eva lo pidió por el plazo, y Mariana lo revisa en el PR.
 - **Revisión humana:** pendiente en el PR.
+
+### #17 Conclusiones de Carla y Mariana, y subida a main
+
+- **Fecha:** 2026-11-18
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «vuelve a chequear lo de las conclusiones, si falta alguna complétala, cerramos PRs pendientes y subimos el código a main».
+- **Qué generó el agente:** los apartados 9.2 (Carla) y 9.4 (Mariana), que seguían pendientes a la hora de la entrega. Salen solo de cifras que ya estaban en las secciones 1, 4, 5 y 7a, y cada uno lleva una nota que dice que lo redactó Eva y que la autora puede corregirlo.
+- **Aceptado:** completarlos por el plazo de las 23:59.
+- **Rechazado o cambiado, y por qué:** no se inventan cifras nuevas: todas están ya en el informe.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno detectado.
+- **Revisión humana:** Eva, en el PR.
