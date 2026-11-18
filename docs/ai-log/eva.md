@@ -399,6 +399,17 @@
 - **Errores o alucinaciones del agente y cómo se corrigieron:** el agente no pudo abrir Canva (pide sesión), así que Eva exportó el PDF y el agente lo leyó por partes. Con el PDF se vio que el archivo tiene solo la presentación de negocio, no la técnica, y se corrigió el README. El agente comparó las cifras del PDF con los datos: «~44 % de clase 5» y «26 partidos de clase 4» son correctos para 2023-24.
 - **Revisión humana:** pendiente en el PR.
 
+### #18 Dailies del 17/11 y 18/11
+
+- **Fecha:** 2026-11-18
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «chequea si falta alguna tarea y los PR… completa las dailies de todo el equipo».
+- **Qué generó el agente:** la columna «Resultado» de la daily del 17/11, con lo que consta en el repositorio, y la daily del 18/11 (presentación según la estructura de la entrega, recorte a 19 diapositivas, bloqueo del PR #77 y secciones del informe que siguen hablando del modelo de prueba).
+- **Aceptado:** marcar como propuesta lo que no consta en el repo, en lugar de inventarlo.
+- **Rechazado o cambiado, y por qué:** nada.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** el bloqueo del PR #77 (LightGBM fuera de `requirements.txt`) se comprobó cargando el modelo sin LightGBM; la carga falla con `ModuleNotFoundError`.
+- **Revisión humana:** Eva aprobó el PR (#78).
+
 ### #17 Sección 6 al día, presentación definitiva y conclusiones
 
 - **Fecha:** 2026-11-18
@@ -407,5 +418,5 @@
 - **Qué generó el agente:** la sección 6 del informe al día (modelo final en producción desde el 16/11, modelo provisional solo como respaldo, 234 tests y límites actuales); el enlace a la presentación definitiva de 19 diapositivas en `docs/presentacion/README.md` y en el índice del informe, con el reparto por persona; y las líneas de Eva para la sección 9, en un comentario de la issue #17 para que Mariana las compile.
 - **Aceptado:** dejar el enlace de Canva como primer borrador, sustituido por la presentación definitiva.
 - **Rechazado o cambiado, y por qué:** escribir directamente en `09-conclusiones.md`, porque la compila Mariana.
-- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno; la cifra de tests se comprobó con `pytest --co` (234).
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno; la cifra de tests se comprobó con `pytest --co` (234). Al fusionar con `dev` chocaron las dos entradas de esta bitácora; se conservaron las dos.
 - **Revisión humana:** pendiente en el PR.
