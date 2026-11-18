@@ -4,6 +4,8 @@ pandas>=2.2,<3
 numpy>=1.26,<3
 scikit-learn>=1.5,<2
 xgboost>=2.1,<4
+# joblib loads MatchPredictor → final.py → tuning.py → ensembles.py, which imports LightGBM at module level.
+lightgbm>=4.5,<5
 streamlit>=1.50,<2
 joblib>=1.4,<2
 sqlalchemy>=2.0,<3

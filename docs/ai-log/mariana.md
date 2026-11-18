@@ -108,8 +108,8 @@
 - **Fecha:** 2026-11-18
 - **Herramienta y modelo:** Cursor, Grok 4.6
 - **Prompt clave:** «realizame una auditoria de codigo» y luego «arreglalo».
-- **Qué generó el agente:** tope de 20 predicciones por sesión; `predicted_at` en el export (ya no se finge `Date` de partido); selectores = `predictor.teams`; Render exige `DATABASE_URL`; caps de versiones y LightGBM solo en dev; CODEOWNERS del `.joblib`.
-- **Aceptado:** los must-fix y should-fix que cabían sin migrar Neon ni reescribir el pickle.
-- **Rechazado o cambiado, y por qué:** no Alembic (no hay columna nueva); el límite es por sesión, no por IP.
+- **Qué generó el agente:** tope de 20 predicciones por sesión; `predicted_at` en el export (ya no se finge `Date` de partido); selectores = `predictor.teams`; Render exige `DATABASE_URL`; caps de versiones; CODEOWNERS del `.joblib`.
+- **Aceptado:** los must-fix y should-fix que cabían sin migrar Neon ni reescribir el pickle. Tras la review de Eva, LightGBM vuelve a `requirements.txt` porque el pickle importa `ensembles.py` al cargar.
+- **Rechazado o cambiado, y por qué:** no Alembic (no hay columna nueva); el límite es por sesión, no por IP. LightGBM solo en dev se revirtió: rompe Render.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** el clone local estaba en `main` viejo; se trabajó sobre `origin/dev`.
 - **Revisión humana:** este PR.
