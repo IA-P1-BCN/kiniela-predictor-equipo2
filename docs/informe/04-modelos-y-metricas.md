@@ -58,7 +58,7 @@ Hiperparámetros finales, registrados dentro del artefacto: `max_depth=2`, `n_es
 
 **Trade-off honesto.** Cumplir el criterio cuesta F1 macro (0,180 → 0,172), pero el modelo deja de memorizar el entrenamiento: el gap pasa de 0,505 a 0,0496, justo por debajo del límite. Con features débiles y clasificación difícil, ese es el cambio que permite entregar un modelo que generaliza.
 
-## 4.4 Modelo final y estado del informe de métricas (#8)
+## 4.4 Modelo final e informe de métricas (#8)
 
 El modelo que sirve la app es el XGBoost ajustado, versionado `tuned-xgb-2026-11-16` en [`models/model_card.json`](../../models/model_card.json). Se entrena con 9 temporadas de Premier League (2015-16 a 2023-24): 3.420 partidos, de los que 3.235 tienen historial y 185 se descartan por ser primeras jornadas.
 
@@ -72,14 +72,19 @@ El modelo que sirve la app es el XGBoost ajustado, versionado `tuned-xgb-2026-11
 
 Frente a la referencia (0,080), el modelo final duplica el F1 macro. La accuracy de 0,179 no es un error de cálculo: con la clase 5 repartida por 9 temporadas, predecir siempre esa clase daría un 31,9 % de aciertos, y los modelos entrenados sacrifican accuracy para no ignorar las otras cinco clases.
 
-**Pendiente de cifra (issue #8 abierta).** No están todavía calculados para el modelo final de 9 temporadas:
+El **[informe de métricas](../metrics-report.md)** (issue #8) está generado y se puede regenerar con `PYTHONPATH=src python -m kiniela.models.report` ([código](../../src/kiniela/models/report.py)). Usa predicciones **fuera de fold** del mismo `StratifiedKFold`: cada uno de los 3.235 partidos se puntúa con un modelo que no lo vio al entrenar, con los hiperparámetros de la ficha y pesos de clase calculados solo en el fold de entrenamiento. No son métricas de entrenamiento.
 
-- precision, recall y F1 por cada una de las 6 clases;
-- matriz de confusión legible con las etiquetas de clase;
-- feature importance del modelo seleccionado;
-- análisis de errores: clases más confundidas y ejemplos representativos.
+| Métrica del informe | Valor |
+| --- | --- |
+| Accuracy global | 0,1787 |
+| F1 macro agregado (todas las predicciones) | 0,175 |
+| F1 macro de la ficha (media de los 5 folds) | 0,1719 |
+| Clase peor recuperada | 1 · Victoria local ajustada (recall 0,098) |
+| Clase menos fiable al predecirla | 4 · Victoria visitante clara (precision 0,122) |
+| Confusión más frecuente | 5 → 4: 288 partidos (28,0 % de la clase 5) |
+| Feature más importante | `avg_away_goals_last_5` (gain 0,2187) |
 
-Ya existe `score_multiclass()` en [`metrics.py`](../../src/kiniela/models/metrics.py) (de la #15), que devuelve accuracy, precision, recall y F1 por clase, y la tabla de 4.2 tiene F1 por clase de la comparación de una temporada. Ninguna de las dos cosas es el informe del modelo final, así que no se rellenan con esos números. Se completará aquí cuando cierre la #8.
+El documento enlazado tiene la matriz de confusión con las 6 etiquetas, precision/recall/F1 por clase, las confusiones con ejemplos de partidos reales y la importance de las 8 features. El 0,175 y el 0,1719 son dos formas de agregar el mismo esquema (predicciones agrupadas frente a media de folds), no dos modelos distintos.
 
 ## 4.5 Cómo reproducirlo
 
@@ -107,4 +112,4 @@ El CSV de modelado no está en git: `kiniela.models.final` lo genera a partir de
 - **Comparación de una temporada, entrega de nueve.** La tabla de 4.2 usa 359 partidos de 2023-24; el modelo final usa 3.235 de 9 temporadas. Son experimentos distintos y no se mezclan sus cifras.
 - **Pocas features.** Ocho variables de forma y goles; no hay tiros, lesiones, alineaciones ni descanso.
 - **Solo Premier League.** No hay datos de otras ligas ni de copas.
-- **Informe de métricas incompleto.** Falta lo marcado en 4.4 (issue #8); la sección 9 y la presentación tienen que respetar ese límite.
+- **El informe de métricas es de validación, no de futuro.** La matriz y los ejemplos de 4.4 describen partidos ya jugados y fuera de fold; no explican por qué se acierta o se falla en cada partido nuevo.
