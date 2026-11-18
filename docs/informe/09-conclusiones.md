@@ -13,7 +13,9 @@ Cada persona escribe su entrada en su apartado: **4–6 líneas**, con un límit
 
 ## 9.2 Carla · Modelos y métricas
 
-*Pendiente: la escribe Carla.*
+- **Límite:** el modelo final acierta poco (F1 macro 0,172). Con ocho features de forma y goles, el techo está en los datos, no en el algoritmo.
+- **Aprendizaje:** la accuracy engaña con clases desbalanceadas: predecir siempre la clase 5 da 0,443. Por eso decidimos con F1 macro y la misma validación para todos los modelos.
+- **Aprendizaje:** controlar el sobreajuste vale la pena. El gap bajó de 0,505 a 0,0496 perdiendo solo 0,008 de F1 macro.
 
 ## 9.3 Eva · App, base de datos, despliegue y MLOps
 
@@ -25,4 +27,7 @@ Cada persona escribe su entrada en su apartado: **4–6 líneas**, con un límit
 
 ## 9.4 Mariana · Red neuronal, MLOps y producto
 
-*Pendiente: la escribe Mariana.*
+- **Límite:** la red neuronal se comparó con una sola temporada y quedó por debajo de los árboles (F1 macro 0,129 frente a 0,180). Próximo paso: repetirla con las 9 temporadas.
+- **Límite:** el ciclo de MLOps (drift, promoción y despliegue) funciona, pero es manual.
+- **Aprendizaje:** más accuracy no es un modelo mejor: la red acierta más porque se pega a la clase 5.
+- **Aprendizaje:** el producto promete un tipo de resultado, no el marcador, y eso hay que dejarlo claro a quien lo usa.
