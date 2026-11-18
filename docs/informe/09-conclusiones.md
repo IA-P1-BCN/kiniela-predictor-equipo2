@@ -6,7 +6,10 @@ Cada persona escribe su entrada en su apartado: **4–6 líneas**, con un límit
 
 ## 9.1 Anna · Datos, target y features
 
-*Pendiente: la escribe Anna.*
+- **Límite:** solo usamos resultados y goles de la Premier League. No hay lesiones, alineaciones, descanso entre partidos ni cuotas, y el historial se reinicia en cada temporada. Por eso las primeras jornadas no se pueden predecir: se descartan 185 de 3.420 partidos. Próximo paso: aprovechar la forma de la temporada anterior y añadir variables que se conocen antes del partido, como el descanso.
+- **Límite:** la regla del target es muy sensible a un gol: en 2023-24 hubo 80 partidos de 3 goles y otros 80 de 4. Además, la clase 4 sigue siendo la más rara (7,9 %, 245 partidos útiles), así que es la que peor se aprende.
+- **Aprendizaje:** el problema era la cantidad de datos más que el modelo. Con una temporada había 26 partidos útiles de la clase 4; con nueve, 245, y fue lo que permitió que el modelo final superara al provisional.
+- **Aprendizaje:** una fuga de datos puede venir de algo tan pequeño como el formato de fecha. Ordenar `dd/mm/aaaa` como texto metía partidos futuros en el «pasado», y la temporada 2016-17 trae el año con dos cifras. Ahora las fechas se convierten antes de ordenar, y si se vuelve a meter la fuga fallan 9 tests.
 
 ## 9.2 Carla · Modelos y métricas
 
