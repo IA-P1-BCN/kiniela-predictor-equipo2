@@ -398,3 +398,14 @@
 - **Rechazado o cambiado, y por qué:** editar `02-modelos.md`, `04-mlops-y-cierre.md` y `docs/presentacion-negocio/`, porque cada parte es de su autora.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** el agente no pudo abrir Canva (pide sesión), así que Eva exportó el PDF y el agente lo leyó por partes. Con el PDF se vio que el archivo tiene solo la presentación de negocio, no la técnica, y se corrigió el README. El agente comparó las cifras del PDF con los datos: «~44 % de clase 5» y «26 partidos de clase 4» son correctos para 2023-24.
 - **Revisión humana:** pendiente en el PR.
+
+### #18 Dailies del 17/11 y 18/11
+
+- **Fecha:** 2026-11-18
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «chequea si falta alguna tarea y los PR… completa las dailies de todo el equipo».
+- **Qué generó el agente:** la columna «Resultado» de la daily del 17/11, con lo que consta en el repositorio, y la daily del 18/11 (presentación según la estructura de la entrega, recorte a 19 diapositivas, bloqueo del PR #77 y secciones del informe que siguen hablando del modelo de prueba).
+- **Aceptado:** marcar como propuesta lo que no consta en el repo, en lugar de inventarlo.
+- **Rechazado o cambiado, y por qué:** nada.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** el bloqueo del PR #77 (LightGBM fuera de `requirements.txt`) se comprobó cargando el modelo sin LightGBM; la carga falla con `ModuleNotFoundError`.
+- **Revisión humana:** pendiente en el PR.
