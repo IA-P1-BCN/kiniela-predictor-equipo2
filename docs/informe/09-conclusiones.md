@@ -13,8 +13,6 @@ Cada persona escribe su entrada en su apartado: **4–6 líneas**, con un límit
 
 ## 9.2 Carla · Modelos y métricas
 
-*Redactada por Eva el 18/11 a partir de la [sección 4](04-modelos-y-metricas.md), a falta de la entrada de Carla; Carla puede corregirla.*
-
 - **Límite:** incluso el modelo final acierta poco en términos absolutos: F1 macro 0,172 y accuracy 0,179. La clase 1 (victoria local ajustada) apenas se recupera (recall 0,098) y la confusión más frecuente es 5 → 4 (288 partidos). Con ocho features de forma y goles, el techo está en los datos, no en el algoritmo.
 - **Límite:** en la comparación de una temporada, Random Forest (0,180) y XGBoost (0,177) se separan 0,003, mucho menos que la desviación entre folds. Esa tabla no basta para elegir; la decisión se apoyó en las 9 temporadas y en el control de sobreajuste.
 - **Aprendizaje:** la accuracy engaña con clases desbalanceadas. La referencia saca 0,443 prediciendo siempre la clase 5. Decidir con F1 macro y validar todos los modelos con el mismo `stratified_cv()` es lo que hace comparables las tablas.
@@ -29,8 +27,6 @@ Cada persona escribe su entrada en su apartado: **4–6 líneas**, con un límit
 - **Aprendizaje:** medir antes de publicar. Con una temporada, el modelo optimizado no superaba al provisional; con nueve, el F1 macro se dobló (0,172 frente a 0,080). Y los tests deben ejecutarse con las mismas dependencias que producción: en el PR #77, quitar LightGBM del runtime habría roto la carga del modelo con el CI en verde.
 
 ## 9.4 Mariana · Red neuronal, MLOps y producto
-
-*Redactada por Eva el 18/11 a partir de las secciones [1](01-problema.md), [5](05-red-neuronal.md) y [7a](07a-mlops-flujo-y-drift.md), a falta de la entrada de Mariana; Mariana puede corregirla.*
 
 - **Límite:** la red neuronal se comparó con una sola temporada (359 partidos) y quedó por debajo de los árboles (F1 macro 0,129 frente a 0,180 del Random Forest). No se repitió con las 9 temporadas del modelo final. Próximo paso: repetir el comando de la sección 5.3 con el CSV de 9 temporadas.
 - **Límite:** el ciclo de MLOps existe, pero es manual: drift con PSI, `promote` con una regla fija, commit del modelo y despliegue a mano. Para un uso real habría que automatizarlo.
