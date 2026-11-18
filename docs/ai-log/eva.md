@@ -398,3 +398,14 @@
 - **Rechazado o cambiado, y por qué:** editar `02-modelos.md`, `04-mlops-y-cierre.md` y `docs/presentacion-negocio/`, porque cada parte es de su autora.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** el agente no pudo abrir Canva (pide sesión), así que Eva exportó el PDF y el agente lo leyó por partes. Con el PDF se vio que el archivo tiene solo la presentación de negocio, no la técnica, y se corrigió el README. El agente comparó las cifras del PDF con los datos: «~44 % de clase 5» y «26 partidos de clase 4» son correctos para 2023-24.
 - **Revisión humana:** pendiente en el PR.
+
+### #17 Sección 6 al día, presentación definitiva y conclusiones
+
+- **Fecha:** 2026-11-18
+- **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
+- **Prompt clave:** «escribe mi parte [de las conclusiones] y actualiza el link de la presentación en el repo, usaremos la versión corta».
+- **Qué generó el agente:** la sección 6 del informe al día (modelo final en producción desde el 16/11, modelo provisional solo como respaldo, 234 tests y límites actuales); el enlace a la presentación definitiva de 19 diapositivas en `docs/presentacion/README.md` y en el índice del informe, con el reparto por persona; y las líneas de Eva para la sección 9, en un comentario de la issue #17 para que Mariana las compile.
+- **Aceptado:** dejar el enlace de Canva como primer borrador, sustituido por la presentación definitiva.
+- **Rechazado o cambiado, y por qué:** escribir directamente en `09-conclusiones.md`, porque la compila Mariana.
+- **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno; la cifra de tests se comprobó con `pytest --co` (234).
+- **Revisión humana:** pendiente en el PR.

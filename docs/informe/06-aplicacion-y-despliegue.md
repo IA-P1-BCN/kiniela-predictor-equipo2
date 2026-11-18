@@ -1,6 +1,6 @@
 # 6. Aplicación, base de datos y despliegue
 
-**Autora:** Eva (App & Backend Lead) · **Issues:** #9, #10, #11, #12 y #36 · **Estado a 13/11/2026**
+**Autora:** Eva (App & Backend Lead) · **Issues:** #9, #10, #11, #12, #35 y #36 · **Estado a 18/11/2026**
 
 Esta parte convierte el modelo en un producto: una aplicación web que cualquiera puede usar para predecir la clase de un partido, que guarda cada predicción y la opinión de quien la usa, y que está desplegada en la nube.
 
@@ -13,8 +13,8 @@ flowchart LR
   U[Persona usuaria] --> APP["App Streamlit<br/>app/"]
   APP --> PRED["load_predictor()<br/>contrato Predictor"]
   APP --> STO["storage/<br/>predicciones y feedback"]
-  PRED -->|si existe| M[(models/kiniela_model.joblib)]
-  PRED -->|si no| REF[Modelo de prueba]
+  PRED -->|modelo final| M[(models/kiniela_model.joblib)]
+  PRED -->|si faltara el archivo| REF[Modelo provisional]
   STO --> DB[("PostgreSQL (Neon)<br/>o SQLite en local")]
   STO --> EXP["export<br/>datos para reentrenar"]
 ```
@@ -22,7 +22,7 @@ flowchart LR
 | Capa | Dónde | Qué hace |
 | --- | --- | --- |
 | Interfaz | `app/` | Solo pantalla: dos páginas (Predecir e Historial), con caché de recursos |
-| Predicción | `src/kiniela/models/predict.py` | Contrato `Predictor`, carga del modelo y modelo de prueba |
+| Predicción | `src/kiniela/models/predict.py` y `final.py` | Contrato `Predictor`, carga del modelo final y modelo provisional de respaldo |
 | Catálogo | `src/kiniela/data/catalog.py` | Equipos y clases del dataset, con valores de respaldo |
 | Persistencia | `src/kiniela/storage/` | Conexión, tablas, operaciones y export para reentrenar |
 | Empaquetado | `Dockerfile`, `docker-compose.yml` | Imagen de la app y entorno local con PostgreSQL |
@@ -50,7 +50,15 @@ class Predictor(Protocol):
     def predict(self, home_team: str, away_team: str) -> list[float]: ...  # 6 probabilidades
 ```
 
-`load_predictor()` carga `models/kiniela_model.joblib` si existe y, si no, un **modelo de prueba** que devuelve el reparto de clases observado en el dataset (por ejemplo, 43,7 % para la clase 5). La app lo indica con un aviso visible. Cuando el modelo final cumpla el contrato (#35, [`docs/model-contract.md`](../model-contract.md)), se conectará **sin cambiar el código de la app**.
+Con ese contrato, la app se desplegó primero con un **modelo provisional** (`reference-class-frequencies`), que devuelve siempre el reparto de clases observado (por ejemplo, 43,7 % para la clase 5), y lo indicaba con un aviso visible.
+
+**Desde el 16/11/2026, la app usa el modelo final** (#35): `tuned-xgb-2026-11-16`, un XGBoost con los hiperparámetros de la #7, entrenado con 9 temporadas (3.235 partidos útiles). Su F1 macro de validación es 0,172, frente a 0,080 del modelo provisional con los mismos datos. Entró **sin cambiar el código de la app**:
+
+- `MatchPredictor` (`src/kiniela/models/final.py`) cumple el contrato y calcula las features de un partido nuevo con **la misma función** que el entrenamiento (`build_match_features`), para evitar el *training-serving skew*.
+- Solo ofrece los equipos de la última temporada y rechaza los que no conoce.
+- El modelo y su ficha (`models/model_card.json`) se versionan como excepción documentada, porque Render construye la imagen desde el repositorio ([`docs/model-contract.md`](../model-contract.md)).
+
+`load_predictor()` carga `models/kiniela_model.joblib`; el modelo provisional solo entraría si faltara ese archivo. Cada predicción guarda la versión del modelo que la hizo.
 
 ### Robustez
 
@@ -124,7 +132,7 @@ Detalle: [`docs/deploy.md`](../deploy.md).
 
 ## 6.7 Calidad y pruebas
 
-- **123 tests en CI** en cada PR (13/11/2026), de los que 64 cubren esta parte: predicción y contrato, catálogo, base de datos, export y app.
+- **234 tests en CI** en cada PR (18/11/2026). Los de esta parte cubren predicción y contrato, modelo final (incluida su carga en otro proceso), catálogo, base de datos, export, A/B testing y app.
 - La app se prueba **de punta a punta sin navegador** con `AppTest` de Streamlit: predicción, entradas inválidas, feedback e historial.
 - **Probado además a mano:**
   - la base de datos contra un **PostgreSQL 17 real** (driver, JSON, fechas en UTC y restricciones);
@@ -135,7 +143,8 @@ Detalle: [`docs/deploy.md`](../deploy.md).
 
 | Límite | Efecto | Cómo se resolvería |
 | --- | --- | --- |
-| Modelo de prueba hasta la #35 | La app devuelve las mismas probabilidades para cualquier partido | Conectar el modelo final que cumpla el contrato |
+| El modelo está fijo desde el 16/11 | No aprende solo del feedback | Proceso manual a propósito: export, drift, reentrenar y promoción con A/B testing ([sección 7b](07b-mlops-feedback-ab.md)) |
+| El feedback depende de la gente | Hoy hay muy pocas respuestas, y nadie verifica la clase real | Rellenar la clase real con los resultados oficiales de la misma fuente |
 | Render gratis duerme la app tras 15 minutos | La primera visita tarda alrededor de un minuto | Abrirla antes de una demo, o pasar a un plan de pago |
 | Despliegue manual | Cada versión nueva se lanza con *Manual Deploy* | Que la organización de GitHub autorice la app de Render |
 | Sin migraciones de esquema | Un cambio en las tablas exige recrearlas | Añadir Alembic |
