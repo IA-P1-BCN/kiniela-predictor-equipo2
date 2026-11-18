@@ -426,8 +426,8 @@
 - **Fecha:** 2026-11-18
 - **Herramienta y modelo:** Claude Code, Claude Opus 5.5.
 - **Prompt clave:** «compila la sección 9 con las líneas de todas y pon al día las secciones 1, 5 y 7a», con la entrega a las 23:59.
-- **Qué generó el agente:** la sección 9 compilada a partir de las secciones 1 a 8 y de las aportaciones de la #17 (qué se consiguió, límites por parte, aprendizajes y próximos pasos), y las secciones 1, 5 y 7a sin la frase «modelo de prueba hasta promocionar»; la 5 decía además que el modelo de la app era el Random Forest, y es el XGBoost ajustado.
-- **Aceptado:** compilar desde lo que ya está escrito y medido, sin cifras nuevas.
-- **Rechazado o cambiado, y por qué:** recalcular la red neuronal con 9 temporadas: no daba tiempo antes de la entrega; queda como límite y próximo paso.
+- **Qué generó el agente:** la sección 9 con un apartado por persona y la entrada de Eva escrita, y las secciones 1, 5 y 7a sin la frase «modelo de prueba hasta promocionar»; la 5 decía además que el modelo de la app era el Random Forest, y es el XGBoost ajustado.
+- **Aceptado:** dejar los apartados de Anna, Carla y Mariana pendientes para que cada una escriba el suyo.
+- **Rechazado o cambiado, y por qué:** el primer borrador compilaba las conclusiones de todas a partir del informe. Eva lo rechazó: cada persona escribe su propia entrada. Tampoco se recalculó la red neuronal con 9 temporadas, por falta de tiempo.
 - **Errores o alucinaciones del agente y cómo se corrigieron:** ninguno detectado. Son archivos de Mariana: Eva lo pidió por el plazo, y Mariana lo revisa en el PR.
 - **Revisión humana:** pendiente en el PR.
