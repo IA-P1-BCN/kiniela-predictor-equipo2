@@ -11,7 +11,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     STREAMLIT_BROWSER_GATHER_USAGE_STATS=false \
     PORT=8501
 
-# LightGBM needs the OpenMP runtime, which the slim image does not include
+# XGBoost and LightGBM need the OpenMP runtime, which the slim image does not include
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libgomp1 \
     && rm -rf /var/lib/apt/lists/*

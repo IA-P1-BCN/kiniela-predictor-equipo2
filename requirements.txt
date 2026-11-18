@@ -1,12 +1,12 @@
-# Runtime dependencies: what the app and the model need to predict.
-# This is what the Docker image installs. Development tools go in requirements-dev.txt.
-pandas>=2.2
-numpy>=1.26
-scikit-learn>=1.5
-xgboost>=2.1
-lightgbm>=4.5
-streamlit>=1.50
-joblib>=1.4
-# Predictions and feedback storage: SQLite locally, PostgreSQL (Neon) in production
-sqlalchemy>=2.0
-psycopg[binary]>=3.2
+# Runtime: what the Docker image installs to serve predictions.
+# Upper bounds keep models/kiniela_model.joblib loadable; bump only with a re-saved model.
+pandas>=2.2,<3
+numpy>=1.26,<3
+scikit-learn>=1.5,<2
+xgboost>=2.1,<4
+# joblib loads MatchPredictor → final.py → tuning.py → ensembles.py, which imports LightGBM at module level.
+lightgbm>=4.5,<5
+streamlit>=1.50,<2
+joblib>=1.4,<2
+sqlalchemy>=2.0,<3
+psycopg[binary]>=3.2,<4

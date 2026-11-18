@@ -64,11 +64,17 @@ st.title("Historial")
 st.caption("Las últimas predicciones y cuánto acierta el modelo según el feedback de las personas usuarias.")
 
 try:
+    predictor = get_predictor()
+    router = get_router()
+except (FileNotFoundError, TypeError, ValueError) as error:
+    st.error(f"No se ha podido cargar el modelo: {error}")
+    st.stop()
+
+try:
     with session_scope(get_db_engine()) as session:
-        current_version = get_predictor().version
+        current_version = predictor.version
         overall = feedback_stats(session)
         current = feedback_stats(session, model_version=current_version)
-        router = get_router()
         comparison = comparison_rows(session, router) if router.candidate is not None else []
         rows = [
             {

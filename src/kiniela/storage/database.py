@@ -34,6 +34,11 @@ def resolve_database_url(url: str | None = None) -> str:
     """
     url = url or os.environ.get("DATABASE_URL", "").strip()
     if not url:
+        # Render wipes the instance disk on every deploy; SQLite would look fine and lose rows.
+        if os.environ.get("RENDER"):
+            raise RuntimeError(
+                "DATABASE_URL is required on Render; the instance disk is ephemeral."
+            )
         DEFAULT_SQLITE_PATH.parent.mkdir(parents=True, exist_ok=True)
         return f"sqlite:///{DEFAULT_SQLITE_PATH.as_posix()}"
     for prefix in ("postgres://", "postgresql://"):

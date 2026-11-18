@@ -88,7 +88,7 @@ Detalle completo: [`docs/database.md`](../database.md).
 
 ## 6.4 Datos para reentrenar (#36)
 
-`python -m kiniela.storage.export` añade a `data/raw/feedback/labelled_matches.csv` los partidos cuyo feedback incluye la **clase real**. Lo hace con las columnas del dataset histórico (`HomeTeam`, `AwayTeam`, `Date`) y la etiqueta `target`, para unirlos al histórico y recalcular las features sin fuga de datos.
+`python -m kiniela.storage.export` añade a `data/raw/feedback/labelled_matches.csv` los partidos cuyo feedback incluye la **clase real**. Lleva `HomeTeam`, `AwayTeam`, `target` y `predicted_at` (momento de la predicción, no el día del partido). No se pega al histórico hasta poner `Date` del encuentro.
 
 - **Es incremental:** no repite partidos ya exportados. Se hizo comparando con el CSV existente, no añadiendo una columna a la tabla, porque sin migraciones la tabla de producción no la tendría.
 - **Admite filtros** por fecha (`--since`) y por versión de modelo.

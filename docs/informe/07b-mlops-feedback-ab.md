@@ -38,7 +38,7 @@ PYTHONPATH=src python -m kiniela.storage.export
 ```
 
 - Saca de la base de datos (la de producción si `DATABASE_URL` apunta a Neon) los partidos con clase real, y los añade a `data/raw/feedback/labelled_matches.csv`.
-- **Mismo formato que el histórico.** Usa las columnas `HomeTeam`, `AwayTeam` y `Date`, y la etiqueta se llama `target`, como en el entrenamiento. Así se unen al histórico y pasan por el mismo cálculo de features, solo con partidos anteriores.
+- **Equipos y etiqueta como el histórico.** `HomeTeam`, `AwayTeam` y `target` coinciden con el entrenamiento. La marca de tiempo es `predicted_at` (cuándo se predijo), no la fecha del partido: no se une al histórico hasta rellenar `Date` a mano.
 - **Incremental.** No repite ningún `prediction_id` que ya esté en el CSV, así que se puede lanzar cada día sin duplicar partidos. Admite filtros por fecha (`--since`) y por versión de modelo (`--model-version`).
 - **Fuera de git.** El CSV va a `data/raw/`, que no se versiona: los datos recogidos no acaban en el repositorio.
 

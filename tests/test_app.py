@@ -75,6 +75,18 @@ def test_invalid_input_shows_a_message_and_saves_nothing(database_url, home, awa
     assert saved_predictions(database_url) == []
 
 
+def test_session_stops_after_the_prediction_limit(database_url, monkeypatch):
+    import kiniela.config as config
+
+    monkeypatch.setattr(config, "MAX_PREDICTIONS_PER_SESSION", 1)
+    app = start_app()
+    predict(app, "arsenal", "chelsea")
+    assert len(saved_predictions(database_url)) == 1
+    predict(app, "liverpool", "chelsea")
+    assert "límite de predicciones" in app.error[0].value
+    assert len(saved_predictions(database_url)) == 1
+
+
 def test_example_match_predicts_shows_six_probabilities_and_saves(database_url):
     app = start_app()
     app.button[0].click().run()  # "Usar un partido de ejemplo"
@@ -166,6 +178,17 @@ def test_history_page_compares_both_models_in_an_ab_test(candidate_in_ab_test, d
 def committed_model(database_url, monkeypatch):
     """Use the final model in models/kiniela_model.joblib, as in production (#35)."""
     monkeypatch.setattr(resources, "load_predictor", load_predictor)
+
+
+def test_final_model_selectors_use_the_model_teams(committed_model, database_url):
+    from kiniela.models.predict import DEFAULT_MODEL_PATH, load_predictor
+
+    app = start_app()
+    offered = set(app.selectbox(key="home_team").options)
+    expected = {resources.team_label(team) for team in load_predictor(DEFAULT_MODEL_PATH).teams}
+    assert offered == expected
+    assert "Luton" in offered
+    assert "Ipswich" not in offered
 
 
 def test_app_uses_the_final_model_without_the_test_model_warning(committed_model, database_url):

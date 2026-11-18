@@ -38,7 +38,7 @@ Solo las predicciones con feedback **y** clase real. Un «falló» sin clase rea
 | Columna | Qué es |
 | --- | --- |
 | `prediction_id` | Identificador de la predicción; evita duplicados |
-| `Date` | Día de la predicción (UTC) |
+| `predicted_at` | Cuándo se hizo la predicción (UTC). **No** es la fecha del partido |
 | `HomeTeam`, `AwayTeam` | Equipos, con los mismos nombres que el dataset histórico |
 | `target` | **Clase real (0-5)**: la etiqueta para entrenar. Mismo nombre de columna que usa `kiniela.models.train` |
 | `predicted_class` | Lo que dijo el modelo |
@@ -49,7 +49,7 @@ Solo las predicciones con feedback **y** clase real. Un «falló» sin clase rea
 ## Cómo se usa para reentrenar
 
 1. Ejecutar el export.
-2. Añadir las filas al histórico de partidos. Tienen `HomeTeam`, `AwayTeam` y `Date`, como el dataset de la #1.
+2. Poner a mano la fecha **del partido** (`Date`) antes de unir las filas al histórico de la #1. `predicted_at` no sirve como `Date`.
 3. Calcular las features con el feature engineering (#3, #34). Las features de un partido se calculan con los partidos anteriores, así que las filas nuevas siguen sin fuga de datos.
 4. Entrenar y validar como en las #5–#7.
 5. Si el modelo nuevo mejora, promocionarlo (#35 y #37).
@@ -59,4 +59,4 @@ Solo las predicciones con feedback **y** clase real. Un «falló» sin clase rea
 ## Precauciones
 
 - **Calidad de la etiqueta.** La clase real la escribe una persona. Antes de reentrenar, conviene cruzarla con el resultado real del partido cuando esté en football-data.co.uk.
-- **Fecha.** `Date` es el día en que se hizo la predicción, no el del partido. Mientras la app no pida la fecha del partido, hay que revisarla antes de mezclar las filas con el histórico.
+- **Fecha.** El export no incluye la fecha del partido (la app no la pide). No concatenar el CSV al histórico hasta rellenar `Date` con el día real del encuentro.

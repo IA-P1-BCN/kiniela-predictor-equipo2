@@ -1,10 +1,10 @@
 """Export labelled feedback for future retraining (issue #36).
 
 Every prediction whose feedback includes the real class becomes a labelled match: the
-teams, the date, the real class (``target``) and where it came from (prediction id,
-model version, predicted class). The columns follow the historical dataset
-(``HomeTeam``, ``AwayTeam``, ``Date``) so the rows can be appended to it and go through
-the same feature engineering before training.
+teams, when it was predicted (``predicted_at``, not the match day), the real class
+(``target``) and where it came from (prediction id, model version, predicted class).
+Do not append this CSV to the football-data histórico as if ``predicted_at`` were
+``Date``: the app never asked for the match date.
 
 The export is incremental: rows whose ``prediction_id`` is already in the output file
 are skipped, so running it every day never duplicates a match.
@@ -34,7 +34,7 @@ DEFAULT_OUTPUT = PROJECT_ROOT / "data" / "raw" / "feedback" / "labelled_matches.
 
 EXPORT_COLUMNS = [
     "prediction_id",
-    "Date",
+    "predicted_at",
     "HomeTeam",
     "AwayTeam",
     TARGET_COLUMN,
@@ -70,7 +70,7 @@ def labelled_feedback(
     rows = [
         {
             "prediction_id": prediction.id,
-            "Date": prediction.created_at.date().isoformat(),
+            "predicted_at": prediction.created_at.isoformat(),
             "HomeTeam": prediction.home_team,
             "AwayTeam": prediction.away_team,
             TARGET_COLUMN: feedback.actual_class,

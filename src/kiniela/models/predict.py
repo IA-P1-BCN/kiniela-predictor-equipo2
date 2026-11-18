@@ -107,4 +107,5 @@ def predicted_class(probabilities: list[float]) -> int:
     total = sum(probabilities)
     if abs(total - 1) > 0.01:
         raise ValueError("Las probabilidades deben sumar aproximadamente 1.")
+    # Ties keep the lowest class index (0 before 5). XGBoost almost never ties.
     return max(range(N_CLASSES), key=probabilities.__getitem__)
