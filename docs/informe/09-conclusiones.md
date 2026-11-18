@@ -13,10 +13,9 @@ Cada persona escribe su entrada en su apartado: **4–6 líneas**, con un límit
 
 ## 9.2 Carla · Modelos y métricas
 
-- **Límite:** incluso el modelo final acierta poco en términos absolutos: F1 macro 0,172 y accuracy 0,179. La clase 1 (victoria local ajustada) apenas se recupera (recall 0,098) y la confusión más frecuente es 5 → 4 (288 partidos). Con ocho features de forma y goles, el techo está en los datos, no en el algoritmo.
-- **Límite:** en la comparación de una temporada, Random Forest (0,180) y XGBoost (0,177) se separan 0,003, mucho menos que la desviación entre folds. Esa tabla no basta para elegir; la decisión se apoyó en las 9 temporadas y en el control de sobreajuste.
-- **Aprendizaje:** la accuracy engaña con clases desbalanceadas. La referencia saca 0,443 prediciendo siempre la clase 5. Decidir con F1 macro y validar todos los modelos con el mismo `stratified_cv()` es lo que hace comparables las tablas.
-- **Aprendizaje:** controlar el sobreajuste cuesta poco y vale mucho. Con los parámetros por defecto el gap era 0,505; la rejilla con `GAP_THRESHOLD` lo bajó a 0,0496 a cambio de 0,008 de F1 macro, y si ninguna combinación cumple, la búsqueda falla en vez de entregar un modelo sobreajustado.
+- **Límite:** el modelo final acierta poco (F1 macro 0,172). Con ocho features de forma y goles, el techo está en los datos, no en el algoritmo.
+- **Aprendizaje:** la accuracy engaña con clases desbalanceadas: predecir siempre la clase 5 da 0,443. Por eso decidimos con F1 macro y la misma validación para todos los modelos.
+- **Aprendizaje:** controlar el sobreajuste vale la pena. El gap bajó de 0,505 a 0,0496 perdiendo solo 0,008 de F1 macro.
 
 ## 9.3 Eva · App, base de datos, despliegue y MLOps
 
@@ -28,7 +27,7 @@ Cada persona escribe su entrada en su apartado: **4–6 líneas**, con un límit
 
 ## 9.4 Mariana · Red neuronal, MLOps y producto
 
-- **Límite:** la red neuronal se comparó con una sola temporada (359 partidos) y quedó por debajo de los árboles (F1 macro 0,129 frente a 0,180 del Random Forest). No se repitió con las 9 temporadas del modelo final. Próximo paso: repetir el comando de la sección 5.3 con el CSV de 9 temporadas.
-- **Límite:** el ciclo de MLOps existe, pero es manual: drift con PSI, `promote` con una regla fija, commit del modelo y despliegue a mano. Para un uso real habría que automatizarlo.
-- **Aprendizaje:** una accuracy más alta no es un modelo mejor. La red acierta más que los árboles (0,354 frente a 0,228) porque se pega a la clase 5 y casi no ve las clases 0 y 4. Solo con la misma validación y F1 macro se ve.
-- **Aprendizaje:** el producto se define por lo que no promete: un tipo de resultado en 6 clases, no el marcador. Versionar el modelo y su ficha en git (la excepción de la #35) fue lo que permitió que el modelo llegara a producción.
+- **Límite:** la red neuronal se comparó con una sola temporada y quedó por debajo de los árboles (F1 macro 0,129 frente a 0,180). Próximo paso: repetirla con las 9 temporadas.
+- **Límite:** el ciclo de MLOps (drift, promoción y despliegue) funciona, pero es manual.
+- **Aprendizaje:** más accuracy no es un modelo mejor: la red acierta más porque se pega a la clase 5.
+- **Aprendizaje:** el producto promete un tipo de resultado, no el marcador, y eso hay que dejarlo claro a quien lo usa.
