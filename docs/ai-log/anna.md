@@ -135,3 +135,14 @@
   - Con `<=` en lugar de `<` fallan 9 tests.
   - `pytest` pasa entero.
 - **Revisión humana:** _pendiente_
+
+---
+
+### #17 Informe: mis conclusiones (sección 9.1)
+
+- **Fecha:** 2026-11-18
+- **Herramienta y modelo:** Claude Code (extensión de VS Code), Claude Opus 5.5.
+- **Prompt clave:** comprobar si estaba hecha mi parte de las conclusiones y, como faltaba, escribirla: 4–6 líneas con un límite real y un aprendizaje de datos, target y features.
+- **Qué generó el agente:** el apartado 9.1 de `docs/informe/09-conclusiones.md`, con dos límites (solo resultados y goles, con 185 partidos sin historial; la sensibilidad del target a un gol y la rareza de la clase 4) y dos aprendizajes (la cantidad de datos pesaba más que el modelo; una fuga de datos puede venir del formato de fecha). Solo cambia la línea «Pendiente» de mi apartado, con permiso; el resto del archivo es de Eva y Mariana y no se toca.
+- **Comprobación:** las cifras se recalcularon hoy con `download_premier_league_data`, `build_target` y `build_features` sobre las 9 temporadas: 3.420 partidos, 185 sin historial, clase 4 con el 7,9 % y 245 partidos útiles (26 con una temporada), y 80 partidos de 3 goles y 80 de 4 en 2023-24. Los 9 tests que fallan con `<=` son los de la sección 3. No repite lo que ya cuenta Eva en 9.3.
+- **Revisión humana:** _pendiente_
