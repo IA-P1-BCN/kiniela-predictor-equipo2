@@ -21,7 +21,7 @@ PYTHONPATH=src python -m kiniela.models.promote
 
 El script aplica la regla (F1 macro, gap < 0,05, feedback mínimo). Si el candidato gana, archiva el actual y deja el candidato como modelo de la app. Después hay que commitear `kiniela_model.joblib` y `model_card.json` y desplegar.
 
-Hasta que existan en el repo, la app usa un modelo de prueba (frecuencias de clase) y lo dice en pantalla. Así Eva pudo desplegar sin esperar al modelo final.
+Mientras no existían en el repo, la app usaba un modelo provisional (frecuencias de clase) y lo decía en pantalla. Así Eva pudo desplegar sin esperar al modelo final. Desde el 16/11 la app usa `tuned-xgb-2026-11-16`; el provisional solo entraría si faltara el archivo.
 
 El objeto tiene que cumplir el [contrato](../model-contract.md): `version` + `predict(local, visitante) → 6 probabilidades`.
 

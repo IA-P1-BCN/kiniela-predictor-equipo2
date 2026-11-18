@@ -64,11 +64,11 @@ La red está para:
 - dejar por escrito L2 y early stopping;
 - no vender una red que no se puede volver a entrenar.
 
-El modelo que se promociona a la app **no** es esta red: sigue el de Carla vía `python -m kiniela.models.promote`, hoy el Random Forest de este run. La red queda como línea neuronal; con más temporadas se puede repetir el comando.
+El modelo de la app **no** es esta red: es el XGBoost ajustado de Carla (`tuned-xgb-2026-11-16`, [sección 4](04-modelos-y-metricas.md)), entrenado con 9 temporadas y en producción desde el 16/11. La red queda como línea neuronal; con más temporadas se puede repetir el comando.
 
 ## 5.5 Límites
 
 - Sin búsqueda de arquitectura: más capas o dropout serían otra issue.
 - El early stopping usa un trozo del fold de train, no un conjunto extra de test.
 - Hay que repetir el comando de 5.3 cada vez que cambien las features o el CSV.
-- Hasta promocionar un `Predictor` con `python -m kiniela.models.promote` y commitear `kiniela_model.joblib`, la app usa el modelo de prueba y lo avisa (Eva, [sección 6](06-aplicacion-y-despliegue.md)).
+- Las cifras de esta sección son de una temporada (359 filas); el modelo final usa 3.235 de 9 temporadas. Repetir el comando de 5.3 con el CSV de 9 temporadas compararía la red en las mismas condiciones que el modelo final.

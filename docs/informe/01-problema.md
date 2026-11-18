@@ -42,7 +42,7 @@ Entregar un ciclo completo, no un notebook:
 ## 1.5 Qué no prometemos
 
 - No acertamos el marcador. Acertamos un **tipo** de resultado, y a veces mal: las clases están desbalanceadas (la 5 es frecuente).
-- Hasta promocionar un `models/kiniela_model.joblib` que cumpla el [contrato](../model-contract.md), la app usa un modelo de prueba (frecuencias de clase) y lo avisa.
+- El modelo de la app (`tuned-xgb-2026-11-16`, un XGBoost entrenado con 9 temporadas y en producción desde el 16/11) dobla a la referencia en F1 macro (0,172 frente a 0,080), pero su acierto absoluto sigue siendo bajo: el fútbol tiene mucho azar y un gol cambia la clase.
 - El plan gratuito de Render duerme la app a los 15 minutos; el primer clic puede tardar.
 
 El valor de negocio, hoy, es poder **usar** la predicción en la web, guardar si falló y tener un procedimiento para mejorar el modelo, no un porcentaje mágico de acierto.
