@@ -11,3 +11,10 @@ CLASS_NAMES: dict[int, str] = {
 
 N_CLASSES = len(CLASS_NAMES)
 RANDOM_STATE = 42
+
+# shortcut: per Streamlit session, not per IP. Tighten if the public URL is scraped.
+MAX_PREDICTIONS_PER_SESSION = 20
+
+# Fixed cross-validation scheme: every model (#5 to #8) trains and validates with
+# the same splitter and seed, so their metrics are directly comparable.
+CV_N_SPLITS = 5

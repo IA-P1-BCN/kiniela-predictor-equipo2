@@ -2,10 +2,12 @@
 
 Clasificación multiclase del tipo de resultado de un partido de fútbol para una kiniela. El modelo distingue seis situaciones, no solo local, empate o visitante.
 
+**App desplegada**: https://kiniela-predictor.onrender.com  
 **Repositorio**: https://github.com/IA-P1-BCN/kiniela-predictor-equipo2  
-**Organización**: [IA-P1-BCN](https://github.com/IA-P1-BCN)
+**Organización**: [IA-P1-BCN](https://github.com/IA-P1-BCN)  
+**Tablero**: [GitHub Projects](https://github.com/orgs/IA-P1-BCN/projects/56)
 
-Esta versión es la base del proyecto. No incluye dataset ni modelo entrenado.
+La app usa el modelo final (`models/kiniela_model.joblib`): un XGBoost entrenado con 9 temporadas de la Premier League (2015-16 a 2023-24). Sus métricas están en `models/model_card.json`.
 
 ## Clases
 
@@ -25,7 +27,7 @@ El umbral entre victoria clara y ajustada, y la precedencia de la clase 5, se ci
 | Persona | Rol |
 | --- | --- |
 | Anna | Scrum Master y Data & EDA Lead |
-| Cala | Modeling Lead |
+| Carla | Modeling Lead |
 | Eva | App & Backend Lead |
 | Mariana | Product Owner y MLOps & Neural Networks Lead |
 
@@ -45,13 +47,17 @@ La red neuronal se añade en la issue correspondiente, cuando el baseline ya sea
 ## Estructura
 
 ```text
-app/streamlit_app.py          Aplicación
+app/                          Aplicación Streamlit
+  streamlit_app.py            Entrada y navegación
+  resources.py                Modelo, base de datos y equipos (en caché)
+  views/                      Páginas: predecir e historial
 src/kiniela/                  Código reutilizable
   config.py                   Clases y semilla
   data/                       Carga y variable objetivo
   features/                   Feature engineering
   models/                     Entrenamiento y predicción
   monitoring/                 Data drift
+  storage/                    Predicciones y feedback (base de datos)
 notebooks/                    EDA, features y modelado
 data/raw/                     Datos de origen (no se versionan)
 data/processed/               Dataset de modelado (no se versiona)
@@ -64,22 +70,92 @@ docs/                         Backlog, tareas y dailies
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+source .venv/bin/activate          # Windows (Git Bash): source .venv/Scripts/activate
+pip install -r requirements-dev.txt
 pytest
 streamlit run app/streamlit_app.py
 ```
 
-La pantalla abre las seis clases. El botón de predicción permanece desactivado hasta que haya un modelo en `models/`.
+Las dependencias están en dos archivos:
+
+| Archivo | Contenido | Quién lo usa |
+| --- | --- | --- |
+| `requirements.txt` | Lo que necesitan la app y el modelo para predecir | La imagen Docker y el despliegue |
+| `requirements-dev.txt` | Lo anterior, más pytest, matplotlib, seaborn e ipykernel | Desarrollo local, notebooks y CI |
+
+Una librería nueva va en `requirements.txt` solo si la app la necesita para predecir. Si no, va en `requirements-dev.txt`.
+
+## Aplicación
+
+```bash
+streamlit run app/streamlit_app.py
+```
+
+Se abre en http://localhost:8501 y tiene dos páginas:
+
+| Página | Qué hace |
+| --- | --- |
+| **Predecir** | Eliges el equipo local y el visitante (o un partido de ejemplo), y la app muestra la clase predicha con su nombre y las probabilidades de las 6 clases. La predicción se guarda, y después puedes decir si acertó y cuál fue la clase real |
+| **Historial** | Las últimas 50 predicciones con su feedback, y el acierto según el feedback, para el modelo actual y para todos |
+
+- Si eliges un equipo que falta, o el mismo equipo dos veces, la app muestra un mensaje y no predice.
+- Si la base de datos falla, la predicción se muestra igualmente, con un aviso de que no se ha guardado.
+- **Modelo.** La app carga `models/kiniela_model.joblib`, que cumple el [contrato del modelo](docs/model-contract.md). Para entrenarlo de nuevo: `PYTHONPATH=src python -m kiniela.models.final`. Si el archivo no existe, la app usa un modelo de prueba (el reparto de clases observado) y lo avisa en pantalla.
+- Los equipos salen del dataset de `data/processed/`. Si no está, como dentro de Docker, se usan los 20 equipos de la Premier 2023-24.
 
 ## Docker
 
 ```bash
 docker build -t kiniela-predictor .
-docker run --rm -p 8501:8501 kiniela-predictor
+docker run --rm -p 8501:8501 --name kiniela kiniela-predictor
 ```
 
 La app queda en http://localhost:8501.
+
+| Comando | Para qué |
+| --- | --- |
+| `docker ps` | Ver si el contenedor está en marcha y si el healthcheck lo marca como `healthy` |
+| `docker logs -f kiniela` | Ver los logs de la app |
+| `docker stop kiniela` | Pararlo |
+| `docker run --rm -p 8080:8080 -e PORT=8080 kiniela-predictor` | Cambiar el puerto, como hacen los servicios en la nube |
+
+Detalles de la imagen:
+
+- Parte de `python:3.12-slim` e instala solo `requirements.txt`.
+- La app se ejecuta con un usuario sin privilegios, no como root.
+- No incluye `.env`, datos, notebooks, tests ni entornos virtuales (ver `.dockerignore`). Los secretos se pasan al arrancar, con `-e` o `--env-file .env`.
+- De `models/` solo entran el modelo promocionado (`kiniela_model.joblib`), el candidato del A/B testing (`candidate_model.joblib`) y sus fichas, si existen.
+
+### Docker Compose (app + PostgreSQL)
+
+Para probar en local igual que en producción, con PostgreSQL en vez de SQLite:
+
+```bash
+docker compose up --build      # http://localhost:8501
+docker compose down            # parar (los datos se quedan)
+```
+
+## Despliegue
+
+**URL pública:** https://kiniela-predictor.onrender.com (rama `dev`; si lleva un rato sin visitas, tarda alrededor de un minuto en despertar)
+
+La app corre en Render (Docker, plan gratuito) y guarda las predicciones en PostgreSQL de Neon. Variables de entorno:
+
+| Variable | Para qué | Dónde se define |
+| --- | --- | --- |
+| `DATABASE_URL` | Conexión a PostgreSQL (Neon) | Panel de Render; es secreta, nunca va en el repo |
+| `PORT` | Puerto de la app | Lo pone Render |
+
+Pasos, limitaciones del plan gratuito y cómo cambiar a `main`: [docs/deploy.md](docs/deploy.md).
+
+## Base de datos
+
+La app guarda cada predicción y el feedback de la persona usuaria.
+
+- **En local** no hay que configurar nada: se usa SQLite en `data/kiniela.db`.
+- **En producción** se usa PostgreSQL en Neon, con la variable `DATABASE_URL`. Las variables necesarias están en `.env.example`, sin valores reales.
+
+El esquema y las métricas en tiempo real están en [docs/database.md](docs/database.md). Los comandos se lanzan desde la raíz del repo con `PYTHONPATH=src` delante, porque el paquete vive en `src/`. Para sacar los partidos con su clase real y reentrenar: `python -m kiniela.storage.export` ([docs/retraining.md](docs/retraining.md)). Para comparar las features de entrenamiento con un lote nuevo: `python -m kiniela.monitoring.drift` ([docs/drift.md](docs/drift.md)). Para probar un modelo nuevo junto al actual y promocionarlo si gana: `python -m kiniela.models.promote` ([docs/ab-testing.md](docs/ab-testing.md)).
 
 ## Tests
 
@@ -87,11 +163,22 @@ La app queda en http://localhost:8501.
 pytest
 ```
 
-Hoy cubren el catálogo de clases, la validación de goles y la elección de la clase más probable. El etiquetado completo sigue pendiente de la regla de negocio.
+Cubren el catálogo de clases, el etiquetado, la validación del dataset (esquema, nulos, rangos y `target` 0-5), la predicción, un caso fijo de métricas, la base de datos y la app de punta a punta. La app se prueba con `AppTest` de Streamlit, sin navegador: predicción, entradas inválidas, feedback e historial.
 
 ## Documentación de trabajo
 
 - [Issues](docs/ISSUES.md)
 - [Asignación de tareas](docs/ASIGNACION_TAREAS.md)
-- [Plantilla de daily](docs/DAILY_TEMPLATE.md)
+- [Dailies](docs/dailies/README.md) y su [plantilla](docs/DAILY_TEMPLATE.md)
+- [Base de datos](docs/database.md)
+- [Despliegue](docs/deploy.md)
+- [Contrato del modelo](docs/model-contract.md)
+- [Datos para reentrenar](docs/retraining.md)
+- [Informe técnico](docs/informe/README.md)
+- [Guion de la presentación técnica](docs/presentacion/README.md)
+- [Presentación de negocio](docs/presentacion-negocio/README.md)
+- [Operación de modelos (MLOps)](docs/mlops.md)
+- [Data drift](docs/drift.md)
+- [A/B testing y promoción del modelo](docs/ab-testing.md)
+- [Informe de métricas del modelo (#8)](docs/metrics-report.md), generable con `PYTHONPATH=src python -m kiniela.models.report`
 - Plantilla de GitHub: `.github/ISSUE_TEMPLATE/tarea.md`

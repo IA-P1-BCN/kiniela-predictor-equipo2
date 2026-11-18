@@ -9,7 +9,7 @@
 | Persona | Hecho |
 | --- | --- |
 | Anna | |
-| Cala | |
+| Carla | |
 | Eva | |
 | Mariana | |
 
@@ -18,7 +18,7 @@
 | Persona | Siguiente paso | Issue |
 | --- | --- | --- |
 | Anna | | |
-| Cala | | |
+| Carla | | |
 | Eva | | |
 | Mariana | | |
 

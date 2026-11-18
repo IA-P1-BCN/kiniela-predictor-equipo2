@@ -1,2 +1,5 @@
 # Eva es la jefa y revisa cualquier cambio que entre en main.
 * @miskybox
+
+# joblib is pickle: loading it runs code. Eva must see model file diffs.
+models/*.joblib @miskybox

@@ -25,7 +25,25 @@ models/*
 *.joblib
 *.h5
 *.keras
+# Documented exception (issue #35): the final model of the app and its card are
+# versioned, because Render builds the Docker image from the repo
+!models/kiniela_model.joblib
+!models/model_card.json
 
 dist/
 build/
 *.egg-info/
+
+# Personal AI assistant settings: each person keeps their own, never versioned
+CLAUDE.md
+CLAUDE.local.md
+GEMINI.md
+.claude/settings.local.json
+
+# Personal scratch files and accidental nested clones of this repo
+scratchpad/
+kiniela-predictor-equipo2/
+
+# Local SQLite databases (predictions and feedback)
+*.db
+*.sqlite3
